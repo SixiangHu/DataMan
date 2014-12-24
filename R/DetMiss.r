@@ -5,13 +5,11 @@
 #' @param data This could be data frame, matrix or a vector.
 #' @keywords Missing Value
 #' @export A data frame with summary info about missing value
-#' @seealso DetMiss
-#' @author Sixiang.Hu.at.Gmail.Com
+#' @seealso PopMiss
+#' @author Sixiang Hu
 #' @examples
 #' a <- c(sample(LETTERS,5),NA)
 #' DetMiss(a)
-
-if(getRversion() < "3.1.0") anyNA <- function(x) any(is.na(x))
 
 setGeneric("DetMiss",function(data) standardGeneric("DetMiss"))
 
@@ -61,3 +59,9 @@ setMethod("DetMiss",signature(data="integer"),DetMiss.factor,valueClass="integer
 setMethod("DetMiss",signature(data="numeric"),DetMiss.factor,valueClass="numeric")
 setMethod("DetMiss",signature(data="data.frame"),DetMiss.data.frame,valueClass="data.frame")
 setMethod("DetMiss",signature(data="matrix"),DetMiss.matrix,valueClass="numeric")
+
+
+anyNA <- function(x){
+  if(getRversion() < "3.1.0") any(is.na(x))
+  else anyNA(x)
+}

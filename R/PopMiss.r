@@ -8,19 +8,21 @@
 #' @keywords Missing Value
 #' @export A data frame or vector with missing value being populated
 #' @seealso DetMiss
-#' @author Sixiang.Hu.at.Gmail.Com
+#' @author Sixiang Hu
 #' @examples
 #' a <- c(sample(LETTERS,5),NA)
 #' PopMiss(a)
-
-
-if(getRversion() < "3.1.0") anyNA <- function(x) any(is.na(x))
 
 setGeneric("PopMiss",function(data,
                               na.treatment=c("mean.or.mode","delete","replace"),
                               replace=NULL)
            standardGeneric("PopMiss")
   )
+
+anyNA <- function(x){
+  if(getRversion() < "3.1.0") any(is.na(x))
+  else anyNA(x)
+}
 
 PopMiss.factor<-function(data,na.treatment,replace){
   num_miss <- length(which(is.na(data)))
