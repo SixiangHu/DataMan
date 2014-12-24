@@ -12,6 +12,7 @@ Data cleaning have 2 functions at the moment:
 
 Currently, there is only one function provided:
 * `DataSummary`: Have a better format and more info compared with R core function `summary`.
+* `CramersV`: Calculate the Cramers' V statistics for given data set. Useful for independent test.
 
 ### Getting Started
 
