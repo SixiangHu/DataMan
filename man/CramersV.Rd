@@ -7,14 +7,13 @@
 CramersV(data)
 }
 \arguments{
-\item{data}{This could be data frame, matrix or a vector.}
+\item{data}{This could be data frame or matrix.}
 }
 \description{
 Conduct Cramers V test. Please populate or delete missing value before runnign this function.
 }
 \examples{
-a <- c(sample(LETTERS,5),NA)
-PopMiss(a)
+CramersV(cars)
 }
 \author{
 Sixiang Hu
