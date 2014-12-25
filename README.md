@@ -1,5 +1,7 @@
 # DataMan
 
+[![Build Status](https://travis-ci.org/SixiangHu/DataMan.svg?branch=master)](https://travis-ci.org/SixiangHu/DataMan)
+
 This is an R package for data cleaning and preliminary data analysis.
 
 ### Data Cleaning
