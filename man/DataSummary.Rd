@@ -8,6 +8,8 @@ DataSummary(data,weights=NULL)
 }
 \arguments{
 \item{data}{This could be data frame or a vector.}
+
+\item{weights}{For a sampled dataset, you may want to specify the wieght.  This is a vector that each element in the vector giving a weight to the current observation.}
 }
 \description{
 This function allows you to have a summary about the given dataset.

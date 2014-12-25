@@ -7,6 +7,7 @@
 #' @param replace A single value used for populating ALL missing value.  May not be useful for a data frame with missing values in different type of variable. 
 #' @seealso DetMiss
 #' @author Sixiang Hu
+#' @export
 #' @examples
 #' a <- c(sample(LETTERS,5),NA)
 #' PopMiss(a)

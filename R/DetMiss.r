@@ -5,6 +5,7 @@
 #' @param data This could be data frame, matrix or a vector.
 #' @author Sixiang Hu
 #' @seealso PopMiss
+#' @export
 #' @examples
 #' a <- c(sample(LETTERS,5),NA)
 #' DetMiss(a)

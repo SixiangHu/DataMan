@@ -6,6 +6,7 @@
 #' @param data This could be data frame or matrix.
 #' @seealso PopMiss
 #' @author Sixiang Hu
+#' @export
 #' @examples
 #' CramersV(cars)
 
