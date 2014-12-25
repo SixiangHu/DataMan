@@ -6,4 +6,5 @@ Date: 2014-12-23
 Author: Sixiang Hu
 Maintainer: Sixiang Hu <Sixiang.Hu@Gmail.Com>
 Description: This package provides some simple function used for: Data Cleaning - detecting and populating missing value in a given data frame or vector; Data Analysis - an enhanced summary function to provide more info about variables in the given data. 
-License:  GPL 2
+Depends: data.table
+License:  GPL-2

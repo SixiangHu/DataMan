@@ -15,6 +15,7 @@ CramersV <- function(data){
   
   if (dim(data)[1]<=1) stop("No enough obs in data to conduct Cramers' V test.\n")
   
+  dataNames <- names(data)
   varNumber <- dim(data)[2]
 
   Cramer <- matrix(,nrow=varNumber,ncol=varNumber)

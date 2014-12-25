@@ -3,6 +3,7 @@
 #' @description This function allows you to have a summary about the given dataset.
 #' @usage DataSummary(data,weights=NULL)
 #' @param data This could be data frame or a vector.
+#' @param weights For a sampled dataset, you may want to specify the wieght.  This is a vector that each element in the vector giving a weight to the current observation.
 #' @author Sixiang Hu
 #' @seealso PopMiss
 #' @examples
