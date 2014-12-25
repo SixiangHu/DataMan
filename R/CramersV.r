@@ -60,7 +60,7 @@ cv.test <- function(x,y) {
     chi <- 0
   }
   else if (x_len==2 && y_len==2) {
-    tb <- table(x,y)
+    tb <- table(x,y,useNA ="always")
     Sx <- as.integer(table(x,useNA ="always"))
     Sy <- as.integer(table(y,useNA ="always"))
     Oxy <- sum(Sx)
