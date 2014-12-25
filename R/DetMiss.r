@@ -3,10 +3,8 @@
 #' @description This function allows you to detect missing values in given dataset. 
 #' @usage DetMiss(data)
 #' @param data This could be data frame, matrix or a vector.
-#' @keywords Missing Value
-#' @export A data frame with summary info about missing value
-#' @seealso PopMiss
 #' @author Sixiang Hu
+#' @seealso PopMiss
 #' @examples
 #' a <- c(sample(LETTERS,5),NA)
 #' DetMiss(a)

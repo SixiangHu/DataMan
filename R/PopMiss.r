@@ -5,8 +5,6 @@
 #' @param data This could be data frame, matrix or a vector.
 #' @param na.treatment One of "mean.or.mode", "delete", or "replace", to specify the method to populate missing values.
 #' @param replace A single value used for populating ALL missing value.  May not be useful for a data frame with missing values in different type of variable. 
-#' @keywords Missing Value
-#' @export A data frame or vector with missing value being populated
 #' @seealso DetMiss
 #' @author Sixiang Hu
 #' @examples

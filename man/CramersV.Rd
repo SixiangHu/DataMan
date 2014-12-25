@@ -21,6 +21,4 @@ Sixiang Hu
 \seealso{
 PopMiss
 }
-\keyword{Cramers'}
-\keyword{V}
 

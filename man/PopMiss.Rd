@@ -26,6 +26,4 @@ Sixiang Hu
 \seealso{
 DetMiss
 }
-\keyword{Missing}
-\keyword{Value}
 

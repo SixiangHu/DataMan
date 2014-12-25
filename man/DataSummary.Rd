@@ -16,8 +16,9 @@ This function allows you to have a summary about the given dataset.
 DataSummary(cars)
 }
 \author{
-Sixiang.Hu.at.Gmail.Com
+Sixiang Hu
 }
-\keyword{Data}
-\keyword{Summary}
+\seealso{
+PopMiss
+}
 

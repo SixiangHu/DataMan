@@ -22,6 +22,4 @@ Sixiang Hu
 \seealso{
 PopMiss
 }
-\keyword{Missing}
-\keyword{Value}
 

@@ -1,10 +1,9 @@
 #' Cramers' V Test
 #'
-#' @description Conduct Cramers V test. Please populate or delete missing value before runnign this function.
+#' @description 
+#' Conduct Cramers V test. Please populate or delete missing value before runnign this function.
 #' @usage CramersV(data)
 #' @param data This could be data frame or matrix.
-#' @keywords Cramers' V
-#' @export A data frame or vector with Cramers V statistics
 #' @seealso PopMiss
 #' @author Sixiang Hu
 #' @examples
@@ -83,6 +82,5 @@ cv.test <- function(x,y) {
     CV <- sqrt(chi/(Oxy * min(x_len-1, y_len-1)))
   }
   
-  #print.noquote("Cramér V / Phi:")
   return(as.numeric(CV))
 }

@@ -3,9 +3,8 @@
 #' @description This function allows you to have a summary about the given dataset.
 #' @usage DataSummary(data,weights=NULL)
 #' @param data This could be data frame or a vector.
-#' @keywords Data Summary
-#' @export A data frame with summary info including min, max, missing value counts, and mean or mode for each variable in the dataset.
-#' @author Sixiang.Hu.at.Gmail.Com
+#' @author Sixiang Hu
+#' @seealso PopMiss
 #' @examples
 #' DataSummary(cars)
 
