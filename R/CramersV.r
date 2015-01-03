@@ -11,7 +11,8 @@
 #' CramersV(cars)
 
 CramersV <- function(data){
- 
+  if (is.null(data)) stop("Object is null.\n")
+  
   if (length(data)==1) stop("Only one variable in the data.\n")
   
   if (dim(data)[1]<=1) stop("No enough obs in data to conduct Cramers' V test.\n")
@@ -27,7 +28,39 @@ CramersV <- function(data){
       if (i==j) Cramer[i,j] <- 1
       else {
         y <- data[,j]
-        Cramer[i,j] <- cv.test(x,y)
+        
+        x_len <- length(unique(x))
+        y_len <- length(unique(y))
+        
+        if (x_len==1 || y_len==1) {
+          CV <- 1
+          chi <- 0
+        }
+        else if (x_len==2 && y_len==2) {
+          tb <- quickTable(x,y)
+          Sx <- quickTable(x)
+          Sy <- quickTable(y)
+          Oxy <- sum(Sx)
+          
+          chi <- (tb[1,1]*tb[2,2]-tb[1,2]*tb[2,1])*Oxy/(Sx[1]*Sx[2]*Sy[1]*Sy[2])
+          V <- sqrt(abs(chi)/(Oxy * min(x_len-1, y_len-1)))
+        }
+        else {
+          tb <- quickTable(x,y)
+          Sx <- quickTable(x)
+          Sy <- quickTable(y)
+          Oxy <- sum(Sx)
+          
+          chi <- 0
+          for (k in 1:x_len){
+            for (l in 1:y_len){
+              Exy <- Sx[k]*Sy[l]/Oxy
+              chi <- chi + (tb[k,l]-Exy)^2/Exy
+            }
+          }
+          CV <- sqrt(chi/(Oxy * min(x_len-1, y_len-1)))
+        }
+        Cramer[i,j] <- CV
       }
       Cramer[j,i] <- Cramer[i,j]
     }
@@ -38,51 +71,34 @@ CramersV <- function(data){
   return(Cramer)
 }
 
-cv.test <- function(x,y) {
-  all2int <- function(x){
-    if (is.character(x)){
-      return(as.integer(factor(x)))
-    }
-    else if (is.factor(x)){
-      return(as.integer(x))
-    }
-    else return(x)
-  }
-  
-  x <- all2int(x)
-  y <- all2int(y)
-  
-  x_len <- length(unique(x))
-  y_len <- length(unique(y))
-  
-  if (x_len==1 || y_len==1) {
-    CV <- 1
-    chi <- 0
-  }
-  else if (x_len==2 && y_len==2) {
-    tb <- table(x,y,useNA ="always")
-    Sx <- as.integer(table(x,useNA ="always"))
-    Sy <- as.integer(table(y,useNA ="always"))
-    Oxy <- sum(Sx)
-    
-    chi <- (tb[1,1]*tb[2,2]-tb[1,2]*tb[2,1])*Oxy/(Sx[1]*Sx[2]*Sy[1]*Sy[2])
-    CV <- sqrt(chi/(Oxy * min(x_len-1, y_len-1)))
+#' quickTable
+#'
+#' @description 
+#' Build cross table on given vector(s). Similar to \code{\link{table}} function in base, but much faster using data.table package.
+#' @usage quickTable(x,y=NULL,exclude = c(NULL,NA))
+#' @param x integer, character, or date vectors.
+#' @param y integer, character, or date vectors.
+#' @param exclude include missing value (NULL) or exclude (NA)
+#' @return return a matrix.
+#' @seealso \code{\link{table}}
+#' @author Sixiang Hu
+#' @export
+#' @examples
+#' quickTable(cars$speed,cars$dist)
+
+quickTable <- function(x,y=NULL,exclude = NULL){
+  x <- factor(x,exclude = exclude)
+  if (is.null(y)) {
+    dt <- data.table(factor(x))
+    dt_cr <- dt[,.N,by=x]
+    dt_tb <- tapply(dt_cr$N,list(dt_cr$x), sum)
   }
   else {
-    tb <- table(x,y,useNA ="always")
-    Sx <- as.integer(table(x,useNA ="always"))
-    Sy <- as.integer(table(y,useNA ="always"))
-    Oxy <- sum(Sx)
-    
-    chi <- 0
-    for (i in 1:x_len){
-      for (j in 1:y_len){
-        Exy <- Sx[i]*Sy[j]/Oxy
-        chi <- chi + (tb[i,j]-Exy)^2/Exy
-      }
-    }
-    CV <- sqrt(chi/(Oxy * min(x_len-1, y_len-1)))
+    y <- factor(y,exclude = exclude)
+    dt <- data.table(x,y)
+    dt_cr <- dt[,.N,by=list(x,y)]
+    dt_tb <- tapply(dt_cr$N,list(dt_cr$x,dt_cr$y), sum)
   }
   
-  return(as.numeric(CV))
+  return(replace(dt_tb,is.na(dt_tb),0))
 }
