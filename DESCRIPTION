@@ -6,5 +6,5 @@ Date: 2015-01-24
 Author: Sixiang Hu
 Maintainer: Sixiang Hu <Sixiang.Hu@Gmail.Com>
 Description: This package provides some simple function used for: Data Cleaning - detecting and populating missing value in a given data frame or vector; Data Analysis - an enhanced summary function to provide more info about variables in the given data. 
-Depends: data.table,methods,ggplot2,googleVis,gridExtra,scales,reshape2,splines
+Depends: data.table,methods,ggplot2,googleVis,gridExtra,scales,reshape2,splines,gbm
 License:  GPL-2

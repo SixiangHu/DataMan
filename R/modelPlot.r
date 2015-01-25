@@ -1,6 +1,6 @@
 #' modelPlot
 #'
-#' @description This function allows you visulise the GLM fitting by comparing mean fit, observation, and normal fit.
+#' @description This function allows you visulise the GLM or GBM fitting by comparing observation, fitted and mean fitted on the same plot.
 #' @usage modelPlot(model,xvar,type=c("response","link"),dataset=NULL,weights=NULL,by=NULL,modelType=c("glm","gbm"),interactive=FALSE,...)
 #' @param model a model object. Currently this is created for glm and gbm. 
 #' @param xvar a character string indicates the variable name you want to visulise.
@@ -13,19 +13,21 @@
 #' @param ... xlim and ylim can be used to set the range of the ggplot2 plot. For example, xlim=c(0,1) means restrict the xaxis within (0,1).  This doesn't work for goolgeVis interactive plot because, because, because it is interactive, which you can zoom in and out with your mouse. :)
 #' @details 
 #' For those used Emblem before, you will find this plot quite familiar.  The purpose of this function is the same that to put observation, fitted, and mean fit on the same plot for better understanding about model fitting.
-#' 
-#' You can also use loop with plot, lm with plot, gbm function to visulise the fit.  But I'm quite lazy that wants to put everthing together in the way I familiar with.
-#' 
+#'  
 #' Please do not name the dataset as "data", which is confusing and may cause problems.
 #' 
-#' Observation line for xvar is simply the weighted average on target varaible, hence if the xvar is a numeric, the plot could be very messy. Will improve this in the future to banded those numeric factor.
+#' Observation line for xvar is simply the weighted average on target varaible, hence if xvar is a numeric, the plot could be very messy. Will improve this in the future to banded those numeric factor.
 #'   
 #' Fitted line for xvar is the weighted average on model prediction.
 #' 
 #' Fitted_mean line for xvar is the predictions of the current model on a Mode dataset which keeps xvar as it is but fix all other variabel as its mean or mode.   
 #' 
+#' For GBM model, currently, can only create response plot.  Because of the fact that link function is not explicitly saved in its model object hence I need to create link function for each of the GBM family.  Will think about how to do this.
+#' 
+#' The difference between `plot.gbm` in `gbm` package and this modelPlot function is that `plot.gbm` is plotting "marginal effect" as oppose to overall fitting.    
+#' 
 #' @author Sixiang Hu
-#' @seealso gbm, glm
+#' @seealso gbm, glm, plot.gbm
 #' @export modelPlot
 #' @examples
 #' 
@@ -91,15 +93,17 @@ modelPlot <- function(model,xvar,type=c("response","link"),dataset=NULL,weights=
   
   #data source
   if(!is.null(dataset)) {
-    cat("modelPlot: Refitting model using new data...\n")
-    model<-update(model,data=dataset,weights=weights)
+    if (modelType=="glm"){
+      cat("modelPlot: Refitting model using new data...\n")
+      model<-update(model,data=dataset,weights=weights)
+    }
   }
   else{
     if ( ("data" %in% names(model)) && modelType=="glm" ) {
       #this method doesn't work for gbm, because gbm$data is not the raw data, but a list.
-      dataset <- data.frame()
-      dataset <- model$data
+       dataset <- model$data
     }
+    else if ( !is.null(model$gbm.call$dataframe) ) dataset <- model$gbm.call$dataframe
     else {
       if (isS4(model)) call <- model@call
       else call <- model$call
@@ -113,6 +117,7 @@ modelPlot <- function(model,xvar,type=c("response","link"),dataset=NULL,weights=
   #weights
   if (is.null(weights)) {
     if (modelType == "glm") weights <- model$prior.weights
+    else if ("weights" %in% names(model) ) weights <- model$weights
     else if (modelType == "gbm") {
       w_name <- deparse(model$call$weights)
       if (w_name %in% names(dataset)) weights <- dataset[,deparse(model$call$weights)]
@@ -122,25 +127,35 @@ modelPlot <- function(model,xvar,type=c("response","link"),dataset=NULL,weights=
   }
   
   #fitted.values
-  fitted <- as.numeric(model$fit)
+  fitted <- as.numeric(predict(model,dataset,type=type,weights=weights,n.trees=model$n.trees))
   
   #observed
   if (modelType == "glm") observed <- as.numeric(model$y)
   else if (modelType == "gbm") {
     if ( model$response.name %in% names(dataset) ) observed <- as.numeric(dataset[,model$response.name])
+    else if ( model$gbm.call$response.name %in% names(dataset) )  observed <- as.numeric(dataset[,model$gbm.call$response.name])
     else observed <- get(model$response.name)
   }
 
   #Calculate mean data set for mean_fit line
   MeanData <- ModeData(dataset,weights)
   MeanData[,xvar] <- dataset[,xvar]
-  fitted_mean <- as.numeric(predict(model,MeanData,type=type,weights=weights))
+  
+  if (modelType == "glm") fitted_mean <- as.numeric(predict(model,MeanData,type=type,weights=weights))
+  else if (modelType == "gbm") fitted_mean <- as.numeric(predict(model,MeanData,type=type,weights=weights,n.trees=model$n.trees))
   
   #Plotting
   options(warn=-1)
   
   covf2c <- sapply(dataset, is.factor)
   dataset[covf2c] <- lapply(dataset[covf2c], as.character)
+  
+  #any difference between trans before and after aggregate?
+  if(type=="link") {
+    tran_lnk_fun <- family(model)$linkfun
+    fitted <- tran_lnk_fun(fitted)
+    observed <- tran_lnk_fun(observed)
+  }
   
   if( !is.null(by) && !by %in% colnames(dataset) ) stop(paste("Selected factor (",by,") is not in the data.",""))
   else if ( !is.null(by) ) {
@@ -153,13 +168,7 @@ modelPlot <- function(model,xvar,type=c("response","link"),dataset=NULL,weights=
     data.agg <- as.data.frame(data.plot[,lapply(.SD,weighted.mean,w=weights),by=list(xvar,by),.SDcols=c("fitted","observed","weights")],row.names=c("xvar","by","weights","fitted","observed"))
     
     data.freq <- as.data.frame(data.plot[,sum(weights),by=list(xvar,by)][,freq:=V1/sum(V1)])
-    
-    #any difference between trans before and after aggregate?
-    if(type=="link") {
-      data.agg$fitted <- tran_lnk_fun(data.agg$fitted)
-      data.agg$observed <- tran_lnk_fun(data.agg$observed)
-    }
-    
+        
     #line graph fitted
     gLine1 <- ggplot2::ggplot(data=data.agg,aes(x=xvar,y=fitted,group=by,colour=by))+geom_line(size=1.5)+geom_point(size=4,fill="white")
     if("xlim" %in% opts) gLine1 <-gLine1 + xlim(xlim)
@@ -184,7 +193,7 @@ modelPlot <- function(model,xvar,type=c("response","link"),dataset=NULL,weights=
     gridExtra::grid.arrange(gLine1,gLine2,ghist,ncol=1,nrow=3,heights=c(4,4,2))
   }
   else {
-  
+
     #use data.table to speed up
     data.plot <-data.table::data.table(as.data.frame(cbind(xvar=dataset[,xvar],fitted,fitted_mean,observed,weights),stringsAsFactors=FALSE))
     data.table::setkey(data.plot,xvar)
@@ -192,14 +201,7 @@ modelPlot <- function(model,xvar,type=c("response","link"),dataset=NULL,weights=
     data.plot <- data.plot[,lapply(.SD,as.numeric),by=xvar,.SDcols=c("fitted","fitted_mean","observed","weights")]
     data.agg <- as.data.frame(data.plot[,lapply(.SD,weighted.mean,w=weights),by=xvar,.SDcols=c("fitted","fitted_mean","observed","weights")],row.names=c("xvar","weights","fitted","fitted_mean","observed"))
     data.freq <- as.data.frame(data.plot[,sum(weights),by=xvar][,freq:=V1/sum(V1)])
-    
-    #any difference between trans before and after aggregate?
-    if(type=="link") {
-      tran_lnk_fun <- family(model)$linkfun
-      data.agg$fitted <- tran_lnk_fun(data.agg$fitted)
-      data.agg$observed <- tran_lnk_fun(data.agg$observed)
-    }
-    
+
     #melt
     data.melt <- reshape2::melt(data.agg[,-5],id=c("xvar"))
     

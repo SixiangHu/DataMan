@@ -26,20 +26,22 @@ modelPlot(model,xvar,type=c("response","link"),dataset=NULL,weights=NULL,by=NULL
 \item{data}{Optional. A data frame. update the glm model plot with a new dataset.}
 }
 \description{
-This function allows you visulise the GLM fitting by comparing mean fit, observation, and normal fit.
+This function allows you visulise the GLM or GBM fitting by comparing observation, fitted and mean fitted on the same plot.
 }
 \details{
 For those used Emblem before, you will find this plot quite familiar.  The purpose of this function is the same that to put observation, fitted, and mean fit on the same plot for better understanding about model fitting.
 
-You can also use loop with plot, lm with plot, gbm function to visulise the fit.  But I'm quite lazy that wants to put everthing together in the way I familiar with.
-
 Please do not name the dataset as "data", which is confusing and may cause problems.
 
-Observation line for xvar is simply the weighted average on target varaible, hence if the xvar is a numeric, the plot could be very messy. Will improve this in the future to banded those numeric factor.
+Observation line for xvar is simply the weighted average on target varaible, hence if xvar is a numeric, the plot could be very messy. Will improve this in the future to banded those numeric factor.
 
 Fitted line for xvar is the weighted average on model prediction.
 
 Fitted_mean line for xvar is the predictions of the current model on a Mode dataset which keeps xvar as it is but fix all other variabel as its mean or mode.
+
+For GBM model, currently, can only create response plot.  Because of the fact that link function is not explicitly saved in its model object hence I need to create link function for each of the GBM family.  Will think about how to do this.
+
+The difference between `plot.gbm` in `gbm` package and this modelPlot function is that `plot.gbm` is plotting "marginal effect" as oppose to overall fitting.
 }
 \examples{
 #model from gbm package
@@ -90,6 +92,6 @@ modelPlot(glm1,"cyl",modelType="glm",interactive=T)
 Sixiang Hu
 }
 \seealso{
-gbm, glm
+gbm, glm, plot.gbm
 }
 
