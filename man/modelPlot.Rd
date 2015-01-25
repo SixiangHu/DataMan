@@ -86,7 +86,7 @@ modelPlot(gbm1,xvar="X3",modelType="gbm",by="X5")
 
 glm1 <- glm(formula = mpg ~ cyl + hp, family = Gamma(log), data = mtcars, weights = wt)
 
-modelPlot(glm1,"cyl",modelType="glm",interactive=T)
+modelPlot(glm1,"cyl",modelType="glm",interactive=TRUE)
 }
 \author{
 Sixiang Hu
