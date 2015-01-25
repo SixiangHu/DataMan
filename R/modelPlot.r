@@ -10,10 +10,11 @@
 #' @param modelType A character string. Either "glm" or "gbm".
 #' @param interactive logical. Set true to use googleVis package plotting interactively. Currently it doesn't work when using "by" method.
 #' @param by Optinal. A character string indicates the variable name you want to plot the fit by.
+#' @param ... xlim and ylim can be used to set the range of the ggplot2 plot. For example, xlim=c(0,1) means restrict the xaxis within (0,1).  This doesn't work for goolgeVis interactive plot because, because, because it is interactive, which you can zoom in and out with your mouse. :)
 #' @details 
 #' For those used Emblem before, you will find this plot quite familiar.  The purpose of this function is the same that to put observation, fitted, and mean fit on the same plot for better understanding about model fitting.
 #' 
-#' As James said, you can also use loop, lm, gbm function to check the fit.  But I'm quite lazy that wants to put everthing together in the way I familiar with.
+#' You can also use loop with plot, lm with plot, gbm function to visulise the fit.  But I'm quite lazy that wants to put everthing together in the way I familiar with.
 #' 
 #' Please do not name the dataset as "data", which is confusing and may cause problems.
 #' 
@@ -73,14 +74,7 @@
 #' modelPlot(glm1,"cyl",modelType="glm",interactive=T)
 
 modelPlot <- function(model,xvar,type=c("response","link"),dataset=NULL,weights=NULL,by=NULL,modelType=c("glm","gbm"),interactive=FALSE,...){
-  require(data.table)
-  require(ggplot2)
-  require(gridExtra)
-  require(scales)
-  require(reshape2)
-  require(splines)
-  require(googleVis)
-  
+
   type <- match.arg(type)
   opts.list<-list(...)
   opts <- names(list(...))
@@ -144,9 +138,14 @@ modelPlot <- function(model,xvar,type=c("response","link"),dataset=NULL,weights=
   
   #Plotting
   options(warn=-1)
+  
+  covf2c <- sapply(dataset, is.factor)
+  dataset[covf2c] <- lapply(dataset[covf2c], as.character)
+  
   if( !is.null(by) && !by %in% colnames(dataset) ) stop(paste("Selected factor (",by,") is not in the data.",""))
   else if ( !is.null(by) ) {
-    data.plot <-data.table(as.data.frame(cbind(xvar=data[,xvar],by=data[,by],fitted,observed,weights),stringsAsFactors=FALSE))
+  
+    data.plot <-data.table(as.data.frame(cbind(xvar=dataset[,xvar],by=dataset[,by],fitted,observed,weights),stringsAsFactors=FALSE))
     setkey(data.plot,xvar,by)
     
     data.plot <- data.plot[,lapply(.SD,as.numeric),by=list(xvar,by),.SDcols=c("fitted","observed","weights")]
@@ -162,35 +161,33 @@ modelPlot <- function(model,xvar,type=c("response","link"),dataset=NULL,weights=
     }
     
     #line graph fitted
-    gLine1 <- ggplot(data=data.agg,aes(x=xvar,y=fitted,group=by,colour=by))+geom_line(size=1.5)+geom_point(size=4,fill="white")
+    gLine1 <- ggplot2::ggplot(data=data.agg,aes(x=xvar,y=fitted,group=by,colour=by))+geom_line(size=1.5)+geom_point(size=4,fill="white")
     if("xlim" %in% opts) gLine1 <-gLine1 + xlim(xlim)
     if("ylim" %in% opts) gLine1 <-gLine1 + ylim(ylim)
-    gLine1 <- gLine1+xlab("")+ylab(type)+ ggtitle(paste("Fitting Analysis on: ",xvar," by ",by, "(Fitted)"))+
-      theme_bw()+theme(legend.justification=c(1,1), legend.position=c(1,1),axis.text.x = element_blank())
+    gLine1 <- gLine1+ggplot2::xlab("")+ggplot2::ylab(type)+ ggplot2::ggtitle(paste("Fitting Analysis on: ",xvar," by ",by, "(Fitted)"))+
+      ggplot2::theme_bw()+ggplot2::theme(legend.justification=c(1,1), legend.position=c(1,1),axis.text.x = element_blank())
     
     #line graph observed
-    gLine2 <- ggplot(data=data.agg,aes(x=xvar,y=observed,group=by,colour=by))+geom_line(size=1.5)+geom_point(size=4,fill="white")
-    if("xlim" %in% opts) gLine2 <-gLine2 + xlim(xlim)
-    if("ylim" %in% opts) gLine2 <- gLine2 + ylim(ylim)
-    gLine2 <- gLine2+xlab("")+ylab(type)+ ggtitle(paste("Fitting Analysis on: ",xvar," by ",by, "(Observed)"))+
-      theme_bw()+theme(legend.justification=c(1,1), legend.position=c(1,1))
-    if(nlevels(as.factor(data.agg$xvar))>25) gLine2 <- gLine2 + theme(axis.text.x = element_text(angle = 90,hjust=0.5,vjust=0.5))
+    gLine2 <- ggplot2::ggplot(data=data.agg,aes(x=xvar,y=observed,group=by,colour=by))+geom_line(size=1.5)+ggplot2::geom_point(size=4,fill="white")
+    if("xlim" %in% opts) gLine2 <-gLine2 + ggplot2::xlim(xlim)
+    if("ylim" %in% opts) gLine2 <- gLine2 + ggplot2::ylim(ylim)
+    gLine2 <- gLine2+ggplot2::xlab("")+ggplot2::ylab(type)+ ggplot2::ggtitle(paste("Fitting Analysis on: ",xvar," by ",by, "(Observed)"))+
+      ggplot2::theme_bw()+ggplot2::theme(legend.justification=c(1,1), legend.position=c(1,1))
+    if(nlevels(as.factor(data.agg$xvar))>25) gLine2 <- gLine2 + ggplot2::theme(axis.text.x = element_text(angle = 90,hjust=0.5,vjust=0.5))
     
     #histogram graph
-    ghist <- ggplot(data=data.freq,aes(x=xvar,y=freq,fill=by))+ geom_histogram(stat="identity",binwidth=1)
-    if("xlim" %in% opts) ghist <-ghist + xlim(xlim)
-    ghist <- ghist +xlab("")+ ylab("percent (%)")+ scale_y_continuous(labels = percent)+theme_bw()+
-      theme(legend.justification=c(1,1), legend.position=c(1,1),axis.text.x = element_blank())
+    ghist <- ggplot2::ggplot(data=data.freq,aes(x=xvar,y=freq,fill=by))+ ggplot2::geom_histogram(stat="identity",binwidth=1)
+    if("xlim" %in% opts) ghist <-ghist + ggplot2::xlim(xlim)
+    ghist <- ghist + ggplot2::xlab("")+ ggplot2::ylab("percent (%)")+ ggplot2::scale_y_continuous(labels = percent) + ggplot2::theme_bw()+
+      ggplot2::theme(legend.justification=c(1,1), legend.position=c(1,1),axis.text.x = element_blank())
     
-    grid.arrange(gLine1,gLine2,ghist,ncol=1,nrow=3,heights=c(4,4,2))
+    gridExtra::grid.arrange(gLine1,gLine2,ghist,ncol=1,nrow=3,heights=c(4,4,2))
   }
   else {
-    covf2c <- sapply(data, is.factor)
-    data[covf2c] <- lapply(data[covf2c], as.character)
-    
+  
     #use data.table to speed up
-    data.plot <-data.table(as.data.frame(cbind(xvar=data[,xvar],fitted,fitted_mean,observed,weights),stringsAsFactors=FALSE))
-    setkey(data.plot,xvar)
+    data.plot <-data.table::data.table(as.data.frame(cbind(xvar=dataset[,xvar],fitted,fitted_mean,observed,weights),stringsAsFactors=FALSE))
+    data.table::setkey(data.plot,xvar)
     
     data.plot <- data.plot[,lapply(.SD,as.numeric),by=xvar,.SDcols=c("fitted","fitted_mean","observed","weights")]
     data.agg <- as.data.frame(data.plot[,lapply(.SD,weighted.mean,w=weights),by=xvar,.SDcols=c("fitted","fitted_mean","observed","weights")],row.names=c("xvar","weights","fitted","fitted_mean","observed"))
@@ -204,33 +201,33 @@ modelPlot <- function(model,xvar,type=c("response","link"),dataset=NULL,weights=
     }
     
     #melt
-    data.melt <- melt(data.agg[,-5],id=c("xvar"))
+    data.melt <- reshape2::melt(data.agg[,-5],id=c("xvar"))
     
     #line graph
     
     strV1 <- paste("Fitting Analysis on: ",xvar,"(",type,")")
     
-    gLine <- ggplot(data=data.melt,aes(x=xvar,y=value,group=variable,colour=variable,shape=variable))+geom_line(size=1.5)+geom_point(size=4,fill="white")
-    if(("xlim" %in% opts) && is.numeric(data.melt$xvar)) gLine <-gLine + scale_x_continuous(limits=xlim)
-    else if(("xlim" %in% opts) && !is.numeric(data.melt$xvar)) gLine <-gLine + scale_x_discrete(limits=xlim)
-    else if(("xlim" %in% opts) && is(data.melt[,"xvar"],"Date")) gLine <-gLine + scale_x_date(label=date_format("%y%m"),limits=xlim)
-    if("ylim" %in% opts) gLine <-gLine + ylim(ylim)
-    gLine <- gLine+scale_colour_manual(values=c("green4","green1","magenta3"))+scale_shape_manual(values=c(21,2,0))+xlab("")+ylab(type)+
-      ggtitle(strV1)+
-      theme_bw()+theme(legend.justification=c(1,1), legend.position=c(1,1))
-    if(nlevels(as.factor(data.melt$xvar))>25) gLine <- gLine + theme(axis.text.x = element_text(angle = 90,hjust=0.5,vjust=0.5))
+    gLine <- ggplot2::ggplot(data=data.melt,aes(x=xvar,y=value,group=variable,colour=variable,shape=variable)) + 
+      ggplot2::geom_line(size=1.5)+geom_point(size=4,fill="white")
+    if(("xlim" %in% opts) && is.numeric(data.melt$xvar)) gLine <-gLine + ggplot2::scale_x_continuous(limits=xlim)
+    else if(("xlim" %in% opts) && !is.numeric(data.melt$xvar)) gLine <-gLine + ggplot2::scale_x_discrete(limits=xlim)
+    else if(("xlim" %in% opts) && is(data.melt[,"xvar"],"Date")) gLine <-gLine + ggplot2::scale_x_date(label=date_format("%y%m"),limits=xlim)
+    if("ylim" %in% opts) gLine <-gLine + ggplot2::ylim(ylim)
+    gLine <- gLine + ggplot2::scale_colour_manual(values=c("green4","green1","magenta3")) + ggplot2::scale_shape_manual(values=c(21,2,0)) + ggplot2::xlab("") + ggplot2::ylab(type)+
+      ggplot2::ggtitle(strV1)+
+      ggplot2::theme_bw() + ggplot2::theme(legend.justification=c(1,1), legend.position=c(1,1))
+    if(nlevels(as.factor(data.melt$xvar))>25) gLine <- gLine + ggplot2::theme(axis.text.x = element_text(angle = 90,hjust=0.5,vjust=0.5))
     
     #histogram graph
-    ghist <- ggplot(data=data.freq,aes(x=xvar,y=freq))+
-      geom_histogram(stat="identity",colour="black",fill="yellow")
-      if(("xlim" %in% opts) && is.numeric(data.melt$xvar)) ghist <-ghist + scale_x_continuous(limits=xlim)
-      else if(("xlim" %in% opts) && !is.numeric(data.melt$xvar)) ghist <-ghist + scale_x_discrete(limits=xlim)
-      #else if(("xlim" %in% opts) && is(data.freq[,"xvar"],"Date")) ghist <-ghist + scale_x_date(label=date_format("%y%m"),limits=xlim)
-      ghist <- ghist + ylab("percent (%)")+
-      scale_y_continuous(labels = percent)+
-      xlab("")+theme_bw()+theme(axis.text.x = element_blank())
+    ghist <- ggplot2::ggplot(data=data.freq,aes(x=xvar,y=freq))+
+      ggplot2::geom_histogram(stat="identity",colour="black",fill="yellow")
+      if(("xlim" %in% opts) && is.numeric(data.melt$xvar)) ghist <-ghist + ggplot2::scale_x_continuous(limits=xlim)
+      else if(("xlim" %in% opts) && !is.numeric(data.melt$xvar)) ghist <-ghist + ggplot2::scale_x_discrete(limits=xlim)
+      ghist <- ghist + ggplot2::ylab("percent (%)")+
+      ggplot2::scale_y_continuous(labels = percent)+
+      ggplot2::xlab("")+ggplot2::theme_bw()+ggplot2::theme(axis.text.x = element_blank())
   
-    grid.arrange(gLine,ghist,ncol=1,nrow=2,heights=c(4,1))
+    gridExtra::grid.arrange(gLine,ghist,ncol=1,nrow=2,heights=c(4,1))
     
     if (interactive) {
       df <- data.frame(data.agg,freq=data.freq$freq)
@@ -248,17 +245,34 @@ modelPlot <- function(model,xvar,type=c("response","link"),dataset=NULL,weights=
                                    chartArea="{width:'90%',height:'90%'}",
                                    height=750)
       
-      plot(gvisComboChart(df,xvar="xvar",yvar=c("fitted","fitted_mean","observed","freq"),options=gvisSingleOptionList))
-#       plot(gvisComboChart(df,xvar="xvar",yvar=c("fitted","fitted_mean","observed","freq"),
-#                           options=list(series='{type:"line",color:"green4",targetAxisIndex:0},
-#                                                     {type:"line",color:"green1",targetAxisIndex:0},
-#                                                     {type:"line",color:"magenta3",targetAxisIndex:0},
-#                                                     {type:"bars",color:"yellow",targetAxisIndex:1}',
-#                                        crosshair="{trigger:'both'}",
-#                                        height=800)))
-      #   plot(gvisLineChart(df,xvar="xvar",yvar="fitted"))
+      plot(googleVis::gvisComboChart(df,xvar="xvar",yvar=c("fitted","fitted_mean","observed","freq"),options=gvisSingleOptionList))
+
     }
   }
   
   options(warn=0)
+}
+
+# Create mode or average of a dataset
+ModeData <- function(data,weights){
+
+  if(!(class(data) %in% c("data.frame","ore.frame"))){
+    if(length(data)==0) stop("data set is empty.")
+  }
+  else{
+    if(dim(data)[1]>0 && dim(data)[2]>0 ){
+      VarName <- names(data)
+      iLen <- length(VarName)
+    }
+    else stop("data set is empty.")
+  }
+  
+  if(is.null(weights)) weights<-rep(1,length(data[,1]))
+  
+  for(i in 1:iLen) {
+    x_dt<-data.table::data.table(x=data[,VarName[i]],weights)
+    data[,VarName[i]] <- rep(data.frame(x_dt[,sum(weights),by=x][order(-V1)])[1,1],length(data[,1]))
+  }
+  
+  return(data)
 }

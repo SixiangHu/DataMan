@@ -17,6 +17,10 @@ Currently, there is only one function provided:
 * `DataSummary`: Have a better format and more info compared with R core function `summary`.
 * `CramersV`: Calculate the Cramers' V statistics for given data set. Useful for independent test.
 
+### Model Access
+
+* `modelPlot`: Used to visualise glm and gbm model fit by `ggplot2` and `googleVis` package.
+
 ### Getting Started
 
 You can install `DataMan` from GitHub as follows:

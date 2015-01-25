@@ -21,6 +21,8 @@ modelPlot(model,xvar,type=c("response","link"),dataset=NULL,weights=NULL,by=NULL
 
 \item{interactive}{logical. Set true to use googleVis package plotting interactively. Currently it doesn't work when using "by" method.}
 
+\item{...}{xlim and ylim can be used to set the range of the ggplot2 plot. For example, xlim=c(0,1) means restrict the xaxis within (0,1).  This doesn't work for goolgeVis interactive plot because, because, because it is interactive, which you can zoom in and out with your mouse. :)}
+
 \item{data}{Optional. A data frame. update the glm model plot with a new dataset.}
 }
 \description{
@@ -29,7 +31,7 @@ This function allows you visulise the GLM fitting by comparing mean fit, observa
 \details{
 For those used Emblem before, you will find this plot quite familiar.  The purpose of this function is the same that to put observation, fitted, and mean fit on the same plot for better understanding about model fitting.
 
-As James said, you can also use loop, lm, gbm function to check the fit.  But I'm quite lazy that wants to put everthing together in the way I familiar with.
+You can also use loop with plot, lm with plot, gbm function to visulise the fit.  But I'm quite lazy that wants to put everthing together in the way I familiar with.
 
 Please do not name the dataset as "data", which is confusing and may cause problems.
 
