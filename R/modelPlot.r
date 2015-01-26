@@ -10,6 +10,7 @@
 #' @param modelType A character string. Either "glm" or "gbm".
 #' @param interactive logical. Set true to use googleVis package plotting interactively. Currently it doesn't work when using "by" method.
 #' @param by Optinal. A character string indicates the variable name you want to plot the fit by.
+#' @param newGroupNum Optional. An integer specifies number of new bands when levels of current plotting variable `xvar` or `by` is more than 100. 
 #' @param ... xlim and ylim can be used to set the range of the ggplot2 plot. For example, xlim=c(0,1) means restrict the xaxis within (0,1).  This doesn't work for goolgeVis interactive plot because, because, because it is interactive, which you can zoom in and out with your mouse. :)
 #' @details 
 #' For those used Emblem before, you will find this plot quite familiar.  The purpose of this function is the same that to put observation, fitted, and mean fit on the same plot for better understanding about model fitting.
@@ -27,7 +28,7 @@
 #' The difference between `plot.gbm` in `gbm` package and this modelPlot function is that `plot.gbm` is plotting "marginal effect" as oppose to overall fitting.    
 #' 
 #' @author Sixiang Hu
-#' @seealso gbm, glm, plot.gbm
+#' @seealso \code{\link{gbm}}, \code{\link{glm}}, \code{\link{plot.gbm}}
 #' @export modelPlot
 #' @examples
 #' 
@@ -75,7 +76,7 @@
 #' 
 #' modelPlot(glm1,"cyl",modelType="glm",interactive=TRUE)
 
-modelPlot <- function(model,xvar,type=c("response","link"),dataset=NULL,weights=NULL,by=NULL,modelType=c("glm","gbm"),interactive=FALSE,...){
+modelPlot <- function(model,xvar,type=c("response","link"),dataset=NULL,weights=NULL,by=NULL,modelType=c("glm","gbm"),interactive=FALSE,newGroupNum=10,...){
 
   type <- match.arg(type)
   opts.list<-list(...)
@@ -141,6 +142,15 @@ modelPlot <- function(model,xvar,type=c("response","link"),dataset=NULL,weights=
   MeanData <- ModeData(dataset,weights)
   MeanData[,xvar] <- dataset[,xvar]
   
+  #New Group for data which has too much levels.
+  if ( (is.numeric(dataset[,xvar]) || is.integer(dataset[,xvar])) && nlevels(dataset[,xvar])>100 ) {
+    if ( is.null(newGroupNum) ) newGroupNum <- 10
+    
+    new_band <- seq(min(dataset[,xvar]),max(dataset[,xvar]),length.out=newGroupNum)
+    dataset[,xvar] <- cut(dataset[,xvar],new_band,include.lowest = TRUE)
+  }
+  
+  #fitted mean
   if (modelType == "glm") fitted_mean <- as.numeric(predict(model,MeanData,type=type,weights=weights))
   else if (modelType == "gbm") fitted_mean <- as.numeric(predict(model,MeanData,type=type,weights=weights,n.trees=model$n.trees))
   
@@ -156,10 +166,17 @@ modelPlot <- function(model,xvar,type=c("response","link"),dataset=NULL,weights=
     fitted <- tran_lnk_fun(fitted)
     observed <- tran_lnk_fun(observed)
   }
-  
+
   if( !is.null(by) && !by %in% colnames(dataset) ) stop(paste("Selected factor (",by,") is not in the data.",""))
   else if ( !is.null(by) ) {
-  
+    
+    if ( (is.numeric(dataset[,by]) || is.integer(dataset[,by])) && nlevels(dataset[,by])>100 ) {
+      if ( is.null(newGroupNum) ) newGroupNum <- 10
+      
+      new_band <- seq(min(dataset[,by]),max(dataset[,by]),length.out=newGroupNum)
+      dataset[,by] <- cut(dataset[,by],new_band,include.lowest = TRUE)
+    }
+    
     data.plot <-data.table(as.data.frame(cbind(xvar=dataset[,xvar],by=dataset[,by],fitted,observed,weights),stringsAsFactors=FALSE))
     setkey(data.plot,xvar,by)
     
@@ -170,25 +187,27 @@ modelPlot <- function(model,xvar,type=c("response","link"),dataset=NULL,weights=
     data.freq <- as.data.frame(data.plot[,sum(weights),by=list(xvar,by)][,freq:=V1/sum(V1)])
         
     #line graph fitted
-    gLine1 <- ggplot2::ggplot(data=data.agg,aes(x=xvar,y=fitted,group=by,colour=by))+geom_line(size=1.5)+geom_point(size=4,fill="white")
+    gLine1 <- ggplot2::ggplot(data=data.agg,aes(x=xvar,y=fitted,group=by,colour=by))+
+      ggplot2::geom_line(size=1) + ggplot2::geom_point(size=4,fill="white")
     if("xlim" %in% opts) gLine1 <-gLine1 + xlim(xlim)
     if("ylim" %in% opts) gLine1 <-gLine1 + ylim(ylim)
     gLine1 <- gLine1+ggplot2::xlab("")+ggplot2::ylab(type)+ ggplot2::ggtitle(paste("Fitting Analysis on: ",xvar," by ",by, "(Fitted)"))+
-      ggplot2::theme_bw()+ggplot2::theme(legend.justification=c(1,1), legend.position=c(1,1),axis.text.x = element_blank())
+      theme_mp_line
     
     #line graph observed
-    gLine2 <- ggplot2::ggplot(data=data.agg,aes(x=xvar,y=observed,group=by,colour=by))+geom_line(size=1.5)+ggplot2::geom_point(size=4,fill="white")
+    gLine2 <- ggplot2::ggplot(data=data.agg,aes(x=xvar,y=observed,group=by,colour=by))+
+      ggplot2::geom_line(size=1) + ggplot2::geom_point(size=4,fill="white")
     if("xlim" %in% opts) gLine2 <-gLine2 + ggplot2::xlim(xlim)
     if("ylim" %in% opts) gLine2 <- gLine2 + ggplot2::ylim(ylim)
     gLine2 <- gLine2+ggplot2::xlab("")+ggplot2::ylab(type)+ ggplot2::ggtitle(paste("Fitting Analysis on: ",xvar," by ",by, "(Observed)"))+
-      ggplot2::theme_bw()+ggplot2::theme(legend.justification=c(1,1), legend.position=c(1,1))
+      theme_mp_line
     if(nlevels(as.factor(data.agg$xvar))>25) gLine2 <- gLine2 + ggplot2::theme(axis.text.x = element_text(angle = 90,hjust=0.5,vjust=0.5))
     
     #histogram graph
     ghist <- ggplot2::ggplot(data=data.freq,aes(x=xvar,y=freq,fill=by))+ ggplot2::geom_histogram(stat="identity",binwidth=1)
     if("xlim" %in% opts) ghist <-ghist + ggplot2::xlim(xlim)
-    ghist <- ghist + ggplot2::xlab("")+ ggplot2::ylab("percent (%)")+ ggplot2::scale_y_continuous(labels = percent) + ggplot2::theme_bw()+
-      ggplot2::theme(legend.justification=c(1,1), legend.position=c(1,1),axis.text.x = element_blank())
+    ghist <- ghist + ggplot2::xlab("")+ ggplot2::ylab("percent (%)")+ ggplot2::scale_y_continuous(labels = percent) + 
+      theme_mp_hist
     
     gridExtra::grid.arrange(gLine1,gLine2,ghist,ncol=1,nrow=3,heights=c(4,4,2))
   }
@@ -210,14 +229,13 @@ modelPlot <- function(model,xvar,type=c("response","link"),dataset=NULL,weights=
     strV1 <- paste("Fitting Analysis on: ",xvar,"(",type,")")
     
     gLine <- ggplot2::ggplot(data=data.melt,aes(x=xvar,y=value,group=variable,colour=variable,shape=variable)) + 
-      ggplot2::geom_line(size=1.5)+geom_point(size=4,fill="white")
+      ggplot2::geom_line(size=1) + ggplot2::geom_point(size=4,fill="white")
     if(("xlim" %in% opts) && is.numeric(data.melt$xvar)) gLine <-gLine + ggplot2::scale_x_continuous(limits=xlim)
     else if(("xlim" %in% opts) && !is.numeric(data.melt$xvar)) gLine <-gLine + ggplot2::scale_x_discrete(limits=xlim)
     else if(("xlim" %in% opts) && is(data.melt[,"xvar"],"Date")) gLine <-gLine + ggplot2::scale_x_date(label=date_format("%y%m"),limits=xlim)
     if("ylim" %in% opts) gLine <-gLine + ggplot2::ylim(ylim)
-    gLine <- gLine + ggplot2::scale_colour_manual(values=c("green4","green1","magenta3")) + ggplot2::scale_shape_manual(values=c(21,2,0)) + ggplot2::xlab("") + ggplot2::ylab(type)+
-      ggplot2::ggtitle(strV1)+
-      ggplot2::theme_bw() + ggplot2::theme(legend.justification=c(1,1), legend.position=c(1,1))
+    gLine <- gLine + ggplot2::scale_colour_manual(values=c("green4","green1","magenta3")) + ggplot2::scale_shape_manual(values=c(21,24,22)) + ggplot2::xlab("") + ggplot2::ylab(type)+
+      ggplot2::ggtitle(strV1)+ theme_mp_line
     if(nlevels(as.factor(data.melt$xvar))>25) gLine <- gLine + ggplot2::theme(axis.text.x = element_text(angle = 90,hjust=0.5,vjust=0.5))
     
     #histogram graph
@@ -227,7 +245,7 @@ modelPlot <- function(model,xvar,type=c("response","link"),dataset=NULL,weights=
       else if(("xlim" %in% opts) && !is.numeric(data.melt$xvar)) ghist <-ghist + ggplot2::scale_x_discrete(limits=xlim)
       ghist <- ghist + ggplot2::ylab("percent (%)")+
       ggplot2::scale_y_continuous(labels = percent)+
-      ggplot2::xlab("")+ggplot2::theme_bw()+ggplot2::theme(axis.text.x = element_blank())
+      ggplot2::xlab("")+ theme_mp_hist
   
     gridExtra::grid.arrange(gLine,ghist,ncol=1,nrow=2,heights=c(4,1))
     
@@ -278,3 +296,14 @@ ModeData <- function(data,weights){
   
   return(data)
 }
+
+#theme for plot ggplot2 graph
+theme_mp_line <- ggplot2::theme_bw() + 
+  ggplot2::theme(text=element_text(family="Times",face="bold.italic"),
+                 legend.justification=c(1,1),
+                 legend.position=c(1,1))
+
+
+theme_mp_hist <- ggplot2::theme_bw() + 
+  ggplot2::theme(text=element_text(family="Times",face="bold.italic"),
+                 axis.text.x = element_blank())
