@@ -19,7 +19,8 @@ Currently, there is only one function provided:
 
 ### Model Access
 
-* `modelPlot`: Used to visualise glm and gbm model fit by `ggplot2` and `googleVis` package.
+* `modelPlot`: Used to visualise `glm` and `gbm` model fitted by `ggplot2` and `googleVis` package.
+* `sankeyPlot`: Used to visualise `rpart` model fitted by `rpart`.
 
 ### Getting Started
 
