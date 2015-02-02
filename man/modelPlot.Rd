@@ -23,7 +23,7 @@ modelPlot(model,xvar,type=c("response","link"),dataset=NULL,weights=NULL,by=NULL
 
 \item{newGroupNum}{Optional. An integer specifies number of new bands when levels of current plotting variable `xvar` or `by` is more than 100.}
 
-\item{...}{xlim and ylim can be used to set the range of the ggplot2 plot. For example, xlim=c(0,1) means restrict the xaxis within (0,1).  This doesn't work for goolgeVis interactive plot because, because, because it is interactive, which you can zoom in and out with your mouse. :)}
+\item{...}{xlim and ylim can be used to set the range of the ggplot2 plot. For example, xlim=c(0,1) means restrict the xaxis within (0,1).  This does not work for goolgeVis interactive plot because, because, because it is interactive, which you can zoom in and out with your mouse. :)}
 
 \item{data}{Optional. A data frame. update the glm model plot with a new dataset.}
 }

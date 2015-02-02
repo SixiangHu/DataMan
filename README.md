@@ -1,6 +1,6 @@
 # DataMan
 
-[![Build Status](https://travis-ci.org/SixiangHu/DataMan.svg?branch=master)](https://travis-ci.org/SixiangHu/DataMan)
+[![Build Status](https://travis-ci.org/SixiangHu/DataMan.svg?branch=master)](https://travis-ci.org/SixiangHu/DataMan) [![License](http://img.shields.io/badge/license-GPL%20%28%3E=%202%29-brightgreen.svg?style=flat)](http://www.gnu.org/licenses/gpl-2.0.html)
 
 This is an R package for data cleaning and preliminary data analysis.
 
@@ -20,7 +20,7 @@ Currently, there is only one function provided:
 ### Model Access
 
 * `modelPlot`: Used to visualise `glm` and `gbm` model fitted by `ggplot2` and `googleVis` package.
-* `sankeyPlot`: Used to visualise `rpart` model fitted by `rpart`.
+* `sankeyPlot`: (Descoped) Used to visualise `rpart` model fitted by `rpart`.  This has been implemented by `sankeyNetwork` in `networkD3` package.
 
 ### Getting Started
 

@@ -3,8 +3,10 @@ Type: Package
 Title: This is an R package for data cleaning and preliminary data analysis.
 Version: 0.1
 Date: 2015-01-24
-Author: Sixiang Hu
+Author: Sixiang Hu <sixiang.hu@gmail.com>
 Maintainer: Sixiang Hu <Sixiang.Hu@Gmail.Com>
 Description: This package provides some simple function used for: Data Cleaning - detecting and populating missing value in a given data frame or vector; Data Analysis - an enhanced summary function to provide more info about variables in the given data. 
-Depends: data.table,methods,ggplot2,googleVis,gridExtra,scales,reshape2,splines,gbm,rCharts
-License:  GPL-2
+Depends: R (>3.0.0), data.table,methods,ggplot2,googleVis,gridExtra,scales,reshape2,splines,gbm
+License:  GPL (>= 2)
+URL: https://github.com/SixiangHu/DataMan
+BugReports: https://github.com/SixiangHu/DataMan/issues

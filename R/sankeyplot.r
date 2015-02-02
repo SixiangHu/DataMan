@@ -16,22 +16,21 @@ sankeyPlot <- function(model,
                              nodeWidth = 15, 
                              nodePadding = 10, 
                              layout = 32, 
-                             width = 600, 
-                             height = 600, 
-                             units= "%",
+                             width = 750, 
+                             height = 750, 
+                             units= "",
                              title=NULL,
                              shiny=FALSE,domain="SankeyPlot"){ 
 
   fr <- model$frame 
-  rn <- row.names(fr) 
+  rn <- as.numeric(row.names(fr))
   num_row <- length(rn) 
+  total <- fr[1,2] 
 
   notename <- paste(as.character(fr$var)," (",as.integer(fr$yval2[(num_row+1):(num_row*2)]),"/",as.integer(fr$yval2[(num_row*2+1):(num_row*3)]),")",sep="") 
-  name <- data.frame(from=as.numeric(rn),source=notename) 
-  
-  total <- fr[1,2] 
-  sankeydata <- data.frame(from=as.numeric(rn) %/% 2,to=as.numeric(rn),value=fr$n /total) 
-  
+  name <- data.frame(from=rn,source=notename) 
+    
+  sankeydata <- data.frame(from=rn %/% 2,to=rn,value=fr$n /total) 
   sankeydata1 <- merge(x = sankeydata, y = name, by = "from", all.x=TRUE) 
   
   colnames(name) <-c("to","target") 
@@ -39,11 +38,8 @@ sankeyPlot <- function(model,
   sankeydata$from <-NULL 
   sankeydata$to <-NULL 
   sankeydata <- sankeydata[,c(2,3,1)] 
-  
-  
-  sankeydata$source <- as.character(sankeydata$source) 
-  sankeydata$target <- as.character(sankeydata$target) 
-  sankeydata[1,1] <-as.character("Root") 
+
+  sankeydata <- sankeydata[-1,] 
   
   sankeyPlot <- rCharts$new() 
   sankeyPlot$setLib('inst/libraries/d3_sankey')
