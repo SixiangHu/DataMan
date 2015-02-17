@@ -29,7 +29,7 @@ DetMiss.data.frame<-function(data){
   
   if(dim(data)[1]==0) stop(paste("object '",deparse(substitute(data)),"' blank or not found.\n"))
   
-  AllMiss <- which(sapply(data,anyNA))
+  AllMiss <- which(sapply(data,function(x) any(is.na(x))))
   Names <- names(AllMiss)
   iLen <- length(Names)
 
@@ -58,9 +58,3 @@ setMethod("DetMiss",signature(data="integer"),DetMiss.factor,valueClass="integer
 setMethod("DetMiss",signature(data="numeric"),DetMiss.factor,valueClass="numeric")
 setMethod("DetMiss",signature(data="data.frame"),DetMiss.data.frame,valueClass="data.frame")
 setMethod("DetMiss",signature(data="matrix"),DetMiss.matrix,valueClass="numeric")
-
-
-anyNA <- function(x){
-  if(getRversion() < "3.1.0") any(is.na(x))
-  else anyNA(x)
-}

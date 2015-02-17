@@ -18,11 +18,6 @@ setGeneric("PopMiss",function(data,
            standardGeneric("PopMiss")
   )
 
-anyNA <- function(x){
-  if(getRversion() < "3.1.0") any(is.na(x))
-  else anyNA(x)
-}
-
 PopMiss.factor<-function(data,na.treatment,replace){
   num_miss <- length(which(is.na(data)))
   na.treatment <- match.arg(na.treatment)
@@ -75,7 +70,7 @@ PopMiss.numeric<-function(data,na.treatment,replace){
 
 PopMiss.data.frame<-function(data,na.treatment,replace){
   na.treatment <- match.arg(na.treatment)
-  num_miss <- which(sapply(data,anyNA))
+  num_miss <- which(sapply(data,function(x) any(is.na(x))))
   if(isTRUE(na.treatment=="delete")) {
     cat(paste(num_miss," columns have been cleaned.\n\n"))
     return(na.omit(data))
