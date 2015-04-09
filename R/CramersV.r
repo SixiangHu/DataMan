@@ -82,20 +82,18 @@ CramersV <- function(data){
 #' @return return a matrix.
 #' @seealso \code{\link{table}}
 #' @author Sixiang Hu
-#' @export
+#' @export quickTable
 #' @examples
 #' quickTable(cars$speed,cars$dist)
 
 quickTable <- function(x,y=NULL,exclude = NULL){
-  x <- factor(x,exclude = exclude)
+  x <- data.table(x=factor(x,exclude = exclude))
   if (is.null(y)) {
-    dt <- data.table(factor(x))
-    dt_cr <- dt[,.N,by=x]
+    dt_cr <- x[,.N,by=x]
     dt_tb <- tapply(dt_cr$N,list(dt_cr$x), sum)
   }
   else {
-    y <- factor(y,exclude = exclude)
-    dt <- data.table(x,y)
+    dt <- data.table(x,y=factor(y,exclude = exclude))
     dt_cr <- dt[,.N,by=list(x,y)]
     dt_tb <- tapply(dt_cr$N,list(dt_cr$x,dt_cr$y), sum)
   }

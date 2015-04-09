@@ -7,7 +7,6 @@
 #' @details This function provides a data summary including min, max, number of unique values and number if missing values.
 #' The min and max will ignore missing value in the data.  The input should be a `data.frame`.
 #' @author Sixiang Hu
-#' @seealso PopMiss
 #' @export
 #' @examples
 #' DataSummary(cars)

@@ -20,7 +20,7 @@ Currently, there is only one function provided:
 ### Model Access
 
 * `modelPlot`: Used to visualise `glm` and `gbm` model fitted by `ggplot2` and `googleVis` package.
-* `sankeyPlot`: (Descoped) Used to visualise `rpart` model fitted by `rpart`.  This has been implemented by `sankeyNetwork` in `networkD3` package.
+* `sankeyPlot`: (Descoped) Used to visualise `rpart` model fitted by `rpart`.  This has been implemented by `sankeyNetwork` in `networkD3` package, hence descoped from this package.
 
 ### Getting Started
 

@@ -24,7 +24,4 @@ DataSummary(cars)
 \author{
 Sixiang Hu
 }
-\seealso{
-PopMiss
-}
 

@@ -76,7 +76,16 @@
 #' 
 #' modelPlot(glm1,"cyl",modelType="glm",interactive=TRUE)
 
-modelPlot <- function(model,xvar,type=c("response","link"),dataset=NULL,weights=NULL,by=NULL,modelType=c("glm","gbm"),interactive=FALSE,newGroupNum=10,...){
+modelPlot <- function(model,
+                      xvar,
+                      type=c("response","link"),
+                      dataset=NULL,
+                      weights=NULL,
+                      by=NULL,
+                      modelType=c("glm","gbm"),
+                      interactive=FALSE,
+                      newGroupNum=10,
+                      ...){
 
   type <- match.arg(type)
   opts.list<-list(...)
