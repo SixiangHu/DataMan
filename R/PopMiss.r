@@ -18,7 +18,7 @@ setGeneric("PopMiss",function(data,
            standardGeneric("PopMiss")
   )
 
-PopMiss.factor<-function(data,na.treatment,replace){
+PopMiss.factor<-function(data,na.treatment,replace=NULL){
   num_miss <- length(which(is.na(data)))
   na.treatment <- match.arg(na.treatment)
   if(isTRUE(na.treatment=="delete")) {
@@ -35,7 +35,7 @@ PopMiss.factor<-function(data,na.treatment,replace){
   return(data)
 }
 
-PopMiss.integer<-function(data,na.treatment,replace){
+PopMiss.integer<-function(data,na.treatment,replace=NULL){
   num_miss <- length(which(is.na(data)))
   na.treatment <- match.arg(na.treatment)
   if(isTRUE(na.treatment=="delete")) {
@@ -51,7 +51,7 @@ PopMiss.integer<-function(data,na.treatment,replace){
   return(data)
 }
 
-PopMiss.numeric<-function(data,na.treatment,replace){
+PopMiss.numeric<-function(data,na.treatment,replace=NULL){
   num_miss <- length(which(is.na(data)))
   na.treatment <- match.arg(na.treatment)
   if(isTRUE(na.treatment=="delete")) {
@@ -68,7 +68,7 @@ PopMiss.numeric<-function(data,na.treatment,replace){
   return(data)
 }
 
-PopMiss.data.frame<-function(data,na.treatment,replace){
+PopMiss.data.frame<-function(data,na.treatment,replace=NULL){
   na.treatment <- match.arg(na.treatment)
   num_miss <- which(sapply(data,function(x) any(is.na(x))))
   if(isTRUE(na.treatment=="delete")) {
@@ -102,7 +102,7 @@ PopMiss.data.frame<-function(data,na.treatment,replace){
   }
 }
 
-PopMiss.matrix <- function(data,na.treatment,replace){
+PopMiss.matrix <- function(data,na.treatment,replace=NULL){
 	if(identical(match.arg(na.treatment),"delete")) warning("na.treatment is \"delete\" and 'data' is a matrix. This only works correctly if whole rows are missing")
 	matrix(PopMiss(as.vector(data),na.treatment,replace),ncol=ncol(data))
 }
@@ -115,4 +115,3 @@ setMethod("PopMiss",signature(data="integer"),PopMiss.integer)
 setMethod("PopMiss",signature(data="numeric"),PopMiss.numeric)
 setMethod("PopMiss",signature(data="data.frame"),PopMiss.data.frame)
 setMethod("PopMiss",signature(data="matrix"),PopMiss.matrix)
-

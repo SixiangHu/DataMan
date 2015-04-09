@@ -14,6 +14,10 @@ DataSummary(data,weights=NULL)
 \description{
 This function allows you to have a summary about the given dataset.
 }
+\details{
+This function provides a data summary including min, max, number of unique values and number if missing values.
+The min and max will ignore missing value in the data.  The input should be a `data.frame`.
+}
 \examples{
 DataSummary(cars)
 }

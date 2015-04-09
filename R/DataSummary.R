@@ -4,6 +4,8 @@
 #' @usage DataSummary(data,weights=NULL)
 #' @param data This could be data frame or a vector.
 #' @param weights For a sampled dataset, you may want to specify the wieght.  This is a vector that each element in the vector giving a weight to the current observation.
+#' @details This function provides a data summary including min, max, number of unique values and number if missing values.
+#' The min and max will ignore missing value in the data.  The input should be a `data.frame`.
 #' @author Sixiang Hu
 #' @seealso PopMiss
 #' @export
@@ -11,10 +13,11 @@
 #' DataSummary(cars)
 
 DataSummary <- function(data,weights=NULL){
+
   if(is.null(weights)) weights <- rep(1,nrow(data))
   
   dsName    <- names(data)
-  dsClass   <- sapply(data,class)
+  dsClass   <- sapply(data,function(x) ifelse(length(class(x))>1,class(x)[1],class(x)))
   dsNLevels <- sapply(data,function(x) nlevels(as.factor(x)))
   dsMiss    <- sapply(data,function(x) sum(is.na(x)))
   
@@ -22,18 +25,22 @@ DataSummary <- function(data,weights=NULL){
     if(is.numeric(x) || is.integer(x)) as.character(round(weighted.mean(x,weights,na.rm = TRUE),6))
     else {
       x.dt<-data.table(x,weights)
-      as.character(x.dt[,sum(weights),by=x][order(-V1)][1,list(x)])
+      dsTemp <- as.character(x.dt[,sum(weights),by=x][order(-V1)][1,list(x)])
+      if(is.null(dsTemp)) as.character(x.dt[,sum(weights),by=x][order(-V1)][2,list(x)])
+      else dsTemp
     }
-  }
-  )
+  })
+  
   dsMax    <- sapply(data,function(x){
     if(is.numeric(x) || is.integer(x)) as.character(round(max(x,na.rm = TRUE),6))
     else {
       x.dt<-data.table(x,weights)
-      as.character(x.dt[,sum(weights),by=x][order(-V1)][1,list(x)])
+      dsTemp <- as.character(x.dt[,sum(weights),by=x][order(-V1)][1,list(x)])
+      if(is.null(dsTemp)) as.character(x.dt[,sum(weights),by=x][order(-V1)][2,list(x)])
+      else dsTemp
     }
-  }
-  )
+  })
+  
   dsMin    <- sapply(data,function(x){
     if(is.numeric(x) || is.integer(x)) as.character(round(min(x,na.rm = TRUE),6))
     else {
@@ -44,9 +51,9 @@ DataSummary <- function(data,weights=NULL){
   )
   
   return(data.frame("Variable Name"=dsName,
-                    "Variable Type"=dsClass,
-                    "Number of Unique Value"=dsNLevels,
-                    "Number of Missing value"=dsMiss,
+                    "Variable Type"=unlist(dsClass),
+                    "Number of Unique Value"=unlist(dsNLevels),
+                    "Number of Missing value"=unlist(dsMiss),
                     "Mean or Mode"=unlist(dsMean),
                     "Min"=unlist(dsMin),
                     "Max"=unlist(dsMax)
