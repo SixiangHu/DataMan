@@ -42,8 +42,8 @@ sankeyPlot <- function(model,
   sankeydata <- sankeydata[-1,] 
   
   sankeyPlot <- rCharts$new() 
-  sankeyPlot$setLib('inst/libraries/d3_sankey')
-  sankeyPlot$setTemplate('inst/libraries/d3_sankey/layouts/chart.html')
+  sankeyPlot$setLib(paste0(system.file(package="DataMan"),'/libraries/d3_sankey'))
+  sankeyPlot$setTemplate(paste0(system.file(package="DataMan"),'inst/libraries/d3_sankey/layouts/chart.html'))
   
   sankeyPlot$set( 
     data = sankeydata, 
