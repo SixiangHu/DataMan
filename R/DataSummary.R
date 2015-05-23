@@ -26,7 +26,7 @@ DataSummary <- function(data,weights=NULL,sparkline=FALSE){
     else {
       x.dt<-data.table(x,weights)
       dsTemp <- as.character(x.dt[,sum(weights),by=x][order(-V1)][1,list(x)])
-      if(is.null(dsTemp)) as.character(x.dt[,sum(weights),by=x][order(-V1)][2,list(x)])
+      if(is.null(dsTemp  ||  is.na(dsTemp))) as.character(x.dt[,sum(weights),by=x][order(-V1)][2,list(x)])
       else dsTemp
     }
   })
@@ -36,7 +36,7 @@ DataSummary <- function(data,weights=NULL,sparkline=FALSE){
     else {
       x.dt<-data.table(x,weights)
       dsTemp <- as.character(x.dt[,sum(weights),by=x][order(-V1)][1,list(x)])
-      if(is.null(dsTemp)) as.character(x.dt[,sum(weights),by=x][order(-V1)][2,list(x)])
+      if(is.null(dsTemp  ||  is.na(dsTemp))) as.character(x.dt[,sum(weights),by=x][order(-V1)][2,list(x)])
       else dsTemp
     }
   })
@@ -45,7 +45,9 @@ DataSummary <- function(data,weights=NULL,sparkline=FALSE){
     if(is.numeric(x) || is.integer(x)) as.character(round(min(x,na.rm = TRUE),6))
     else {
       x.dt<-data.table(x,weights)
-      as.character(x.dt[,sum(weights),by=x][order(V1)][1,list(x)])
+      dsTemp <- as.character(x.dt[,sum(weights),by=x][order(V1)][1,list(x)])
+      if(is.null(dsTemp  ||  is.na(dsTemp))) as.character(x.dt[,sum(weights),by=x][order(V1)][2,list(x)])
+      else dsTemp
     }
   })
   
