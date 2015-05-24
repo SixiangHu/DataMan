@@ -137,7 +137,8 @@ modelPlot <- function(model,
   }
   
   #fitted.values
-  fitted <- as.numeric(predict(model,dataset,type=type,weights=weights,n.trees=model$n.trees))
+  if (modelType == "glm") fitted <- as.numeric(predict(model,dataset,type=type,weights=weights))
+  else if (modelType == "gbm") fitted <- as.numeric(predict(model,dataset,type=type,weights=weights,n.trees=model$n.trees))
   
   #observed
   if (modelType == "glm") observed <- as.numeric(model$y)
