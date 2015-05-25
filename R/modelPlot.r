@@ -166,7 +166,7 @@ modelPlot <- function(model,
   
   #fitted mean
   if (modelType == "glm") fitted_mean <- as.numeric(predict(model,MeanData,type=type,weights=weights))
-  else if (modelType == "glm.nb") fitted <- as.numeric(predict(model,dataset,type=type))
+  else if (modelType == "glm.nb") fitted <- as.numeric(predict(model,MeanData,type=type))
   else if (modelType == "gbm") fitted_mean <- as.numeric(predict(model,MeanData,type=type,weights=weights,n.trees=model$n.trees))
   
   #Plotting
@@ -314,11 +314,11 @@ ModeData <- function(data,weights){
 
 #theme for plot ggplot2 graph
 theme_mp_line <- ggplot2::theme_bw() + 
-  ggplot2::theme(text=element_text(family="Times",face="bold.italic"),
+  ggplot2::theme(text=element_text(face="bold.italic"),
                  legend.justification=c(1,1),
                  legend.position=c(1,1))
 
 
 theme_mp_hist <- ggplot2::theme_bw() + 
-  ggplot2::theme(text=element_text(family="Times",face="bold.italic"),
+  ggplot2::theme(text=element_text(face="bold.italic"),
                  axis.text.x = element_blank())
