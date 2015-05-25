@@ -7,7 +7,7 @@
 #' @param type either "response" or "link". By default ("response") will plot on GLM response as oppose to linear predictor ("link").
 #' @param data Optional. A data frame. update the glm model plot with a new dataset.
 #' @param weights Optional. A numerical vector to specify the weights used for updating the glm model for plotting.
-#' @param modelType A character string. Either "glm" or "gbm".
+#' @param modelType A character string. One of "glm", "glm.nb" or "gbm".
 #' @param interactive logical. Set true to use googleVis package plotting interactively. Currently it doesn't work when using "by" method.
 #' @param by Optinal. A character string indicates the variable name you want to plot the fit by.
 #' @param newGroupNum Optional. An integer specifies number of new bands when levels of current plotting variable `xvar` or `by` is more than 100. 
@@ -82,7 +82,7 @@ modelPlot <- function(model,
                       dataset=NULL,
                       weights=NULL,
                       by=NULL,
-                      modelType=c("glm","gbm"),
+                      modelType=c("glm","glm.nb","gbm"),
                       interactive=FALSE,
                       newGroupNum=10,
                       ...){
@@ -101,11 +101,26 @@ modelPlot <- function(model,
     stop("Model provided is blank.")
   }
   
+  #weights
+  if (is.null(weights)) {
+    if (modelType == "glm") weights <- model$prior.weights
+    else if ("weights" %in% names(model) ) weights <- model$weights
+    else if (modelType == "gbm") {
+      w_name <- deparse(model$call$weights)
+      if (w_name %in% names(dataset)) weights <- dataset[,deparse(model$call$weights)]
+      else if ("weights" %in% names(model$call) ) weights <- model$call$weights
+      else weights <- rep(1,length(model$fit))          
+    }
+  }
+  
   #data source
   if(!is.null(dataset)) {
     if (modelType=="glm"){
       cat("modelPlot: Refitting model using new data...\n")
       model<-update(model,data=dataset,weights=weights)
+    }
+    else if (modelType=="glm.nb"){
+      model<-update(model,data=dataset)
     }
   }
   else{
@@ -124,24 +139,13 @@ modelPlot <- function(model,
   if(is.null(dataset)) stop("modelPlot: Cannot found any proper data set.  Variables not in a data frame persumably?")
   if(!xvar %in% colnames(dataset)) stop(paste("modelPlot: Selected variable (",xvar,") is not in the data.",""))
   
-  #weights
-  if (is.null(weights)) {
-    if (modelType == "glm") weights <- model$prior.weights
-    else if ("weights" %in% names(model) ) weights <- model$weights
-    else if (modelType == "gbm") {
-      w_name <- deparse(model$call$weights)
-      if (w_name %in% names(dataset)) weights <- dataset[,deparse(model$call$weights)]
-      else if ("weights" %in% names(model$call) ) weights <- model$call$weights
-      else weights <- rep(1,length(model$fit))          
-    }
-  }
-  
   #fitted.values
   if (modelType == "glm") fitted <- as.numeric(predict(model,dataset,type=type,weights=weights))
+  else if (modelType == "glm.nb") fitted <- as.numeric(predict(model,dataset,type=type))
   else if (modelType == "gbm") fitted <- as.numeric(predict(model,dataset,type=type,weights=weights,n.trees=model$n.trees))
   
   #observed
-  if (modelType == "glm") observed <- as.numeric(model$y)
+  if (modelType %in% c("glm","glm.nb")) observed <- as.numeric(model$y)
   else if (modelType == "gbm") {
     if ( model$response.name %in% names(dataset) ) observed <- as.numeric(dataset[,model$response.name])
     else if ( model$gbm.call$response.name %in% names(dataset) )  observed <- as.numeric(dataset[,model$gbm.call$response.name])
@@ -153,7 +157,7 @@ modelPlot <- function(model,
   MeanData[,xvar] <- dataset[,xvar]
   
   #New Group for data which has too much levels.
-  if ( (is.numeric(dataset[,xvar]) || is.integer(dataset[,xvar])) && nlevels(dataset[,xvar])>100 ) {
+  if ( (is.numeric(dataset[,xvar]) || is.integer(dataset[,xvar])) && nlevels(as.factor(dataset[,xvar]))>100 ) {
     if ( is.null(newGroupNum) ) newGroupNum <- 10
     
     new_band <- seq(min(dataset[,xvar]),max(dataset[,xvar]),length.out=newGroupNum)
@@ -162,6 +166,7 @@ modelPlot <- function(model,
   
   #fitted mean
   if (modelType == "glm") fitted_mean <- as.numeric(predict(model,MeanData,type=type,weights=weights))
+  else if (modelType == "glm.nb") fitted <- as.numeric(predict(model,dataset,type=type))
   else if (modelType == "gbm") fitted_mean <- as.numeric(predict(model,MeanData,type=type,weights=weights,n.trees=model$n.trees))
   
   #Plotting
@@ -176,11 +181,11 @@ modelPlot <- function(model,
     fitted <- tran_lnk_fun(fitted)
     observed <- tran_lnk_fun(observed)
   }
-
+  
   if( !is.null(by) && !by %in% colnames(dataset) ) stop(paste("Selected factor (",by,") is not in the data.",""))
   else if ( !is.null(by) ) {
     
-    if ( (is.numeric(dataset[,by]) || is.integer(dataset[,by])) && nlevels(dataset[,by])>100 ) {
+    if ( (is.numeric(dataset[,by]) || is.integer(dataset[,by])) && nlevels(as.factor(dataset[,by]))>100 ) {
       if ( is.null(newGroupNum) ) newGroupNum <- 10
       
       new_band <- seq(min(dataset[,by]),max(dataset[,by]),length.out=newGroupNum)
