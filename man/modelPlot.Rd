@@ -17,7 +17,7 @@ modelPlot(model,xvar,type=c("response","link"),dataset=NULL,weights=NULL,by=NULL
 
 \item{by}{Optinal. A character string indicates the variable name you want to plot the fit by.}
 
-\item{modelType}{A character string. Either "glm" or "gbm".}
+\item{modelType}{A character string. One of "glm", "glm.nb" or "gbm".}
 
 \item{interactive}{logical. Set true to use googleVis package plotting interactively. Currently it doesn't work when using "by" method.}
 

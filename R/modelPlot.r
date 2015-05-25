@@ -166,7 +166,7 @@ modelPlot <- function(model,
   
   #fitted mean
   if (modelType == "glm") fitted_mean <- as.numeric(predict(model,MeanData,type=type,weights=weights))
-  else if (modelType == "glm.nb") fitted <- as.numeric(predict(model,MeanData,type=type))
+  else if (modelType == "glm.nb") fitted_mean <- as.numeric(predict(model,MeanData,type=type))
   else if (modelType == "gbm") fitted_mean <- as.numeric(predict(model,MeanData,type=type,weights=weights,n.trees=model$n.trees))
   
   #Plotting
