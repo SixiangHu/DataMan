@@ -9,7 +9,7 @@ sankeyPlot(model)
 \arguments{
 \item{model}{A rpart decision tree object.}
 
-\item{shiny}{logical. If `TRUE`, function returns rChart object. Use `showOutput` in `UI` to display.}
+\item{shiny}{logical. If `TRUE`, function returns rChart object. Use `showOutput` (`UI`) and `renderChart` (`Server`) in shiny code.}
 
 \item{domain}{A character. When `shiny` is `TRUE`, this domain has to be set the same with shiny output variable name.}
 }

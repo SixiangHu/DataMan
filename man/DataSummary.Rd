@@ -9,9 +9,10 @@ DataSummary(data,weights=NULL)
 \arguments{
 \item{data}{This could be data frame or a vector.}
 
-\item{weights}{For a sampled dataset, you may want to specify the wieght.  This is a vector that each element in the vector giving a weight to the current observation.}
+\item{wt}{For a sampled dataset, you may want to specify the wieght for stats calcualted.  It can be a character which is a column name in the dataset provided,
+or integer (numeric) weights vector.}
 
-\item{sparkline}{logical. If true, a string of level percentage will be generated, which can be used later in shiny with sparkline package.}
+\item{sparkline}{logical. If true, a string of level percentage will be generated, which can be used later in `shiny` app with `sparkline` package.}
 }
 \description{
 This function allows you to have a summary about the given dataset.

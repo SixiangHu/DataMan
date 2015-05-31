@@ -46,7 +46,8 @@ For GBM model, currently, can only create response plot.  Because of the fact th
 The difference between `plot.gbm` in `gbm` package and this modelPlot function is that `plot.gbm` is plotting "marginal effect" as oppose to overall fitting.
 }
 \examples{
-#model from gbm package
+## Not run:
+#example from gbm package
 N <- 1000
 X1 <- runif(N)
 X2 <- 2*runif(N)
@@ -89,6 +90,7 @@ modelPlot(gbm1,xvar="X3",modelType="gbm",by="X5")
 glm1 <- glm(formula = mpg ~ cyl + hp, family = Gamma(log), data = mtcars, weights = wt)
 
 modelPlot(glm1,"cyl",modelType="glm",interactive=TRUE)
+## End(Not run)
 }
 \author{
 Sixiang Hu

@@ -3,7 +3,7 @@
 #' @description Using `rCharts` package and java D3.js sankey plot to visualise rpart decision tree model.  
 #' @usage sankeyPlot(model)
 #' @param model A rpart decision tree object.
-#' @param shiny logical. If `TRUE`, function returns rChart object. Use `showOutput` in `UI` to display.
+#' @param shiny logical. If `TRUE`, function returns rChart object. Use `showOutput` (`UI`) and `renderChart` (`Server`) in shiny code.
 #' @param domain A character. When `shiny` is `TRUE`, this domain has to be set the same with shiny output variable name.
 #' @details D3 java graph library provides lots of interactive visualisation function. 
 #' And `rCharts` package provides a link between R and D3. 

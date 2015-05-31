@@ -32,7 +32,8 @@
 #' @export modelPlot
 #' @examples
 #' 
-#' #model from gbm package
+#' ## Not run:
+#' #example from gbm package
 #' N <- 1000
 #' X1 <- runif(N)
 #' X2 <- 2*runif(N)
@@ -75,6 +76,7 @@
 #' glm1 <- glm(formula = mpg ~ cyl + hp, family = Gamma(log), data = mtcars, weights = wt)
 #' 
 #' modelPlot(glm1,"cyl",modelType="glm",interactive=TRUE)
+#' ## End(Not run)
 
 modelPlot <- function(model,
                       xvar,

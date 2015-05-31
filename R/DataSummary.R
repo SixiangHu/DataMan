@@ -3,8 +3,9 @@
 #' @description This function allows you to have a summary about the given dataset.
 #' @usage DataSummary(data,weights=NULL)
 #' @param data This could be data frame or a vector.
-#' @param weights For a sampled dataset, you may want to specify the wieght.  This is a vector that each element in the vector giving a weight to the current observation.
-#' @param sparkline logical. If true, a string of level percentage will be generated, which can be used later in shiny with sparkline package.
+#' @param wt For a sampled dataset, you may want to specify the wieght for stats calcualted.  It can be a character which is a column name in the dataset provided, 
+#' or integer (numeric) weights vector.
+#' @param sparkline logical. If true, a string of level percentage will be generated, which can be used later in `shiny` app with `sparkline` package.
 #' @details This function provides a data summary including min, max, number of unique values and number if missing values.
 #' The min and max will ignore missing value in the data.  The input should be a `data.frame`.
 #' @author Sixiang Hu
@@ -12,9 +13,12 @@
 #' @examples
 #' DataSummary(cars)
 
-DataSummary <- function(data,weights=NULL,sparkline=FALSE){
+DataSummary <- function(data,wt=NULL,sparkline=FALSE){
 
-  if(is.null(weights)) weights <- rep(1,nrow(data))
+  if(is.null(wt)) weight <- rep(1,nrow(data))
+  else if (class(wt) == "character") weight <- data[,wt]
+  else if (class(wt) %in% c("integer","numeric")) weight <- wt
+  else stop("DataSummary: wt provided is not in correct format.\n")
   
   dsName    <- names(data)
   dsClass   <- sapply(data,function(x) ifelse(length(class(x))>1,class(x)[1],class(x)))
@@ -22,11 +26,11 @@ DataSummary <- function(data,weights=NULL,sparkline=FALSE){
   dsMiss    <- sapply(data,function(x) sum(is.na(x)))
   
   dsMean    <- sapply(data,function(x){
-    if(is.numeric(x) || is.integer(x)) as.character(round(weighted.mean(x,weights,na.rm = TRUE),6))
+    if(is.numeric(x) || is.integer(x)) as.character(round(weighted.mean(x,weight,na.rm = TRUE),6))
     else {
-      x.dt<-data.table(x,weights)
-      dsTemp <- as.character(x.dt[,sum(weights),by=x][order(-V1)][1,list(x)])
-      if(is.null(dsTemp) || is.na(dsTemp)) as.character(x.dt[,sum(weights),by=x][order(-V1)][2,list(x)])
+      x.dt<-data.table(x,weight)
+      dsTemp <- as.character(x.dt[,sum(weight),by=x][order(-V1)][1,list(x)])
+      if(is.null(dsTemp) || is.na(dsTemp)) as.character(x.dt[,sum(weight),by=x][order(-V1)][2,list(x)])
       else dsTemp
     }
   })
@@ -34,9 +38,9 @@ DataSummary <- function(data,weights=NULL,sparkline=FALSE){
   dsMax    <- sapply(data,function(x){
     if(is.numeric(x) || is.integer(x)) as.character(round(max(x,na.rm = TRUE),6))
     else {
-      x.dt<-data.table(x,weights)
-      dsTemp <- as.character(x.dt[,sum(weights),by=x][order(-V1)][1,list(x)])
-      if(is.null(dsTemp) || is.na(dsTemp)) as.character(x.dt[,sum(weights),by=x][order(-V1)][2,list(x)])
+      x.dt<-data.table(x,weight)
+      dsTemp <- as.character(x.dt[,sum(weight),by=x][order(-V1)][1,list(x)])
+      if(is.null(dsTemp) || is.na(dsTemp)) as.character(x.dt[,sum(weight),by=x][order(-V1)][2,list(x)])
       else dsTemp
     }
   })
@@ -44,9 +48,9 @@ DataSummary <- function(data,weights=NULL,sparkline=FALSE){
   dsMin    <- sapply(data,function(x){
     if(is.numeric(x) || is.integer(x)) as.character(round(min(x,na.rm = TRUE),6))
     else {
-      x.dt<-data.table(x,weights)
-      dsTemp <- as.character(x.dt[,sum(weights),by=x][order(V1)][1,list(x)])
-      if(is.null(dsTemp) || is.na(dsTemp)) as.character(x.dt[,sum(weights),by=x][order(V1)][2,list(x)])
+      x.dt<-data.table(x,weight)
+      dsTemp <- as.character(x.dt[,sum(weight),by=x][order(V1)][1,list(x)])
+      if(is.null(dsTemp) || is.na(dsTemp)) as.character(x.dt[,sum(weight),by=x][order(V1)][2,list(x)])
       else dsTemp
     }
   })
