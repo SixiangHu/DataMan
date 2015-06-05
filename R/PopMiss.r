@@ -1,7 +1,7 @@
 #' Populate Missing Value
 #'
 #' @description This function allows you to populate missing values. 
-#' @usage PopMiss(data)
+#' @usage PopMiss(data,na.treatment=c("mean.or.mode","delete","replace"),replace=NULL)
 #' @param data This could be data frame, matrix or a vector.
 #' @param na.treatment One of "mean.or.mode", "delete", or "replace", to specify the method to populate missing values.
 #' @param replace A single value used for populating ALL missing value.  May not be useful for a data frame with missing values in different type of variable. 
@@ -12,11 +12,9 @@
 #' a <- c(sample(LETTERS,5),NA)
 #' PopMiss(a)
 
-setGeneric("PopMiss",function(data,
-                              na.treatment=c("mean.or.mode","delete","replace"),
-                              replace=NULL)
-           standardGeneric("PopMiss")
-  )
+PopMiss <- function(data,na.treatment=c("mean.or.mode","delete","replace"),replace=NULL){
+  UseMethod("PopMiss",data)
+}
 
 PopMiss.factor<-function(data,na.treatment,replace=NULL){
   num_miss <- length(which(is.na(data)))
@@ -106,12 +104,3 @@ PopMiss.matrix <- function(data,na.treatment,replace=NULL){
 	if(identical(match.arg(na.treatment),"delete")) warning("na.treatment is \"delete\" and 'data' is a matrix. This only works correctly if whole rows are missing")
 	matrix(PopMiss(as.vector(data),na.treatment,replace),ncol=ncol(data))
 }
-
-setMethod("PopMiss",signature(data="factor"),PopMiss.factor)
-setMethod("PopMiss",signature(data="character"),PopMiss.factor)
-setMethod("PopMiss",signature(data="Date"),PopMiss.factor)
-setMethod("PopMiss",signature(data="logical"),PopMiss.factor)
-setMethod("PopMiss",signature(data="integer"),PopMiss.integer)
-setMethod("PopMiss",signature(data="numeric"),PopMiss.numeric)
-setMethod("PopMiss",signature(data="data.frame"),PopMiss.data.frame)
-setMethod("PopMiss",signature(data="matrix"),PopMiss.matrix)

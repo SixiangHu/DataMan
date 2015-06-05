@@ -4,7 +4,8 @@
 \alias{modelPlot}
 \title{modelPlot}
 \usage{
-modelPlot(model,xvar,type=c("response","link"),dataset=NULL,weights=NULL,by=NULL,modelType=c("glm","gbm"),interactive=FALSE,...)
+modelPlot(model,xvar,type=c("response","link"),dataset=NULL,weights=NULL,
+by=NULL,modelType=c("glm","glm.nb","gbm"),interactive=FALSE,newGroupNum=10,...)
 }
 \arguments{
 \item{model}{a model object. Currently this is created for glm and gbm.}
@@ -12,6 +13,8 @@ modelPlot(model,xvar,type=c("response","link"),dataset=NULL,weights=NULL,by=NULL
 \item{xvar}{a character string indicates the variable name you want to visulise.}
 
 \item{type}{either "response" or "link". By default ("response") will plot on GLM response as oppose to linear predictor ("link").}
+
+\item{dataset}{Optional. A data frame. update the glm model plot with a new dataset.}
 
 \item{weights}{Optional. A numerical vector to specify the weights used for updating the glm model for plotting.}
 
@@ -24,8 +27,6 @@ modelPlot(model,xvar,type=c("response","link"),dataset=NULL,weights=NULL,by=NULL
 \item{newGroupNum}{Optional. An integer specifies number of new bands when levels of current plotting variable `xvar` or `by` is more than 100.}
 
 \item{...}{xlim and ylim can be used to set the range of the ggplot2 plot. For example, xlim=c(0,1) means restrict the xaxis within (0,1).  This does not work for goolgeVis interactive plot because, because, because it is interactive, which you can zoom in and out with your mouse. :)}
-
-\item{data}{Optional. A data frame. update the glm model plot with a new dataset.}
 }
 \description{
 This function allows you visulise the GLM or GBM fitting by comparing observation, fitted and mean fitted on the same plot.
@@ -55,6 +56,6 @@ modelPlot(glm1,"cyl",modelType="glm",interactive=TRUE)
 Sixiang Hu
 }
 \seealso{
-\code{\link{gbm}}, \code{\link{glm}}, \code{\link{plot.gbm}}
+\code{\link{glm}}
 }
 

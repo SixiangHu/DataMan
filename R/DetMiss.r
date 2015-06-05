@@ -10,8 +10,9 @@
 #' a <- c(sample(LETTERS,5),NA)
 #' DetMiss(a)
 
-setGeneric("DetMiss",function(data) standardGeneric("DetMiss"))
-
+DetMiss <- function(data){
+  UseMethod("DetMiss",data)
+}
 DetMiss.matrix <- function(data){
 	v <- DetMiss(as.vector(data))
 }
@@ -49,12 +50,3 @@ DetMiss.data.frame<-function(data){
   return(RetTab)
 
 }
-
-setMethod("DetMiss",signature(data="factor"),DetMiss.factor,valueClass="factor")
-setMethod("DetMiss",signature(data="logical"),DetMiss.factor,valueClass="logical")
-setMethod("DetMiss",signature(data="Date"),DetMiss.factor,valueClass="Date")
-setMethod("DetMiss",signature(data="character"),DetMiss.factor,valueClass="character")
-setMethod("DetMiss",signature(data="integer"),DetMiss.factor,valueClass="integer")
-setMethod("DetMiss",signature(data="numeric"),DetMiss.factor,valueClass="numeric")
-setMethod("DetMiss",signature(data="data.frame"),DetMiss.data.frame,valueClass="data.frame")
-setMethod("DetMiss",signature(data="matrix"),DetMiss.matrix,valueClass="numeric")

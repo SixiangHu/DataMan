@@ -4,7 +4,7 @@
 \alias{DataSummary}
 \title{DataSummary}
 \usage{
-DataSummary(data,weights=NULL)
+DataSummary(data,wt=NULL,sparkline=FALSE)
 }
 \arguments{
 \item{data}{This could be data frame or a vector.}

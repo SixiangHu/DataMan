@@ -4,27 +4,42 @@
 \alias{sankeyPlot}
 \title{sankeyPlot}
 \usage{
-sankeyPlot(model)
+sankeyPlot(model,nodeWidth = 15, nodePadding = 10, layout = 32,
+width = 750, height = 750, units= "",title=NULL,shiny=FALSE,domain="SankeyPlot")
 }
 \arguments{
 \item{model}{A rpart decision tree object.}
+
+\item{nodeWidth}{Integer.}
+
+\item{nodePadding}{Integer.}
+
+\item{layout}{Integer.}
+
+\item{width}{Integer.}
+
+\item{height}{Integer.}
+
+\item{units}{"".}
+
+\item{title}{String.}
 
 \item{shiny}{logical. If `TRUE`, function returns rChart object. Use `showOutput` (`UI`) and `renderChart` (`Server`) in shiny code.}
 
 \item{domain}{A character. When `shiny` is `TRUE`, this domain has to be set the same with shiny output variable name.}
 }
 \description{
-Using `rCharts` package and java D3.js sankey plot to visualise rpart decision tree model.
+Using rCharts package and java D3.js sankey plot to visualise rpart decision tree model.
 }
 \details{
 D3 java graph library provides lots of interactive visualisation function.
-And `rCharts` package provides a link between R and D3.
+And rCharts package provides a link between R and D3.
 Hence, this code comes out to plot a decision tree object using  sankey.
 }
 \author{
 Sixiang Hu
 }
 \seealso{
-rChart,
+rCharts,
 }
 

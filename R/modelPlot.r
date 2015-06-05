@@ -1,11 +1,12 @@
 #' modelPlot
 #'
 #' @description This function allows you visulise the GLM or GBM fitting by comparing observation, fitted and mean fitted on the same plot.
-#' @usage modelPlot(model,xvar,type=c("response","link"),dataset=NULL,weights=NULL,by=NULL,modelType=c("glm","gbm"),interactive=FALSE,...)
+#' @usage modelPlot(model,xvar,type=c("response","link"),dataset=NULL,weights=NULL,
+#' by=NULL,modelType=c("glm","glm.nb","gbm"),interactive=FALSE,newGroupNum=10,...)
 #' @param model a model object. Currently this is created for glm and gbm. 
 #' @param xvar a character string indicates the variable name you want to visulise.
 #' @param type either "response" or "link". By default ("response") will plot on GLM response as oppose to linear predictor ("link").
-#' @param data Optional. A data frame. update the glm model plot with a new dataset.
+#' @param dataset Optional. A data frame. update the glm model plot with a new dataset.
 #' @param weights Optional. A numerical vector to specify the weights used for updating the glm model for plotting.
 #' @param modelType A character string. One of "glm", "glm.nb" or "gbm".
 #' @param interactive logical. Set true to use googleVis package plotting interactively. Currently it doesn't work when using "by" method.
@@ -28,7 +29,13 @@
 #' The difference between `plot.gbm` in `gbm` package and this modelPlot function is that `plot.gbm` is plotting "marginal effect" as oppose to overall fitting.    
 #' 
 #' @author Sixiang Hu
-#' @seealso \code{\link{gbm}}, \code{\link{glm}}, \code{\link{plot.gbm}}
+#' @importFrom data.table as.data.table setkey :=
+#' @importFrom ggplot2 aes element_text ggplot
+#' @importFrom gridExtra grid.arrange
+#' @importFrom reshape2 melt
+#' @importFrom googleVis gvisComboChart
+#' @importFrom scales percent date_format
+#' @seealso \code{\link{glm}}
 #' @export modelPlot
 #' @examples
 #' 
@@ -153,7 +160,7 @@ modelPlot <- function(model,
       dataset[,by] <- cut(dataset[,by],new_band,include.lowest = TRUE)
     }
     
-    data.plot <-data.table(as.data.frame(cbind(xvar=dataset[,xvar],by=dataset[,by],fitted,observed,weights),stringsAsFactors=FALSE))
+    data.plot <-as.data.table(as.data.frame(cbind(xvar=dataset[,xvar],by=dataset[,by],fitted,observed,weights),stringsAsFactors=FALSE))
     setkey(data.plot,xvar,by)
     
     data.plot <- data.plot[,lapply(.SD,as.numeric),by=list(xvar,by),.SDcols=c("fitted","observed","weights")]
@@ -189,16 +196,16 @@ modelPlot <- function(model,
   }
   else {
 
-    #use data.table to speed up
-    data.plot <-data.table::data.table(as.data.frame(cbind(xvar=dataset[,xvar],fitted,fitted_mean,observed,weights),stringsAsFactors=FALSE))
-    data.table::setkey(data.plot,xvar)
+    #use as.data.table to speed up
+    data.plot <-as.data.table(as.data.frame(cbind(xvar=dataset[,xvar],fitted,fitted_mean,observed,weights),stringsAsFactors=FALSE))
+    setkey(data.plot,xvar)
     
     data.plot <- data.plot[,lapply(.SD,as.numeric),by=xvar,.SDcols=c("fitted","fitted_mean","observed","weights")]
     data.agg <- as.data.frame(data.plot[,lapply(.SD,weighted.mean,w=weights),by=xvar,.SDcols=c("fitted","fitted_mean","observed","weights")],row.names=c("xvar","weights","fitted","fitted_mean","observed"))
     data.freq <- as.data.frame(data.plot[,sum(weights),by=xvar][,freq:=V1/sum(V1)])
 
     #melt
-    data.melt <- reshape2::melt(data.agg[,-5],id=c("xvar"))
+    data.melt <- melt(data.agg[,-5],id=c("xvar"))
     
     #line graph
     
@@ -223,7 +230,7 @@ modelPlot <- function(model,
       ggplot2::scale_y_continuous(labels = percent)+
       ggplot2::xlab("")+ theme_mp_hist
   
-    gridExtra::grid.arrange(gLine,ghist,ncol=1,nrow=2,heights=c(4,1))
+    grid.arrange(gLine,ghist,ncol=1,nrow=2,heights=c(4,1))
     
     if (interactive) {
       df <- data.frame(data.agg,freq=data.freq$freq)
@@ -241,7 +248,7 @@ modelPlot <- function(model,
                                    chartArea="{width:'90%',height:'90%'}",
                                    height=750)
       
-      plot(googleVis::gvisComboChart(df,xvar="xvar",yvar=c("fitted","fitted_mean","observed","freq"),options=gvisSingleOptionList))
+      plot(gvisComboChart(df,xvar="xvar",yvar=c("fitted","fitted_mean","observed","freq"),options=gvisSingleOptionList))
 
     }
   }
@@ -249,7 +256,10 @@ modelPlot <- function(model,
   options(warn=0)
 }
 
+percent=value=variable=.N=NULL #global variabel to pass R CMD CHECK
+
 # Create mode or average of a dataset
+x=freq=NULL
 ModeData <- function(data,weights){
 
   if(!(class(data) %in% c("data.frame","ore.frame"))){
@@ -266,7 +276,7 @@ ModeData <- function(data,weights){
   if(is.null(weights)) weights<-rep(1,length(data[,1]))
   
   for(i in 1:iLen) {
-    x_dt<-data.table::data.table(x=data[,VarName[i]],weights)
+    x_dt<-data.table::as.data.table(x=data[,VarName[i]],weights)
     data[,VarName[i]] <- rep(data.frame(x_dt[,sum(weights),by=x][order(-V1)])[1,1],length(data[,1]))
   }
   
@@ -275,11 +285,11 @@ ModeData <- function(data,weights){
 
 #theme for plot ggplot2 graph
 theme_mp_line <- ggplot2::theme_bw() + 
-  ggplot2::theme(text=element_text(face="bold.italic"),
+  ggplot2::theme(text=ggplot2::element_text(face="bold.italic"),
                  legend.justification=c(1,1),
                  legend.position=c(1,1))
 
 
 theme_mp_hist <- ggplot2::theme_bw() + 
-  ggplot2::theme(text=element_text(face="bold.italic"),
-                 axis.text.x = element_blank())
+  ggplot2::theme(text=ggplot2::element_text(face="bold.italic"),
+                 axis.text.x = ggplot2::element_blank())

@@ -4,7 +4,7 @@
 \alias{PopMiss}
 \title{Populate Missing Value}
 \usage{
-PopMiss(data)
+PopMiss(data,na.treatment=c("mean.or.mode","delete","replace"),replace=NULL)
 }
 \arguments{
 \item{data}{This could be data frame, matrix or a vector.}
