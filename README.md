@@ -6,8 +6,8 @@ This is an R package for data cleaning and preliminary data analysis.
 
 ### Data Cleaning
 
-Data cleaning have 2 functions at the moment:
-* `DetMiss` : This is the function to detecting missing value in a given data frame or vector.
+Data cleaning have 3 functions at the moment:
+* `DetMiss` : This is the function to detecting missing value in a given data frame, data.table or vector.
 * `PopMiss` : For missing values, we have choices between: deleting, and, populating with mean or mode.
 * `quickTable` : Build contingency table from given vectors.
 
@@ -17,10 +17,10 @@ Currently, there is only one function provided:
 * `DataSummary`: Have a better format and more info compared with R core function `summary`.
 * `CramersV`: Calculate the Cramers' V statistics for given data set. Useful for independent test.
 
-### Model Access
+### Model Assess
 
-* `modelPlot`: Used to visualise `glm` and `gbm` model fitted by `ggplot2` and `googleVis` package.
-* `sankeyPlot`: (Descoped) Used to visualise `rpart` model fitted by `rpart`.  This has been implemented by `sankeyNetwork` in `networkD3` package, hence descoped from this package.
+* `modelPlot`: Used to visualise `glm`, `glm.nb` and `gbm` model using by `ggplot2` and `googleVis` package.
+* `sankeyPlot`: (Descoped) Used to visualise `rpart` model fitted by `rpart`.  This idea has already been implemented by `sankeyNetwork` in `networkD3` package, hence descoped from this package.
 
 ### Getting Started
 
