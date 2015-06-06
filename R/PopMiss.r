@@ -10,17 +10,17 @@
 #' @export
 #' @examples
 #' a <- c(sample(LETTERS,5),NA)
-#' PopMiss(a)
+#' PopMiss(a,"mean.or.mode")
 
 PopMiss <- function(data,na.treatment=c("mean.or.mode","delete","replace"),replace=NULL){
+  na.treatment <- match.arg(na.treatment)
   UseMethod("PopMiss",data)
 }
 
+#' @export
 PopMiss.factor<-function(data,na.treatment,replace=NULL){
   num_miss <- length(which(is.na(data)))
-  na.treatment <- match.arg(na.treatment)
   if(isTRUE(na.treatment=="delete")) {
-    cat(paste(num_miss," rows have been deleted.\n\n"))
     return(na.omit(data))
   }
   else if(isTRUE(na.treatment=="mean.or.mode")){
@@ -29,29 +29,41 @@ PopMiss.factor<-function(data,na.treatment,replace=NULL){
   
   if (is.null(replace)) stop("NULL value used for populating NAs. Chosen \"replace\" method, but didn't provide a value for replace parameter?")
   data[is.na(data)] <- replace
-  cat(paste(num_miss," row have been populated by value: \"",replace,"\".\n\n"))
   return(data)
 }
 
+#' @export
+PopMiss.character<-function(data,na.treatment,replace=NULL){
+  num_miss <- sum(is.na(data))
+  if(isTRUE(na.treatment=="delete")) {
+    return(data[!is.na(data)])
+  }
+  else if(isTRUE(na.treatment=="mean.or.mode")){
+    replace <- names(table(data))[order(table(data),decreasing=TRUE)[1]]
+  }
+  
+  if (is.null(replace)) stop("NULL value used for populating NAs. Chosen \"replace\" method, but didn't provide a value for replace parameter?")
+  data[is.na(data)] <- replace
+  return(data)
+}
+
+#' @export
 PopMiss.integer<-function(data,na.treatment,replace=NULL){
   num_miss <- length(which(is.na(data)))
-  na.treatment <- match.arg(na.treatment)
   if(isTRUE(na.treatment=="delete")) {
-    cat(paste(num_miss," rows have been delete.\n\n"))
-        return(na.omit(data))
+    return(na.omit(data))
   }
   else if(isTRUE(na.treatment=="mean.or.mode")){
     replace <- floor(mean(data,na.rm=TRUE))
   }
   if (is.null(replace)) stop("NULL value used for populating NAs. Chosen \"replace\" method, but didn't provide a value for replace parameter?")
   data[is.na(data)] <- replace
-  cat(paste(num_miss," row have been populated by value:",replace,".\n\n"))
   return(data)
 }
 
+#' @export
 PopMiss.numeric<-function(data,na.treatment,replace=NULL){
   num_miss <- length(which(is.na(data)))
-  na.treatment <- match.arg(na.treatment)
   if(isTRUE(na.treatment=="delete")) {
     cat(paste(num_miss," rows have been delete.\n\n"))
         return(na.omit(data))
@@ -66,11 +78,10 @@ PopMiss.numeric<-function(data,na.treatment,replace=NULL){
   return(data)
 }
 
+#' @export
 PopMiss.data.frame<-function(data,na.treatment,replace=NULL){
-  na.treatment <- match.arg(na.treatment)
   num_miss <- which(sapply(data,function(x) any(is.na(x))))
   if(isTRUE(na.treatment=="delete")) {
-    cat(paste(num_miss," columns have been cleaned.\n\n"))
     return(na.omit(data))
   }
   else if(isTRUE(na.treatment=="mean.or.mode")){
@@ -85,7 +96,6 @@ PopMiss.data.frame<-function(data,na.treatment,replace=NULL){
       data[is.na(data[,str_name[i]]),str_name[i]] <- replace
     }
     
-    cat(paste(num_miss," columns have been populated with mean or mode.\n\n"))
     return(data)
   }
   else{
@@ -95,12 +105,46 @@ PopMiss.data.frame<-function(data,na.treatment,replace=NULL){
     str_name <- names(data)
     for(i in num_miss)
       data[is.na(data[,str_name[i]]),str_name[i]] <- replace
-    cat(paste(num_miss," columns have been populated with mean or mode.\n\n"))
+    
     return(data)
   }
 }
 
+#' @export
+PopMiss.data.table <-function(data,na.treatment,replace=NULL){
+  num_miss <- which(data[,sapply(.SD,function(x) any(is.na(x)))])
+  if(isTRUE(na.treatment=="delete")) {
+    return(na.omit(data))
+  }
+  else if(isTRUE(na.treatment=="mean.or.mode")){
+    str_name <- names(data)
+    for(i in num_miss){
+      if( data[,class(get(str_name[i]))] %in% c("character","date","factor"))
+        replace <- as.data.frame(data[,.N,get(str_name[i])][order(-N)])[1,1]
+      else if( data[,class(get(str_name[i]))]=="integer" )
+        replace <- data[,floor(mean(get(str_name[i]),na.rm=TRUE))]
+      else 
+        replace <- data[,mean(get(str_name[i]),na.rm=TRUE)]
+      
+      data[which(is.na(data[,i,with=FALSE])),i] <- replace
+    }
+    
+    return(data)
+  }
+  else{
+    if (is.null(replace)) stop("NULL value used for populating NAs. Chosen \"replace\" method, but didn't provide a value for replace parameter?")
+    
+    warning("Provided replacement will be used for all missing value.\n\n")
+    str_name <- names(data)
+    for(i in num_miss)
+      data[which(is.na(data[,i,with=FALSE])),i] <- replace
+    
+    return(data)
+  }
+}
+
+#' @export
 PopMiss.matrix <- function(data,na.treatment,replace=NULL){
-	if(identical(match.arg(na.treatment),"delete")) warning("na.treatment is \"delete\" and 'data' is a matrix. This only works correctly if whole rows are missing")
+	if(identical(na.treatment,"delete")) warning("na.treatment is \"delete\" and 'data' is a matrix. This only works correctly if whole rows are missing")
 	matrix(PopMiss(as.vector(data),na.treatment,replace),ncol=ncol(data))
 }

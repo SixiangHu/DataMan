@@ -18,7 +18,8 @@ DataSummary <- function(data,wt=NULL,sparkline=FALSE){
   UseMethod("DataSummary",data)
 }
 
-DataSummary.default <- function(data,wt=NULL,sparkline=FALSE){
+#' @export
+DataSummary.data.frame <- function(data,wt=NULL,sparkline=FALSE){
 
   if(is.null(wt)) weight <- rep(1,nrow(data))
   else if (class(wt) == "character") weight <- data[,wt]
@@ -87,6 +88,7 @@ DataSummary.default <- function(data,wt=NULL,sparkline=FALSE){
   }
 }
 
+#' @export
 DataSummary.data.table <- function(data,wt=NULL,sparkline=FALSE){
   
   if(is.null(wt)) weight <- rep(1,nrow(data))

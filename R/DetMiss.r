@@ -13,17 +13,21 @@
 DetMiss <- function(data){
   UseMethod("DetMiss",data)
 }
+
+#' @export
 DetMiss.matrix <- function(data){
 	v <- DetMiss(as.vector(data))
 }
 
-DetMiss.factor<-function(data){
+#' @export
+DetMiss.default<-function(data){
   if(length(data)==0) stop(paste("object '",deparse(substitute(data)),"' blank or not found.\n"))
   RetTab<-data.frame(class(data),sum(is.na(data)),stringsAsFactors=FALSE)
   colnames(RetTab) <- c("    Variable Class","    Num of NA")
   return(RetTab)
 }
 
+#' @export
 DetMiss.data.frame<-function(data){
   
   RetTab<-data.frame()

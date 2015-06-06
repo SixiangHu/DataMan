@@ -18,7 +18,7 @@ This function allows you to populate missing values.
 }
 \examples{
 a <- c(sample(LETTERS,5),NA)
-PopMiss(a)
+PopMiss(a,"mean.or.mode")
 }
 \author{
 Sixiang Hu

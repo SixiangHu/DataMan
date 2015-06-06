@@ -230,7 +230,7 @@ modelPlot <- function(model,
       ggplot2::scale_y_continuous(labels = percent)+
       ggplot2::xlab("")+ theme_mp_hist
   
-    grid.arrange(gLine,ghist,ncol=1,nrow=2,heights=c(4,1))
+      gridExtra::grid.arrange(gLine,ghist,ncol=1,nrow=2,heights=c(4,1))
     
     if (interactive) {
       df <- data.frame(data.agg,freq=data.freq$freq)
@@ -248,7 +248,7 @@ modelPlot <- function(model,
                                    chartArea="{width:'90%',height:'90%'}",
                                    height=750)
       
-      plot(gvisComboChart(df,xvar="xvar",yvar=c("fitted","fitted_mean","observed","freq"),options=gvisSingleOptionList))
+      plot(googleVis::gvisComboChart(df,xvar="xvar",yvar=c("fitted","fitted_mean","observed","freq"),options=gvisSingleOptionList))
 
     }
   }
