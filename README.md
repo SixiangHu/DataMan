@@ -9,7 +9,7 @@ This is an R package for data cleaning, preliminary data analysis and modeling a
 Data cleaning have 3 functions at the moment:
 * `DetMiss` : This is the function to detecting missing value in a given data frame, data.table or vector.
 * `PopMiss` : For missing values, we have choices in: deleting, replace, or populating with mean or mode.
-* `quickTable` : Build contingency table from given vectors.
+* (Descoped)`quickTable` : Build contingency table from given vectors.
 
 ### Preliminary Data Analysis
 
