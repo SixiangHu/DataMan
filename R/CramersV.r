@@ -57,11 +57,5 @@ CramersV.data.frame <- function(x,y=NULL){
 CramersV.matrix <- function(x,y=NULL){
   if(!is.null(y)) 
     warning("y will be ignored.")
-  if(dim(x)[1]<2 || dim(x)[2]<2)
-    stop("dimension of the data frame should be larger than 1xN or Nx1.")
-  
-  if(xor(is.numeric(x[1,1]),is.integer(x[1,1]))){
-    stop("Found numeric columns, and CramersV test will not be conducted on those variables.")
-  }
-  CramersV_DF(x)
+  CramersV.data.frame(x)
 }
