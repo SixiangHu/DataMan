@@ -1,11 +1,9 @@
-//#include <RcppArmadillo.h>
 #include <Rcpp.h>
 #include <math.h> 
 #include <utility>
 #include <map>
 #include <algorithm>
 
-//// [[Rcpp::depends(RcppArmadillo)]]
 using namespace Rcpp;
 
 // [[Rcpp::export]]
@@ -81,18 +79,15 @@ Rcpp::NumericMatrix CramersV_DF(Rcpp::IntegerMatrix dm) {
   Rcpp::NumericMatrix ResCV(iCol,iCol);
   
   for (i=0;i<iCol;i++){
-    for (j=i+1;j<iCol;j++){
-        ResCV(i,j) = CramersV_C((IntegerVector)dm(_,i),(IntegerVector)dm(_,j));
+    for (j=i;j<iCol;j++){
+        if(i==j) {ResCV(i,j)=1;}
+        else {
+          ResCV(i,j) = CramersV_C((IntegerVector)dm(_,i),(IntegerVector)dm(_,j));
+          ResCV(j,i) = ResCV(i,j);
+        }
     }
   }
-  
-  for (i=0;i<iCol;i++){
-    for (j=0;j<=i;j++){
-      if (i==j) ResCV(i,j) = 1;
-      else ResCV(i,j) = ResCV(j,i);
-    }
-  }
-  
+
   Rcpp::List dimnms = Rcpp::List::create(VECTOR_ELT(dm.attr("dimnames"), 1),
                                          VECTOR_ELT(dm.attr("dimnames"), 1));
   ResCV.attr("dimnames")=dimnms;
