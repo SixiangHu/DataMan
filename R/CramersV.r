@@ -42,13 +42,23 @@ CramersV.data.frame <- function(x,y=NULL){
   if(dim(x)[1]<2 || dim(x)[2]<2)
     stop("dimension of the data frame should be larger than 1xN or Nx1.")
   
-  indCol <- sapply(x,function(xx) xor(is.numeric(xx),is.integer(xx)))
+  indCol <- sapply(x,function(xx) !is.double(xx))
   strDrop <- names(x)[indCol]
   
-  if(sum(indCol)>0){
+  if( sum(indCol)<dim(x)[2] ){
     warning("Found numeric columns, and CramersV test will not be conducted on those variables.")
   }
-  dm <- as.matrix(x[,setdiff(names(x),strDrop)])
+  else if( sum(indCol)==0 ) {
+    stop("All columns are numerical. No CramersV will be calculated.")
+  }
+  
+  dm <- as.matrix(unlist(sapply(x[,strDrop],function(x)
+  {
+    if(is.character(x)){ as.integer(as.factor(x)) }
+    else if (is.factor(x)) { as.integer(x)}
+    else x
+  }
+    )))
   
   CramersV_DF(dm)
 }
