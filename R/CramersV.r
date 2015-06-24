@@ -16,15 +16,13 @@
 #' CramersV(dm)
 
 CramersV <- function(x,y=NULL){
-  if (class(x) == "numeric" && class(x)!="integer") 
-    stop("Cramers' V Test is used on nominal or discrete variables.")
+  if (is.double(x)) stop("Cramers' V Test is used on nominal or discrete variables.")
   UseMethod("CramersV",x)
 }
 
 #' @export
 CramersV.default <- function(x,y=NULL){
-  if (class(y) == "numeric" && class(y)!="integer") 
-    stop("Cramers' V Test is used on nominal or discrete variables.")
+  if (is.double(x) || is.double(y)) stop("Cramers' V Test is used on nominal or discrete variables.")
   if (is.null(x) || is.null(y))
     stop("When x is integer vector, y must be provided.")
   if (length(x) != length(y))
@@ -43,7 +41,7 @@ CramersV.data.frame <- function(x,y=NULL){
     stop("dimension of the data frame should be larger than 1xN or Nx1.")
   
   indCol <- sapply(x,function(xx) !is.double(xx))
-  strDrop <- names(x)[indCol]
+  strDrop <- colnames(x)[indCol]
   
   if( sum(indCol)<dim(x)[2] ){
     warning("Found numeric columns, and CramersV test will not be conducted on those variables.")
@@ -52,20 +50,18 @@ CramersV.data.frame <- function(x,y=NULL){
     stop("All columns are numerical. No CramersV will be calculated.")
   }
   
-  dm <- as.matrix(unlist(sapply(x[,strDrop],function(x)
+  dm <- sapply(x[,strDrop],function(xx)
   {
-    if(is.character(x)){ as.integer(as.factor(x)) }
-    else if (is.factor(x)) { as.integer(x)}
-    else x
-  }
-    )))
+    if(is.character(xx)){ as.integer(as.factor(xx)) }
+    else if (is.factor(xx)) { as.integer(xx)}
+    else xx
+  })
   
   CramersV_DF(dm)
 }
 
 #' @export
 CramersV.matrix <- function(x,y=NULL){
-  if(!is.null(y)) 
-    warning("y will be ignored.")
-  CramersV.data.frame(x)
+  if(!is.null(y)) warning("y will be ignored.")
+  CramersV.data.frame(as.data.frame(x,stringsAsFactors = TRUE))
 }

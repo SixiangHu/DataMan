@@ -5,3 +5,5 @@ sankeyPlot.r
 sankeyPlot.md
 CramersV.o
 CramersV.dll
+DataMan.dll
+RcppExports.o
