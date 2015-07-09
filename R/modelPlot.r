@@ -2,13 +2,13 @@
 #'
 #' @description This function allows you visulise the GLM or GBM fitting by comparing observation, fitted and mean fitted on the same plot.
 #' @usage modelPlot(model,xvar,type=c("response","link"),dataset=NULL,weights=NULL,
-#' by=NULL,modelType=c("glm","glm.nb","gbm"),interactive=FALSE,newGroupNum=10,...)
+#' by=NULL,modelType=c("glm","glm.nb","gbm","train"),interactive=FALSE,newGroupNum=10,...)
 #' @param model a model object. Currently this is created for glm and gbm. 
 #' @param xvar a character string indicates the variable name you want to visulise.
 #' @param type either "response" or "link". By default ("response") will plot on GLM response as oppose to linear predictor ("link").
 #' @param dataset Optional. A data frame. update the glm model plot with a new dataset.
 #' @param weights Optional. A numerical vector to specify the weights used for updating the glm model for plotting.
-#' @param modelType A character string. One of "glm", "glm.nb" or "gbm".
+#' @param modelType A character string. One of "glm", "glm.nb", "train" or "gbm".
 #' @param interactive logical. Set true to use googleVis package plotting interactively. Currently it doesn't work when using "by" method.
 #' @param by Optinal. A character string indicates the variable name you want to plot the fit by.
 #' @param newGroupNum Optional. An integer specifies number of new bands when levels of current plotting variable `xvar` or `by` is more than 100. 
@@ -50,11 +50,11 @@ modelPlot <- function(model,
                       dataset=NULL,
                       weights=NULL,
                       by=NULL,
-                      modelType=c("glm","glm.nb","gbm"),
+                      modelType=c("glm","glm.nb","gbm","train"),
                       interactive=FALSE,
                       newGroupNum=10,
                       ...){
-
+  
   type <- match.arg(type)
   opts.list<-list(...)
   opts <- names(list(...))
@@ -79,6 +79,10 @@ modelPlot <- function(model,
       else if ("weights" %in% names(model$call) ) weights <- model$call$weights
       else weights <- rep(1,length(model$fit))          
     }
+    else if (modelType == "train"){
+      if ("weights" %in% names(model$call) ) weights <- model$call$weights
+      else weights <- rep(1,dim(knnFit1$trainingData)[1])     
+    }
   }
   
   #data source
@@ -94,7 +98,11 @@ modelPlot <- function(model,
   else{
     if ( ("data" %in% names(model)) && modelType=="glm" ) {
       #this method doesn't work for gbm, because gbm$data is not the raw data, but a list.
-       dataset <- model$data
+      dataset <- model$data
+    }
+    else if ( modelType=="train" ){
+      if (is.null(model$trainingData) ) stop("Model data in the `train` object is blank, please provide the raw data.")
+      else dataset <- model$trainingData
     }
     else if ( !is.null(model$gbm.call$dataframe) ) dataset <- model$gbm.call$dataframe
     else {
@@ -104,6 +112,7 @@ modelPlot <- function(model,
       dataset <- eval(call$data)
     }
   }
+  
   if(is.null(dataset)) stop("modelPlot: Cannot found any proper data set.  Variables not in a data frame persumably?")
   if(!xvar %in% colnames(dataset)) stop(paste("modelPlot: Selected variable (",xvar,") is not in the data.",""))
   
@@ -111,6 +120,7 @@ modelPlot <- function(model,
   if (modelType == "glm") fitted <- as.numeric(predict(model,dataset,type=type,weights=weights))
   else if (modelType == "glm.nb") fitted <- as.numeric(predict(model,dataset,type=type))
   else if (modelType == "gbm") fitted <- as.numeric(predict(model,dataset,type=type,weights=weights,n.trees=model$n.trees))
+  else if (modelType == "train" ) fitted <- as.numeric(predict(model,dataset))
   
   #observed
   if (modelType %in% c("glm","glm.nb")) observed <- as.numeric(model$y)
@@ -119,7 +129,10 @@ modelPlot <- function(model,
     else if ( model$gbm.call$response.name %in% names(dataset) )  observed <- as.numeric(dataset[,model$gbm.call$response.name])
     else observed <- get(model$response.name)
   }
-
+  else if (modelType == "train") {
+    observed <- dataset[,".outcome"]
+  }
+  
   #Calculate mean data set for mean_fit line
   MeanData <- ModeData(dataset,weights)
   MeanData[,xvar] <- dataset[,xvar]
@@ -136,6 +149,7 @@ modelPlot <- function(model,
   if (modelType == "glm") fitted_mean <- as.numeric(predict(model,MeanData,type=type,weights=weights))
   else if (modelType == "glm.nb") fitted_mean <- as.numeric(predict(model,MeanData,type=type))
   else if (modelType == "gbm") fitted_mean <- as.numeric(predict(model,MeanData,type=type,weights=weights,n.trees=model$n.trees))
+  else if (modelType == "train" ) fitted_mean <- as.numeric(predict(model,MeanData))
   
   #Plotting
   options(warn=-1)
@@ -160,7 +174,7 @@ modelPlot <- function(model,
       dataset[,by] <- cut(dataset[,by],new_band,include.lowest = TRUE)
     }
     
-    data.plot <-as.data.table(as.data.frame(cbind(xvar=dataset[,xvar],by=dataset[,by],fitted,observed,weights),stringsAsFactors=FALSE))
+    data.plot <- data.table::as.data.table(as.data.frame(cbind(xvar=dataset[,xvar],by=dataset[,by],fitted,observed,weights),stringsAsFactors=FALSE))
     setkey(data.plot,xvar,by)
     
     data.plot <- data.plot[,lapply(.SD,as.numeric),by=list(xvar,by),.SDcols=c("fitted","observed","weights")]
@@ -168,7 +182,7 @@ modelPlot <- function(model,
     data.agg <- as.data.frame(data.plot[,lapply(.SD,weighted.mean,w=weights),by=list(xvar,by),.SDcols=c("fitted","observed","weights")],row.names=c("xvar","by","weights","fitted","observed"))
     
     data.freq <- as.data.frame(data.plot[,sum(weights),by=list(xvar,by)][,freq:=V1/sum(V1)])
-        
+    
     #line graph fitted
     gLine1 <- ggplot2::ggplot(data=data.agg,aes(x=xvar,y=fitted,group=by,colour=by))+
       ggplot2::geom_line(size=1) + ggplot2::geom_point(size=4,fill="white")
@@ -195,17 +209,17 @@ modelPlot <- function(model,
     gridExtra::grid.arrange(gLine1,gLine2,ghist,ncol=1,nrow=3,heights=c(4,4,2))
   }
   else {
-
+    
     #use as.data.table to speed up
-    data.plot <-as.data.table(as.data.frame(cbind(xvar=dataset[,xvar],fitted,fitted_mean,observed,weights),stringsAsFactors=FALSE))
+    data.plot <-data.table::as.data.table(as.data.frame(cbind(xvar=dataset[,xvar],fitted,fitted_mean,observed,weights),stringsAsFactors=FALSE))
     setkey(data.plot,xvar)
     
     data.plot <- data.plot[,lapply(.SD,as.numeric),by=xvar,.SDcols=c("fitted","fitted_mean","observed","weights")]
     data.agg <- as.data.frame(data.plot[,lapply(.SD,weighted.mean,w=weights),by=xvar,.SDcols=c("fitted","fitted_mean","observed","weights")],row.names=c("xvar","weights","fitted","fitted_mean","observed"))
     data.freq <- as.data.frame(data.plot[,sum(weights),by=xvar][,freq:=V1/sum(V1)])
-
+    
     #melt
-    data.melt <- melt(data.agg[,-5],id=c("xvar"))
+    data.melt <- reshape2::melt(data.agg[,-5],id=c("xvar"))
     
     #line graph
     
@@ -217,28 +231,28 @@ modelPlot <- function(model,
     else if(("xlim" %in% opts) && !is.numeric(data.melt$xvar)) gLine <-gLine + ggplot2::scale_x_discrete(limits=xlim)
     else if(("xlim" %in% opts) && is(data.melt[,"xvar"],"Date")) gLine <-gLine + ggplot2::scale_x_date(label=date_format("%y%m"),limits=xlim)
     if("ylim" %in% opts) gLine <-gLine + ggplot2::ylim(ylim)
-    gLine <- gLine + ggplot2::scale_colour_manual(values=c("green4","green1","magenta3")) + ggplot2::scale_shape_manual(values=c(21,24,22)) + ggplot2::xlab("") + ggplot2::ylab(type)+
+    gLine <- gLine + ggplot2::scale_colour_manual(values=c("green1","green4","magenta3")) + ggplot2::scale_shape_manual(values=c(21,24,22)) + ggplot2::xlab("") + ggplot2::ylab(type)+
       ggplot2::ggtitle(strV1)+ theme_mp_line
     if(nlevels(as.factor(data.melt$xvar))>25) gLine <- gLine + ggplot2::theme(axis.text.x = element_text(angle = 90,hjust=0.5,vjust=0.5))
     
     #histogram graph
     ghist <- ggplot2::ggplot(data=data.freq,aes(x=xvar,y=freq))+
       ggplot2::geom_histogram(stat="identity",colour="black",fill="yellow")
-      if(("xlim" %in% opts) && is.numeric(data.melt$xvar)) ghist <-ghist + ggplot2::scale_x_continuous(limits=xlim)
-      else if(("xlim" %in% opts) && !is.numeric(data.melt$xvar)) ghist <-ghist + ggplot2::scale_x_discrete(limits=xlim)
-      ghist <- ghist + ggplot2::ylab("percent (%)")+
+    if(("xlim" %in% opts) && is.numeric(data.melt$xvar)) ghist <-ghist + ggplot2::scale_x_continuous(limits=xlim)
+    else if(("xlim" %in% opts) && !is.numeric(data.melt$xvar)) ghist <-ghist + ggplot2::scale_x_discrete(limits=xlim)
+    ghist <- ghist + ggplot2::ylab("percent (%)")+
       ggplot2::scale_y_continuous(labels = percent)+
       ggplot2::xlab("")+ theme_mp_hist
-  
-      gridExtra::grid.arrange(gLine,ghist,ncol=1,nrow=2,heights=c(4,1))
+    
+    gridExtra::grid.arrange(gLine,ghist,ncol=1,nrow=2,heights=c(4,1))
     
     if (interactive) {
       df <- data.frame(data.agg,freq=data.freq$freq)
       gvisSingleOptionList <- list(pointSize=8,
                                    series="[{targetAxisIndex:0, type:'line',color:'greenyellow',pointShape: 'circle'},
-{targetAxisIndex:0, type:'line',color:'green',pointShape: 'triangle'},
-{targetAxisIndex:0, type:'line',color:'magenta',pointShape: 'square'},
-{targetAxisIndex:1, type:'bars',color:'yellow'}]",
+                                   {targetAxisIndex:0, type:'line',color:'green',pointShape: 'triangle'},
+                                   {targetAxisIndex:0, type:'line',color:'magenta',pointShape: 'square'},
+                                   {targetAxisIndex:1, type:'bars',color:'yellow'}]",
                                    crosshair="{trigger:'both'}",
                                    hAxis.title=strV1,
                                    theme="maximized",
@@ -249,7 +263,7 @@ modelPlot <- function(model,
                                    height=750)
       
       plot(googleVis::gvisComboChart(df,xvar="xvar",yvar=c("fitted","fitted_mean","observed","freq"),options=gvisSingleOptionList))
-
+      
     }
   }
   
