@@ -81,7 +81,7 @@ modelPlot <- function(model,
     }
     else if (modelType == "train"){
       if ("weights" %in% names(model$call) ) weights <- model$call$weights
-      else weights <- rep(1,dim(knnFit1$trainingData)[1])     
+      else weights <- rep(1,dim(model$trainingData)[1])     
     }
   }
   
