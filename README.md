@@ -19,7 +19,7 @@ Currently, there is only one function provided:
 
 ### Model Assess
 
-* `modelPlot`: visualise `glm`, `glm.nb` and `gbm` model fitting effect using `ggplot2` and `googleVis` packages.
+* `modelPlot`: visualise `glm`, `glm.nb` ,`train` and `gbm` model fitting effect using `ggplot2` and `googleVis` packages.
 * `sankeyPlot`: (Descoped) Used to visualise `rpart` model fitted by `rpart`.  This idea has already been implemented by `sankeyNetwork` in `networkD3` package, hence descoped from this package.
 
 ### Getting Started

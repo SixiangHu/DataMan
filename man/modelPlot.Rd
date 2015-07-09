@@ -5,7 +5,7 @@
 \title{modelPlot}
 \usage{
 modelPlot(model,xvar,type=c("response","link"),dataset=NULL,weights=NULL,
-by=NULL,modelType=c("glm","glm.nb","gbm"),interactive=FALSE,newGroupNum=10,...)
+by=NULL,modelType=c("glm","glm.nb","gbm","train"),interactive=FALSE,newGroupNum=10,...)
 }
 \arguments{
 \item{model}{a model object. Currently this is created for glm and gbm.}
@@ -20,7 +20,7 @@ by=NULL,modelType=c("glm","glm.nb","gbm"),interactive=FALSE,newGroupNum=10,...)
 
 \item{by}{Optinal. A character string indicates the variable name you want to plot the fit by.}
 
-\item{modelType}{A character string. One of "glm", "glm.nb" or "gbm".}
+\item{modelType}{A character string. One of "glm", "glm.nb", "train" or "gbm".}
 
 \item{interactive}{logical. Set true to use googleVis package plotting interactively. Currently it doesn't work when using "by" method.}
 
