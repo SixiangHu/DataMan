@@ -16,6 +16,7 @@ Data cleaning have 3 functions at the moment:
 Currently, there is only one function provided:
 * `DataSummary`: Have a better format and more info compared with R function `summary` in `base`.
 * `CramersV`: Calculate the Cramers' V statistics for given data set. Useful for independent test.
+* `dataPlot`: Visualise data feature.
 
 ### Model Assess
 
