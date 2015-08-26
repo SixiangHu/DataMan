@@ -1,7 +1,7 @@
 #' dataPlot
 #'
 #' @description This function allows you to visualise features of a dataset by specifying dependent and response variable.
-#' @usage dataPlot(data,xvar,yvar,weights=NULL,byvar=NULL,interactive=FALSE,newGroupNum=10,...)
+#' @usage dataPlot(data,xvar,yvar,byvar=NULL,weights=NULL,interactive=FALSE,newGroupNum=10,...)
 #' @param data a data frame.
 #' @param xvar either an integer to specify the position of the dependent variable in the data frame, 
 #' or a character string to indicate the dependent variable name.
@@ -11,7 +11,7 @@
 #' a numerical vector to specify the weights used for calculating weighted average of response,
 #' a character string to specify the name of weight variable in the data frame,
 #' an integer to specify the position of the weight variable in the data frame.
-#' @param interactive logical. Set true to use googleVis package plotting interactively, which can be used in \code{\link{shiny}} apps. Currently it doesn't work when using "by" method.
+#' @param interactive logical. Set true to use googleVis package plotting interactively, which can be used in shiny apps. Currently it doesn't work when using "by" method.
 #' @param byvar Optinal. either an integer to specify the position of the <by> variable in the data frame, 
 #' or a character string to indicate the <by> variable name.
 #' @param newGroupNum Optional. An integer specifies number of new bands when levels of current plotting variable `xvar` or `by` is more than 100. 
@@ -37,7 +37,7 @@
 #' 
 #' dataPlot(mtcars,"wt","mpg",byvar="vs")
 
-dataPlot <- function(data,xvar,yvar,weights=NULL,byvar=NULL,interactive=FALSE,newGroupNum=10,...){
+dataPlot <- function(data,xvar,yvar,byvar=NULL,weights=NULL,interactive=FALSE,newGroupNum=10,...){
   
   opts.list<-list(...)
   opts <- names(list(...))

@@ -4,7 +4,7 @@
 \alias{dataPlot}
 \title{dataPlot}
 \usage{
-dataPlot(data,xvar,yvar,weights=NULL,byvar=NULL,interactive=FALSE,newGroupNum=10,...)
+dataPlot(data,xvar,yvar,byvar=NULL,weights=NULL,interactive=FALSE,newGroupNum=10,...)
 }
 \arguments{
 \item{data}{a data frame.}
@@ -15,15 +15,15 @@ or a character string to indicate the dependent variable name.}
 \item{yvar}{either an integer to specify the position of the response variable in the data frame,
 or a character string to indicate the response variable name.}
 
+\item{byvar}{Optinal. either an integer to specify the position of the <by> variable in the data frame,
+or a character string to indicate the <by> variable name.}
+
 \item{weights}{Optional. One of:
 a numerical vector to specify the weights used for calculating weighted average of response,
 a character string to specify the name of weight variable in the data frame,
 an integer to specify the position of the weight variable in the data frame.}
 
-\item{byvar}{Optinal. either an integer to specify the position of the <by> variable in the data frame,
-or a character string to indicate the <by> variable name.}
-
-\item{interactive}{logical. Set true to use googleVis package plotting interactively, which can be used in \code{\link{shiny}} apps. Currently it doesn't work when using "by" method.}
+\item{interactive}{logical. Set true to use googleVis package plotting interactively, which can be used in shiny apps. Currently it doesn't work when using "by" method.}
 
 \item{newGroupNum}{Optional. An integer specifies number of new bands when levels of current plotting variable `xvar` or `by` is more than 100.}
 

@@ -33,10 +33,13 @@ double CramersV_C(IntegerVector x,IntegerVector y){
   int Oxy = 0;
   int a=0,b=0,c=0,d=0;
   
+  
   if (unique_x==0 || unique_y==0) {
+    // only 1 unique value then return 1
     return 1;
   }
   else if (unique_x==1 && unique_y==1){
+    // if there is only 2 unique value then use special method.
     if (counts_xy.find(std::make_pair(uni_x[0],uni_y[0])) != counts_xy.end()) {
       a = counts_xy.find(std::make_pair(uni_x[0],uni_y[0]))->second;
     }
@@ -56,7 +59,7 @@ double CramersV_C(IntegerVector x,IntegerVector y){
   else {
     for (i=0;i<=unique_x;++i){
       for (j=0;j<=unique_y;++j){
-        Exy = counts_x.find(uni_x[i])->second * counts_y.find(uni_y[j])->second / (double)n;
+        Exy = (double)counts_x.find(uni_x[i])->second * (double)counts_y.find(uni_y[j])->second / (double)n ;
         if (counts_xy.find(std::make_pair(uni_x[i],uni_y[j])) != counts_xy.end()) {
           Oxy = counts_xy.find(std::make_pair(uni_x[i],uni_y[j]))->second;
         }
@@ -64,7 +67,7 @@ double CramersV_C(IntegerVector x,IntegerVector y){
           Oxy=0;
         }
         chisq  = chisq +(Oxy - Exy)*(Oxy - Exy)/Exy;
-      }
+       }
     }
   }
   

@@ -2,6 +2,7 @@
 .Rhistory
 .RData
 sankeyPlot.r
+sankeyPlot.rd
 sankeyPlot.md
 CramersV.o
 CramersV.dll
