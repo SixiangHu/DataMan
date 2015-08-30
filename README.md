@@ -7,21 +7,43 @@ This is an R package for data cleaning, preliminary data analysis and modeling a
 ### Data Cleaning
 
 Data cleaning have 3 functions at the moment:
+
 * `DetMiss` : This is the function to detecting missing value in a given data frame, data.table or vector.
+
 * `PopMiss` : For missing values, we have choices in: deleting, replace, or populating with mean or mode.
+
 * (Descoped)`quickTable` : Build contingency table from given vectors.
 
 ### Preliminary Data Analysis
 
 Currently, there is only one function provided:
+
 * `DataSummary`: Have a better format and more info compared with R function `summary` in `base`.
+
 * `CramersV`: Calculate the Cramers' V statistics for given data set. Useful for independent test.
+
 * `dataPlot`: Visualise data feature.
 
 ### Model Assess
 
 * `modelPlot`: visualise `glm`, `glm.nb` ,`train` and `gbm` model fitting effect using `ggplot2` and `googleVis` packages.
+
+```r
+glm1 <- glm(formula = mpg ~ cyl + hp, family = Gamma(log), data = mtcars, weights = wt)
+modelPlot(glm1,"cyl",modelType="glm")
+```
+
 * `sankeyPlot`: (Descoped) Used to visualise `rpart` model fitted by `rpart`.  This idea has already been implemented by `sankeyNetwork` in `networkD3` package, hence descoped from this package.
+* `tree2data`: function used to collect information from `gbm` or `randomForest` model object to create data for `sankeyNetwork` plot in `networkD3` package.
+
+```r
+library(networkD3)
+data(iris)
+iris.mod <- gbm(Species ~ ., distribution="multinomial", data=iris, n.trees=2000, shrinkage=0.01, cv.folds=5, verbose=FALSE, n.cores=1)
+tree_data <- tree2data(iris.mod,1)
+sankeyNetwork(tree_data[[1]],tree_data[[2]],Source="src",Target="tar",Value="value",NodeID="name")
+
+```
 
 ### Getting Started
 

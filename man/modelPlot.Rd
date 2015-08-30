@@ -8,7 +8,7 @@ modelPlot(model,xvar,type=c("response","link"),dataset=NULL,weights=NULL,
 by=NULL,modelType=c("glm","glm.nb","gbm","train"),interactive=FALSE,newGroupNum=10,...)
 }
 \arguments{
-\item{model}{a model object. Currently this is created for glm and gbm.}
+\item{model}{a model object. Currently this function supports glm, gbm and train object create by caret package.}
 
 \item{xvar}{a character string indicates the variable name you want to visulise.}
 
@@ -33,8 +33,6 @@ This function allows you visulise the GLM or GBM fitting by comparing observatio
 }
 \details{
 For those used Emblem before, you will find this plot quite familiar.  The purpose of this function is the same that to put observation, fitted, and mean fit on the same plot for better understanding about model fitting.
-
-Please do not name the dataset as "data", which is confusing and may cause problems.
 
 Observation line for xvar is simply the weighted average on target varaible, hence if xvar is a numeric, the plot could be very messy. Will improve this in the future to banded those numeric factor.
 

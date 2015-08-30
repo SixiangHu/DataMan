@@ -3,7 +3,7 @@
 #' @description This function allows you visulise the GLM or GBM fitting by comparing observation, fitted and mean fitted on the same plot.
 #' @usage modelPlot(model,xvar,type=c("response","link"),dataset=NULL,weights=NULL,
 #' by=NULL,modelType=c("glm","glm.nb","gbm","train"),interactive=FALSE,newGroupNum=10,...)
-#' @param model a model object. Currently this is created for glm and gbm. 
+#' @param model a model object. Currently this function supports glm, gbm and train object create by caret package. 
 #' @param xvar a character string indicates the variable name you want to visulise.
 #' @param type either "response" or "link". By default ("response") will plot on GLM response as oppose to linear predictor ("link").
 #' @param dataset Optional. A data frame. update the glm model plot with a new dataset.
@@ -15,8 +15,6 @@
 #' @param ... xlim and ylim can be used to set the range of the ggplot2 plot. For example, xlim=c(0,1) means restrict the xaxis within (0,1).  This does not work for goolgeVis interactive plot because, because, because it is interactive, which you can zoom in and out with your mouse. :)
 #' @details 
 #' For those used Emblem before, you will find this plot quite familiar.  The purpose of this function is the same that to put observation, fitted, and mean fit on the same plot for better understanding about model fitting.
-#'  
-#' Please do not name the dataset as "data", which is confusing and may cause problems.
 #' 
 #' Observation line for xvar is simply the weighted average on target varaible, hence if xvar is a numeric, the plot could be very messy. Will improve this in the future to banded those numeric factor.
 #'   
