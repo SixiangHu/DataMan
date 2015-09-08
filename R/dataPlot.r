@@ -106,7 +106,7 @@ dataPlot <- function(data,xvar,yvar,byvar=NULL,weights=NULL,interactive=FALSE,ne
   if ( (is.numeric(x) || is.integer(x) ) && nlevels(as.factor(x))>100 ) {
     if ( is.null(newGroupNum) ) newGroupNum <- 10
     
-    new_band <- seq(min(x),max(x),length.out=newGroupNum)
+    new_band <- seq(min(x, na.rm = TRUE),max(x, na.rm = TRUE),length.out=newGroupNum)
     x <- cut(x,new_band,include.lowest = TRUE)
   }
   
@@ -115,7 +115,7 @@ dataPlot <- function(data,xvar,yvar,byvar=NULL,weights=NULL,interactive=FALSE,ne
     if ( (is.numeric(by) || is.integer(by)) && nlevels(as.factor(by))>100 ) {
       if ( is.null(newGroupNum) ) newGroupNum <- 10
       
-      new_band <- seq(min(by),max(by),length.out=newGroupNum)
+      new_band <- seq(min(by, na.rm = TRUE),max(by, na.rm = TRUE),length.out=newGroupNum)
       by <- cut(by,new_band,include.lowest = TRUE)
     }
   }
