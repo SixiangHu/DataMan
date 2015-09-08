@@ -26,7 +26,7 @@
 #' @author Sixiang Hu
 #' @importFrom data.table as.data.table setkey :=
 #' @importFrom ggplot2 aes element_text ggplot
-#' @importFrom gridExtra grid.arrange
+#' @importFrom gridExtra grid grid.arrange
 #' @importFrom reshape2 melt
 #' @importFrom googleVis gvisComboChart
 #' @importFrom scales percent date_format
@@ -156,7 +156,7 @@ dataPlot <- function(data,xvar,yvar,byvar=NULL,weights=NULL,interactive=FALSE,ne
     p1 <- ggplot2::ggplot_gtable(ggplot2::ggplot_build(gLine))
     p2 <- ggplot2::ggplot_gtable(ggplot2::ggplot_build(ghist))
     
-    maxWidth <- unit.pmax(p1$widths[2:3], p2$widths[2:3])
+    maxWidth <- grid::unit.pmax(p1$widths[2:3], p2$widths[2:3])
     
     p1$widths[2:3] <- maxWidth
     p2$widths[2:3] <- maxWidth
@@ -210,7 +210,7 @@ dataPlot <- function(data,xvar,yvar,byvar=NULL,weights=NULL,interactive=FALSE,ne
     p1 <- ggplot2::ggplot_gtable(ggplot2::ggplot_build(gLine1))
     p2 <- ggplot2::ggplot_gtable(ggplot2::ggplot_build(ghist))
     
-    maxWidth <- unit.pmax(p1$widths[2:3], p2$widths[2:3])
+    maxWidth <- grid::unit.pmax(p1$widths[2:3], p2$widths[2:3])
     
     p1$widths[2:3] <- maxWidth
     p2$widths[2:3] <- maxWidth
