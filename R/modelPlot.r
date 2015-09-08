@@ -139,7 +139,7 @@ modelPlot <- function(model,
   if ( (is.numeric(dataset[,xvar]) || is.integer(dataset[,xvar])) && nlevels(as.factor(dataset[,xvar]))>100 ) {
     if ( is.null(newGroupNum) ) newGroupNum <- 10
     
-    new_band <- seq(min(dataset[,xvar]),max(dataset[,xvar]),length.out=newGroupNum)
+    new_band <- seq(min(dataset[,xvar], na.rm = TRUE),max(dataset[,xvar], na.rm = TRUE),length.out=newGroupNum)
     dataset[,xvar] <- cut(dataset[,xvar],new_band,include.lowest = TRUE)
   }
   
@@ -168,7 +168,7 @@ modelPlot <- function(model,
     if ( (is.numeric(dataset[,by]) || is.integer(dataset[,by])) && nlevels(as.factor(dataset[,by]))>100 ) {
       if ( is.null(newGroupNum) ) newGroupNum <- 10
       
-      new_band <- seq(min(dataset[,by]),max(dataset[,by]),length.out=newGroupNum)
+      new_band <- seq(min(dataset[,by], na.rm = TRUE),max(dataset[,by], na.rm = TRUE),length.out=newGroupNum)
       dataset[,by] <- cut(dataset[,by],new_band,include.lowest = TRUE)
     }
     
