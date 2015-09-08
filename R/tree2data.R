@@ -25,7 +25,7 @@ tree2data.default<- function(tree_model,treeInd = 1){
 
 #' @export
 tree2data.randomForest <- function(tree_model,treeInd = 1){
-  if (class(tree_model) != "randomForest" ) stop("Please provide a randomForest object.")
+  if ( ! ("randomForest" %in% class(tree_model)) ) stop("Please provide a randomForest object.")
   
   tree_data <- randomForest::getTree(tree_model,treeInd,labelVar = TRUE)
   if(tree_data[1,1]==0) stop("The chosen tree has only a root without nodes.")
@@ -63,7 +63,7 @@ tree2data.randomForest <- function(tree_model,treeInd = 1){
 
 #' @export
 tree2data.gbm <- function(tree_model,treeInd = 1){
-  if (class(tree_model) != "gbm" ) stop("Please provide a gbm object.")
+  if (! ("gbm" %in% class(tree_model)) ) stop("Please provide a gbm object.")
   
   tree_data <- gbm::pretty.gbm.tree(tree_model,treeInd)
   if(tree_data[1,1]==-1) stop("The chosen tree has only a root without nodes.")
