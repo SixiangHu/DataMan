@@ -204,7 +204,17 @@ modelPlot <- function(model,
     ghist <- ghist + ggplot2::xlab("")+ ggplot2::ylab("percent (%)")+ ggplot2::scale_y_continuous(labels = percent) + 
       theme_mp_hist
     
-    gridExtra::grid.arrange(gLine1,gLine2,ghist,ncol=1,nrow=3,heights=c(4,4,2))
+    p1 <- ggplot2::ggplot_gtable(ggplot2::ggplot_build(gLine1))
+    p12 <- ggplot2::ggplot_gtable(ggplot2::ggplot_build(gLine2))
+    p2 <- ggplot2::ggplot_gtable(ggplot2::ggplot_build(ghist))
+    
+    maxWidth <- unit.pmax(p1$widths[2:3], p2$widths[2:3],p12$widths[2:3])
+    
+    p1$widths[2:3] <- maxWidth
+    p12$widths[2:3] <- maxWidth
+    p2$widths[2:3] <- maxWidth
+    
+    gridExtra::grid.arrange(p1,p12,p2,ncol=1,nrow=3,heights=c(4,4,2))
   }
   else {
     
@@ -242,7 +252,15 @@ modelPlot <- function(model,
       ggplot2::scale_y_continuous(labels = percent)+
       ggplot2::xlab("")+ theme_mp_hist
     
-    gridExtra::grid.arrange(gLine,ghist,ncol=1,nrow=2,heights=c(4,1))
+    p1 <- ggplot2::ggplot_gtable(ggplot2::ggplot_build(gLine))
+    p2 <- ggplot2::ggplot_gtable(ggplot2::ggplot_build(ghist))
+    
+    maxWidth <- unit.pmax(p1$widths[2:3], p2$widths[2:3])
+    
+    p1$widths[2:3] <- maxWidth
+    p2$widths[2:3] <- maxWidth
+    
+    gridExtra::grid.arrange(p1,p2,ncol=1,nrow=2,heights=c(4,1))
     
     if (interactive) {
       df <- data.frame(data.agg,freq=data.freq$freq)
