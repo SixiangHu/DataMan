@@ -230,4 +230,4 @@ theme_mp_line <- ggplot2::theme_bw() +
 theme_mp_hist <- ggplot2::theme_bw() + 
   ggplot2::theme(text=ggplot2::element_text(face="bold.italic"),
                  axis.text.x = ggplot2::element_blank(),
-                 legend.position="none") 
+                 legend.position = 'none') 
