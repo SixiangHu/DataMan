@@ -29,7 +29,8 @@
 #' @author Sixiang Hu
 #' @importFrom data.table as.data.table setkey :=
 #' @importFrom ggplot2 aes element_text ggplot
-#' @importFrom gridExtra grid grid.arrange
+#' @importFrom gridExtra grid.arrange
+#' @importFrom grid unit.pmax
 #' @importFrom reshape2 melt
 #' @importFrom googleVis gvisComboChart
 #' @importFrom scales percent date_format
