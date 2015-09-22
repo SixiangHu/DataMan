@@ -43,6 +43,9 @@ iris.mod <- gbm(Species ~ ., distribution="multinomial", data=iris, n.trees=2000
 tree_data <- tree2data(iris.mod,1)
 sankeyNetwork(tree_data[[1]],tree_data[[2]],Source="src",Target="tar",Value="value",NodeID="name")
 
+
+* `resiPlot`: This function assess the residual using given actual and predicted values.
+
 ```
 
 ### Getting Started

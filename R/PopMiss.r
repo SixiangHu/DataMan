@@ -18,22 +18,12 @@ PopMiss <- function(data,na.treatment=c("mean.or.mode","delete","replace"),repla
 }
 
 #' @export
-PopMiss.factor<-function(data,na.treatment,replace=NULL){
-  num_miss <- length(which(is.na(data)))
-  if(isTRUE(na.treatment=="delete")) {
-    return(na.omit(data))
-  }
-  else if(isTRUE(na.treatment=="mean.or.mode")){
-    replace <- names(table(data))[order(table(data),decreasing=TRUE)[1]]
-  }
-  
-  if (is.null(replace)) stop("NULL value used for populating NAs. Chosen \"replace\" method, but didn't provide a value for replace parameter?")
-  data[is.na(data)] <- replace
-  return(data)
+PopMiss.factor<-function(data,na.treatment,replace){
+  PopMiss.character(data,na.treatment,replace)
 }
 
 #' @export
-PopMiss.character<-function(data,na.treatment,replace=NULL){
+PopMiss.character<-function(data,na.treatment,replace){
   num_miss <- sum(is.na(data))
   if(isTRUE(na.treatment=="delete")) {
     return(data[!is.na(data)])
@@ -48,7 +38,7 @@ PopMiss.character<-function(data,na.treatment,replace=NULL){
 }
 
 #' @export
-PopMiss.integer<-function(data,na.treatment,replace=NULL){
+PopMiss.integer<-function(data,na.treatment,replace){
   num_miss <- length(which(is.na(data)))
   if(isTRUE(na.treatment=="delete")) {
     return(na.omit(data))
@@ -62,7 +52,7 @@ PopMiss.integer<-function(data,na.treatment,replace=NULL){
 }
 
 #' @export
-PopMiss.numeric<-function(data,na.treatment,replace=NULL){
+PopMiss.numeric<-function(data,na.treatment,replace){
   num_miss <- length(which(is.na(data)))
   if(isTRUE(na.treatment=="delete")) {
     cat(paste(num_miss," rows have been delete.\n\n"))
@@ -79,7 +69,7 @@ PopMiss.numeric<-function(data,na.treatment,replace=NULL){
 }
 
 #' @export
-PopMiss.data.frame<-function(data,na.treatment,replace=NULL){
+PopMiss.data.frame<-function(data,na.treatment,replace){
   num_miss <- which(sapply(data,function(x) any(is.na(x))))
   if(isTRUE(na.treatment=="delete")) {
     return(na.omit(data))
@@ -111,7 +101,7 @@ PopMiss.data.frame<-function(data,na.treatment,replace=NULL){
 }
 
 #' @export
-PopMiss.data.table <-function(data,na.treatment,replace=NULL){
+PopMiss.data.table <-function(data,na.treatment,replace){
   num_miss <- which(data[,sapply(.SD,function(x) any(is.na(x)))])
   if(isTRUE(na.treatment=="delete")) {
     return(na.omit(data))
@@ -144,7 +134,7 @@ PopMiss.data.table <-function(data,na.treatment,replace=NULL){
 }
 
 #' @export
-PopMiss.matrix <- function(data,na.treatment,replace=NULL){
+PopMiss.matrix <- function(data,na.treatment,replace){
 	if(identical(na.treatment,"delete")) warning("na.treatment is \"delete\" and 'data' is a matrix. This only works correctly if whole rows are missing")
 	matrix(PopMiss(as.vector(data),na.treatment,replace),ncol=ncol(data))
 }

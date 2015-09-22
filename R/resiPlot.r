@@ -20,7 +20,6 @@
 #' @importFrom ggplot2 aes ggplot
 #' @importFrom grid grid.newpage viewport pushViewport
 #' @export resiPlot
-#' @examples
 #' 
 
 resiPlot <- function(act,pred,bucket=20){

@@ -9,7 +9,7 @@
 #' @details This function provides a data summary including min, max, number of unique values and number if missing values.
 #' The min and max will ignore missing value in the data.  The input should be a `data.frame`.
 #' @author Sixiang Hu
-#' @importFrom data.table as.data.table :=
+#' @importFrom data.table data.table :=
 #' @export DataSummary
 #' @examples
 #' DataSummary(cars)
@@ -34,7 +34,7 @@ DataSummary.data.frame <- function(data,wt=NULL,sparkline=FALSE){
   dsMean    <- sapply(data,function(x){
     if(is.numeric(x) || is.integer(x)) as.character(round(weighted.mean(x,weight,na.rm = TRUE),6))
     else {
-      x.dt<-data.table(x,weight)
+      x.dt<-data.table::data.table(x,weight)
       dsTemp <- as.character(x.dt[,sum(weight),by=x][order(-V1)][1,list(x)])
       if(is.null(dsTemp) || is.na(dsTemp)) as.character(x.dt[,sum(weight),by=x][order(-V1)][2,list(x)])
       else dsTemp
@@ -44,7 +44,7 @@ DataSummary.data.frame <- function(data,wt=NULL,sparkline=FALSE){
   dsMax    <- sapply(data,function(x){
     if(is.numeric(x) || is.integer(x)) as.character(round(max(x,na.rm = TRUE),6))
     else {
-      x.dt<-data.table(x,weight)
+      x.dt<-data.table::data.table(x,weight)
       dsTemp <- as.character(x.dt[,sum(weight),by=x][order(-V1)][1,list(x)])
       if(is.null(dsTemp) || is.na(dsTemp)) as.character(x.dt[,sum(weight),by=x][order(-V1)][2,list(x)])
       else dsTemp
@@ -54,7 +54,7 @@ DataSummary.data.frame <- function(data,wt=NULL,sparkline=FALSE){
   dsMin    <- sapply(data,function(x){
     if(is.numeric(x) || is.integer(x)) as.character(round(min(x,na.rm = TRUE),6))
     else {
-      x.dt<-data.table(x,weight)
+      x.dt<-data.table::data.table(x,weight)
       dsTemp <- as.character(x.dt[,sum(weight),by=x][order(V1)][1,list(x)])
       if(is.null(dsTemp) || is.na(dsTemp)) as.character(x.dt[,sum(weight),by=x][order(V1)][2,list(x)])
       else dsTemp
@@ -63,7 +63,7 @@ DataSummary.data.frame <- function(data,wt=NULL,sparkline=FALSE){
   
   if (sparkline) {
     dsStr <- sapply(data,function(x) {
-      freq <- data.table(x)[,.N,by=x][order(x)][,f:=N/sum(N)]
+      freq <- data.table::data.table(x)[,.N,by=x][order(x)][,f:=N/sum(N)]
       if (dim(freq)[1]>=100) return("More than 100 levels")
       else return(paste0(round(freq[,f],3),collapse= ","))
     })
@@ -104,7 +104,7 @@ DataSummary.data.table <- function(data,wt=NULL,sparkline=FALSE){
   dsMean    <- data[,sapply(.SD,function(x){
     if(is.numeric(x) || is.integer(x)) as.character(round(weighted.mean(x,weight,na.rm = TRUE),6))
     else {
-      x.dt<- data.table(x,weight)
+      x.dt<- data.table::data.table(x,weight)
       dsTemp <- as.character(x.dt[,sum(weight),by=x][order(-V1)][1,list(x)])
       if(is.null(dsTemp) || is.na(dsTemp)) as.character(x.dt[,sum(weight),by=x][order(-V1)][2,list(x)])
       else dsTemp
@@ -114,7 +114,7 @@ DataSummary.data.table <- function(data,wt=NULL,sparkline=FALSE){
   dsMax    <- data[,sapply(.SD,function(x){
     if(is.numeric(x) || is.integer(x)) as.character(round(max(x,na.rm = TRUE),6))
     else {
-      x.dt<-data.table(x,weight)
+      x.dt<-data.table::data.table(x,weight)
       dsTemp <- as.character(x.dt[,sum(weight),by=x][order(-V1)][1,list(x)])
       if(is.null(dsTemp) || is.na(dsTemp)) as.character(x.dt[,sum(weight),by=x][order(-V1)][2,list(x)])
       else dsTemp
@@ -124,7 +124,7 @@ DataSummary.data.table <- function(data,wt=NULL,sparkline=FALSE){
   dsMin    <- data[,sapply(data,function(x){
     if(is.numeric(x) || is.integer(x)) as.character(round(min(x,na.rm = TRUE),6))
     else {
-      x.dt<-data.table(x,weight)
+      x.dt<-data.table::data.table(x,weight)
       dsTemp <- as.character(x.dt[,sum(weight),by=x][order(V1)][1,list(x)])
       if(is.null(dsTemp) || is.na(dsTemp)) as.character(x.dt[,sum(weight),by=x][order(V1)][2,list(x)])
       else dsTemp
@@ -133,7 +133,7 @@ DataSummary.data.table <- function(data,wt=NULL,sparkline=FALSE){
   
   if (sparkline) {
     dsStr <- data[,sapply(data,function(x) {
-      freq <- data.table(x)[,.N,by=x][order(x)][,f:=N/sum(N)]
+      freq <- data.table::data.table(x)[,.N,by=x][order(x)][,f:=N/sum(N)]
       if (dim(freq)[1]>=100) return("More than 100 levels")
       else return(paste0(round(freq[,f],3),collapse= ","))
     })]
