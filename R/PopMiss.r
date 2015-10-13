@@ -94,7 +94,7 @@ PopMiss.data.frame<-function(data,na.treatment,replace){
     warning("Provided replacement will be used for all missing value.")
     str_name <- names(data)
     for(i in num_miss){
-    	if (is.Date(data[,str_name[i]])) data[is.na(data[,str_name[i]]),str_name[i]] <- as.Date("1960-01-01")	
+    	if ("Date" %in% class(data[,str_name[i]]) ) data[is.na(data[,str_name[i]]),str_name[i]] <- as.Date("1960-01-01")	
       	else data[is.na(data[,str_name[i]]),str_name[i]] <- replace
     }
     return(data)
@@ -128,7 +128,7 @@ PopMiss.data.table <-function(data,na.treatment,replace){
     warning("Provided replacement will be used for all missing value.")
     str_name <- names(data)
     for(i in num_miss){
-     	if (is.Date(data[,i,with=FALSE])) data[which(is.na(data[,i,with=FALSE])),i] <- as.Date("1960-01-01")	
+     	if ("Date" %in% class(data[,i,with=FALSE])) data[which(is.na(data[,i,with=FALSE])),i] <- as.Date("1960-01-01")	
       	data[which(is.na(data[,i,with=FALSE])),i] <- replace
     }
     return(data)
