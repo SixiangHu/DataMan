@@ -91,11 +91,12 @@ PopMiss.data.frame<-function(data,na.treatment,replace){
   else{
     if (is.null(replace)) stop("NULL value used for populating NAs. Chosen \"replace\" method, but didn't provide a value for replace parameter?")
     
-    warning("Provided replacement will be used for all missing value.\n\n")
+    warning("Provided replacement will be used for all missing value.")
     str_name <- names(data)
-    for(i in num_miss)
-      data[is.na(data[,str_name[i]]),str_name[i]] <- replace
-    
+    for(i in num_miss){
+    	if (is.Date(data[,str_name[i]])) data[is.na(data[,str_name[i]]),str_name[i]] <- as.Date("1960-01-01")	
+      	else data[is.na(data[,str_name[i]]),str_name[i]] <- replace
+    }
     return(data)
   }
 }
@@ -124,11 +125,12 @@ PopMiss.data.table <-function(data,na.treatment,replace){
   else{
     if (is.null(replace)) stop("NULL value used for populating NAs. Chosen \"replace\" method, but didn't provide a value for replace parameter?")
     
-    warning("Provided replacement will be used for all missing value.\n\n")
+    warning("Provided replacement will be used for all missing value.")
     str_name <- names(data)
-    for(i in num_miss)
-      data[which(is.na(data[,i,with=FALSE])),i] <- replace
-    
+    for(i in num_miss){
+     	if (is.Date(data[,i,with=FALSE])) data[which(is.na(data[,i,with=FALSE])),i] <- as.Date("1960-01-01")	
+      	data[which(is.na(data[,i,with=FALSE])),i] <- replace
+    }
     return(data)
   }
 }
