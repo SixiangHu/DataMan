@@ -23,7 +23,7 @@
 #' 
 
 resiPlot <- function(act,pred,bucket=20){
-  rng <- range(rbind(act,pre),na.rm = TRUE,finite=TRUE)
+  rng <- range(rbind(act,pred),na.rm = TRUE,finite=TRUE)
   
   if (is.na(rng) || is.infinite(rng)) stop("Given data is all NA's or infinite's.")
   

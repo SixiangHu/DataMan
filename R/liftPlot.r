@@ -17,9 +17,8 @@ liftPlot <- function(data,weight=NULL,bucket=20,showas=NULL){
   newNameFlag <- TRUE
   
   if(dim(data)[1]<bucket) stop("Default or given bucket number is more than data obs.") 
-  if(dim(data)[1]<bucket*10) warning("Number of obs per bucket is less than 10, 
-                                     which may not give a reliable weighted mean.") 
-  
+  if(dim(data)[1]<bucket*10) warning("Number of obs per bucket is less than 10, which may not give a reliable weighted mean.") 
+
   if (is.null(weight)) weight <- rep(1,dim(data)[1])
   if (!is.null(showas) && length(showas) != dim(data)[2]) stop("Names provided in `showas` has a different length with column provided.") 
   else if (is.null(showas)) newNameFlag <- FALSE
@@ -28,6 +27,7 @@ liftPlot <- function(data,weight=NULL,bucket=20,showas=NULL){
   
   for(i in 1:dim(data)[2]){
     temp <- liftGroup(data[,i],weight,bucket)
+    
     if (newNameFlag) temp$ModelNames <- showas[i]
     else temp$ModelNames <- names(data)[i]
     
@@ -44,12 +44,11 @@ liftPlot <- function(data,weight=NULL,bucket=20,showas=NULL){
 }
 
 liftGroup <- function(pred,weight=NULL,bucket){
-  if (is.null(weight)) weight <- rep(1,length(pred))
-  
+
   df <- data.frame(cbind(pred,weight))
   df <- df[order(df[,1]),]
   df$group <- floor((1:length(pred))/ ceiling(length(pred)/bucket))+1
-  
+
   df_plot <-df %>% 
     group_by(group) %>% 
     summarise(wmean = weighted.mean(pred, weight))
@@ -58,5 +57,3 @@ liftGroup <- function(pred,weight=NULL,bucket){
   names(df_plot) <- c("Group","Pred")
   df_plot
 }
-
-1010
