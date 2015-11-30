@@ -5,10 +5,16 @@ Version: 0.1.2
 Date: 2015-01-24
 Author: Sixiang Hu <sixiang.hu@gmail.com>
 Maintainer: Sixiang Hu <Sixiang.Hu@Gmail.Com>
-Description: This package provides some simple function used for: Data Cleaning - detecting and populating missing value in a given data frame or vector; Data Analysis - an enhanced summary function to provide more info about variables in the given data. 
-Depends: ggplot2
-Imports: data.table,scales,reshape2,googleVis,grid,gridExtra,Rcpp (>= 0.11.6)
-License:  GPL (>= 2)
+Description: This package provides some simple function used for: Data Cleaning
+    - detecting and populating missing value in a given data frame or vector; Data
+    Analysis - an enhanced summary function to provide more info about variables in
+    the given data.
+Depends:
+    ggplot2
+Imports:
+    data.table,scales,reshape2,googleVis,grid,gridExtra,Rcpp (>= 0.11.6)
+License: GPL (>= 2)
 LinkingTo: Rcpp, RcppArmadillo
 URL: https://github.com/SixiangHu/DataMan
 BugReports: https://github.com/SixiangHu/DataMan/issues
+RoxygenNote: 5.0.1
