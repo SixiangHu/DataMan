@@ -2,17 +2,15 @@
 #'
 #' @description This function allows you visulise the GLM or GBM fitting by comparing observation, fitted and mean fitted on the same plot.
 #' @usage modelPlot(model,xvar,type=c("response","link"),dataset=NULL,weights=NULL,
-#' by=NULL,modelType=c("glm","glm.nb","gbm","train"),interactive=FALSE,newGroupNum=10,...)
+#' by=NULL,modelType=c("glm","glm.nb","gbm","train"),newGroupNum=10)
 #' @param model a model object. Currently this function supports glm, gbm and train object create by caret package. 
 #' @param xvar a character string indicates the variable name you want to visulise.
 #' @param type either "response" or "link". By default ("response") will plot on GLM response as oppose to linear predictor ("link").
 #' @param dataset Optional. A data frame. update the glm model plot with a new dataset.
 #' @param weights Optional. A numerical vector to specify the weights used for updating the glm model for plotting.
 #' @param modelType A character string. One of "glm", "glm.nb", "train" or "gbm".
-#' @param interactive logical. Set true to use googleVis package plotting interactively. Currently it doesn't work when using "by" method.
 #' @param by Optinal. A character string indicates the variable name you want to plot the fit by.
 #' @param newGroupNum Optional. An integer specifies number of new bands when levels of current plotting variable `xvar` or `by` is more than 100. 
-#' @param ... xlim and ylim can be used to set the range of the ggplot2 plot. For example, xlim=c(0,1) means restrict the xaxis within (0,1).  This does not work for goolgeVis interactive plot because, because, because it is interactive, which you can zoom in and out with your mouse. :)
 #' @details 
 #' For those used Emblem before, you will find this plot quite familiar.  The purpose of this function is the same that to put observation, fitted, and mean fit on the same plot for better understanding about model fitting.
 #' 
@@ -26,22 +24,19 @@
 #' 
 #' The difference between `plot.gbm` in `gbm` package and this modelPlot function is that `plot.gbm` is plotting "marginal effect" as oppose to overall fitting.    
 #' 
+#' It is now support the `caret` package's `train` model.
+#' 
 #' @author Sixiang Hu
 #' @importFrom data.table as.data.table setkey :=
-#' @importFrom ggplot2 aes element_text ggplot
-#' @importFrom gridExtra grid.arrange
-#' @importFrom grid unit.pmax
-#' @importFrom reshape2 melt
-#' @importFrom googleVis gvisComboChart
-#' @importFrom scales percent date_format
-#' @seealso \code{\link{glm}}
+#' @importFrom rbokeh figure ly_lines ly_points ly_hist grid_plot
+#' @seealso \code{\link{glm}} \code{\link{train}}
 #' @export modelPlot
 #' @examples
 #' 
 #' ## glm example
 #' 
 #' glm1 <- glm(formula = mpg ~ cyl + hp, family = Gamma(log), data = mtcars, weights = wt)
-#' modelPlot(glm1,"cyl",modelType="glm",interactive=TRUE)
+#' modelPlot(glm1,"cyl",modelType="glm")
 
 modelPlot <- function(model,
                       xvar,
@@ -50,17 +45,10 @@ modelPlot <- function(model,
                       weights=NULL,
                       by=NULL,
                       modelType=c("glm","glm.nb","gbm","train"),
-                      interactive=FALSE,
-                      newGroupNum=10,
-                      ...){
+                      newGroupNum=10){
   
   type <- match.arg(type)
-  opts.list<-list(...)
-  opts <- names(list(...))
-  if("xlim" %in% opts) xlim<-opts.list$xlim
-  if("ylim" %in% opts) ylim<-opts.list$ylim
-  if("binwidth" %in% opts) binwidth<-opts.list$binwidth else binwidth <- 1
-  
+
   modelType <- match.arg(modelType)
   if (modelType == "gbm" && type =="link") warning("modelPlot: no link function in gbm, using response for plotting.\n")
   
@@ -133,9 +121,9 @@ modelPlot <- function(model,
   }
   
   #Calculate mean data set for mean_fit line
-  MeanData <- ModeData(dataset,weights)
+  MeanData <- .ModeData(dataset,weights)
   MeanData[,xvar] <- dataset[,xvar]
-  
+
   #New Group for data which has too much levels.
   if ( (is.numeric(dataset[,xvar]) || is.integer(dataset[,xvar])) && nlevels(as.factor(dataset[,xvar]))>100 ) {
     if ( is.null(newGroupNum) ) newGroupNum <- 10
@@ -151,10 +139,11 @@ modelPlot <- function(model,
   else if (modelType == "train" ) fitted_mean <- as.numeric(predict(model,MeanData))
   
   #Plotting
-  options(warn=-1)
-  
   covf2c <- sapply(dataset, is.factor)
   dataset[covf2c] <- lapply(dataset[covf2c], as.character)
+  
+  strTitle <- paste("Fitting Analysis on: ",xvar,"(",type,")")
+  tools <- c("wheel_zoom","box_zoom","resize","reset","save")
   
   #any difference between trans before and after aggregate?
   if(type=="link") {
@@ -177,121 +166,75 @@ modelPlot <- function(model,
     setkey(data.plot,xvar,by)
     
     data.plot <- data.plot[,lapply(.SD,as.numeric),by=list(xvar,by),.SDcols=c("fitted","observed","weights")]
-    
-    data.agg <- as.data.frame(data.plot[,lapply(.SD,weighted.mean,w=weights),by=list(xvar,by),.SDcols=c("fitted","observed","weights")],row.names=c("xvar","by","weights","fitted","observed"))
-    
-    data.freq <- as.data.frame(data.plot[,sum(weights),by=list(xvar,by)][,freq:=V1/sum(V1)])
-    
+    data.agg  <- data.plot[,lapply(.SD,weighted.mean,w=weights),by=list(xvar,by),.SDcols=c("fitted","observed","weights")]
+
     #line graph fitted
-    gLine1 <- ggplot2::ggplot(data=data.agg,aes(x=xvar,y=fitted,group=by,colour=by))+
-      ggplot2::geom_line(size=1) + ggplot2::geom_point(size=4,fill="white")
-    if("xlim" %in% opts) gLine1 <-gLine1 + xlim(xlim)
-    if("ylim" %in% opts) gLine1 <-gLine1 + ylim(ylim)
-    gLine1 <- gLine1+ggplot2::xlab("")+ggplot2::ylab(type)+ ggplot2::ggtitle(paste("Fitting Analysis on: ",xvar," by ",by, "(Fitted)"))+
-      theme_mp_line
-    
-    #line graph observed
-    gLine2 <- ggplot2::ggplot(data=data.agg,aes(x=xvar,y=observed,group=by,colour=by))+
-      ggplot2::geom_line(size=1) + ggplot2::geom_point(size=4,fill="white")
-    if("xlim" %in% opts) gLine2 <-gLine2 + ggplot2::xlim(xlim)
-    if("ylim" %in% opts) gLine2 <- gLine2 + ggplot2::ylim(ylim)
-    gLine2 <- gLine2+ggplot2::xlab("")+ggplot2::ylab(type)+ ggplot2::ggtitle(paste("Fitting Analysis on: ",xvar," by ",by, "(Observed)"))+
-      theme_mp_line
-    if(nlevels(as.factor(data.agg$xvar))>25) gLine2 <- gLine2 + ggplot2::theme(axis.text.x = element_text(angle = 90,hjust=0.5,vjust=0.5))
-    
+    p1 <- rbokeh::figure(title=strTitle,xlab="",ylab=type,height=500) %>%
+      rbokeh::ly_lines(xvar,fitted,color=by,type=list(2),
+                       width=2,data=data.agg) %>%
+      rbokeh::ly_points(xvar,fitted,group=by,color=by,
+                        data=data.agg,glyph=2,size=10,
+                        hover="<strong>x value:</strong> @xvar<br><strong>fitted value:</strong> @fitted<br><strong>by value:</strong> @by") %>%
+      rbokeh::ly_lines(xvar,observed,color=by,
+                       width=2,data=data.agg) %>% 
+      rbokeh::ly_points(xvar,observed,group=by,color=by,
+                        data=data.agg,glyph=0,size=10,
+                        hover="<strong>x value:</strong> @xvar<br><strong>obsered value:</strong> @observed<br><strong>by value:</strong> @by")
+
     #histogram graph
-    ghist <- ggplot2::ggplot(data=data.freq,aes(x=xvar,y=freq,fill=by))+ ggplot2::geom_histogram(stat="identity",binwidth=1)
-    if("xlim" %in% opts) ghist <-ghist + ggplot2::xlim(xlim)
-    ghist <- ghist + ggplot2::xlab("")+ ggplot2::ylab("percent (%)")+ ggplot2::scale_y_continuous(labels = percent) + 
-      theme_mp_hist
-    
-    p1 <- ggplot2::ggplot_gtable(ggplot2::ggplot_build(gLine1))
-    p12 <- ggplot2::ggplot_gtable(ggplot2::ggplot_build(gLine2))
-    p2 <- ggplot2::ggplot_gtable(ggplot2::ggplot_build(ghist))
-    
-    maxWidth <- grid::unit.pmax(p1$widths[2:3], p2$widths[2:3],p12$widths[2:3])
-    
-    p1$widths[2:3] <- maxWidth
-    p12$widths[2:3] <- maxWidth
-    p2$widths[2:3] <- maxWidth
-    
-    gridExtra::grid.arrange(p1,p12,p2,ncol=1,nrow=3,heights=c(4,4,2))
+    if (sum(c("integer","numeric") %in% class(data.plot[,xvar]))>0)
+      p2 <- rbokeh::figure(xlab="",ylab="Frequency",height=250) %>%
+      rbokeh::ly_hist(xvar,data=data.plot)
+    else
+      p2 <- rbokeh::figure(xlab="",ylab="Frequency",height=250) %>%
+      rbokeh::ly_bar(xvar,color=by,data=data.plot)
+      
+    grid_plot(list(p1,p2),ncol=1,nrow=2,
+              width=900,
+              same_axes = c(TRUE,FALSE))
   }
   else {
-    
     #use as.data.table to speed up
     data.plot <-data.table::as.data.table(as.data.frame(cbind(xvar=dataset[,xvar],fitted,fitted_mean,observed,weights),stringsAsFactors=FALSE))
     setkey(data.plot,xvar)
     
     data.plot <- data.plot[,lapply(.SD,as.numeric),by=xvar,.SDcols=c("fitted","fitted_mean","observed","weights")]
-    data.agg <- as.data.frame(data.plot[,lapply(.SD,weighted.mean,w=weights),by=xvar,.SDcols=c("fitted","fitted_mean","observed","weights")],row.names=c("xvar","weights","fitted","fitted_mean","observed"))
-    data.freq <- as.data.frame(data.plot[,sum(weights),by=xvar][,freq:=V1/sum(V1)])
-    
-    #melt
-    data.melt <- reshape2::melt(data.agg[,-5],id=c("xvar"))
+    data.agg  <- data.plot[,lapply(.SD,weighted.mean,w=weights),by=xvar,.SDcols=c("fitted","fitted_mean","observed","weights")]
     
     #line graph
-    
-    strV1 <- paste("Fitting Analysis on: ",xvar,"(",type,")")
-    
-    gLine <- ggplot2::ggplot(data=data.melt,aes(x=xvar,y=value,group=variable,colour=variable,shape=variable)) + 
-      ggplot2::geom_line(size=1) + ggplot2::geom_point(size=4,fill="white")
-    if(("xlim" %in% opts) && is.numeric(data.melt$xvar)) gLine <-gLine + ggplot2::scale_x_continuous(limits=xlim)
-    else if(("xlim" %in% opts) && !is.numeric(data.melt$xvar)) gLine <-gLine + ggplot2::scale_x_discrete(limits=xlim)
-    else if(("xlim" %in% opts) && is(data.melt[,"xvar"],"Date")) gLine <-gLine + ggplot2::scale_x_date(label=date_format("%y%m"),limits=xlim)
-    if("ylim" %in% opts) gLine <-gLine + ggplot2::ylim(ylim)
-    gLine <- gLine + ggplot2::scale_colour_manual(values=c("green1","green4","magenta3")) + ggplot2::scale_shape_manual(values=c(21,24,22)) + ggplot2::xlab("") + ggplot2::ylab(type)+
-      ggplot2::ggtitle(strV1)+ theme_mp_line
-    if(nlevels(as.factor(data.melt$xvar))>25) gLine <- gLine + ggplot2::theme(axis.text.x = element_text(angle = 90,hjust=0.5,vjust=0.5))
+    p1 <- rbokeh::figure(xlab="",ylab=type,title=strTitle,
+                         tools=tools,height=500) %>%
+      rbokeh::ly_lines(xvar,fitted,color="#336633",data=data.agg,
+                       width=1,type=2,legend="Fitted") %>%
+      rbokeh::ly_points(xvar,fitted,color="#336633",size=10,
+                        data=data.agg,glyph=2,
+                        hover="<strong>x value:</strong> @xvar<br><strong>fitted value:</strong> @fitted") %>%
+      rbokeh::ly_lines(xvar,observed,color="#CC3399",data=data.agg,
+                       width=1,legend="Observed")%>% 
+      rbokeh::ly_points(xvar,observed,color="#CC3399",size=10,
+                        data=data.agg,glyph=0,
+                        hover="<strong>x value:</strong> @xvar<br><strong>obs value:</strong> @observed") %>%
+      rbokeh::ly_lines(xvar,fitted_mean,color="#33CC33",data=data.agg,
+                     width=1,legend="fitted_mean")%>% 
+      rbokeh::ly_points(xvar,fitted_mean,color="#33CC33",size=10,
+                        data=data.agg,glyph=0,
+                        hover="<strong>x value:</strong> @xvar<br><strong>fitted mean value:</strong> @fitted_mean")
     
     #histogram graph
-    ghist <- ggplot2::ggplot(data=data.freq,aes(x=xvar,y=freq))+
-      ggplot2::geom_histogram(stat="identity",colour="black",fill="yellow")
-    if(("xlim" %in% opts) && is.numeric(data.melt$xvar)) ghist <-ghist + ggplot2::scale_x_continuous(limits=xlim)
-    else if(("xlim" %in% opts) && !is.numeric(data.melt$xvar)) ghist <-ghist + ggplot2::scale_x_discrete(limits=xlim)
-    ghist <- ghist + ggplot2::ylab("percent (%)")+
-      ggplot2::scale_y_continuous(labels = percent)+
-      ggplot2::xlab("")+ theme_mp_hist
+    if (sum(c("integer","numeric") %in% class(data.plot[,xvar]))>0)
+      p2 <- rbokeh::figure(xlab="",ylab="Frequency",height=250) %>%
+      rbokeh::ly_hist(xvar,data=data.plot)
+    else
+      p2 <- rbokeh::figure(xlab="",ylab="Frequency",height=250) %>%
+      rbokeh::ly_bar(xvar,data=data.plot)
     
-    p1 <- ggplot2::ggplot_gtable(ggplot2::ggplot_build(gLine))
-    p2 <- ggplot2::ggplot_gtable(ggplot2::ggplot_build(ghist))
-    
-    maxWidth <- grid::unit.pmax(p1$widths[2:3], p2$widths[2:3])
-    
-    p1$widths[2:3] <- maxWidth
-    p2$widths[2:3] <- maxWidth
-    
-    gridExtra::grid.arrange(p1,p2,ncol=1,nrow=2,heights=c(4,1))
-    
-    if (interactive) {
-      df <- data.frame(data.agg,freq=data.freq$freq)
-      gvisSingleOptionList <- list(pointSize=8,
-                                   series="[{targetAxisIndex:0, type:'line',color:'greenyellow',pointShape: 'circle'},
-                                   {targetAxisIndex:0, type:'line',color:'green',pointShape: 'triangle'},
-                                   {targetAxisIndex:0, type:'line',color:'magenta',pointShape: 'square'},
-                                   {targetAxisIndex:1, type:'bars',color:'yellow'}]",
-                                   crosshair="{trigger:'both'}",
-                                   hAxis.title=strV1,
-                                   theme="maximized",
-                                   title=paste0("Fitting analysis on ",strV1, " Observed"),
-                                   vAxes="{1:{format:'##.#%',maxValue:1}}",
-                                   explorer="{ actions: ['dragToZoom', 'rightClickToReset'],keepInBounds: true }",
-                                   chartArea="{width:'90%',height:'90%'}",
-                                   height=750)
-      
-      plot(googleVis::gvisComboChart(df,xvar="xvar",yvar=c("fitted","fitted_mean","observed","freq"),options=gvisSingleOptionList))
-      
-    }
+    grid_plot(list(p1,p2),ncol=1,nrow=2,
+              width=900,
+              same_axes = c(TRUE,FALSE))
   }
-  
-  options(warn=0)
 }
 
-percent=value=variable=.N=NULL #global variabel to pass R CMD CHECK
-
-# Create mode or average of a dataset
-x=freq=NULL
-ModeData <- function(data,weights){
+.ModeData <- function(data,weights){
 
   if(!(class(data) %in% c("data.frame","ore.frame"))){
     if(length(data)==0) stop("data set is empty.")
@@ -304,24 +247,16 @@ ModeData <- function(data,weights){
     else stop("data set is empty.")
   }
   
-  if(is.null(weights)) weights<-rep(1,length(data[,1]))
+  if(is.null(weights)) weights<-rep(1,dim(data)[1])
   
   for(i in 1:iLen) {
-    x_dt<-data.table::as.data.table(x=data[,VarName[i]],weights)
-    data[,VarName[i]] <- rep(data.frame(x_dt[,sum(weights),by=x][order(-V1)])[1,1],length(data[,1]))
+    x_dt<-data.table::as.data.table(cbind(x=data[,VarName[i]],weights))
+    
+    if( sum(c("character","factor") %in% class(data[,VarName[i]]))>0 )
+      data[,VarName[i]] <- as.character(x_dt[,sum(weights),by=x][order(-V1)][1,1,with=FALSE])
+    else
+      data[,VarName[i]] <- x_dt[,sum(weights),by=x][order(-V1)][1,1,with=FALSE]
   }
   
   return(data)
 }
-
-#theme for plot ggplot2 graph
-theme_mp_line <- ggplot2::theme_bw() + 
-  ggplot2::theme(text=ggplot2::element_text(face="bold.italic"),
-                 legend.justification=c(1,1),
-                 legend.position=c(1,1))
-
-
-theme_mp_hist <- ggplot2::theme_bw() + 
-  ggplot2::theme(text=ggplot2::element_text(face="bold.italic"),
-                 axis.text.x = ggplot2::element_blank(),
-                 legend.position = 'none')

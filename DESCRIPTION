@@ -1,7 +1,7 @@
 Package: DataMan
 Type: Package
 Title: This is an R package for data cleaning and preliminary data analysis
-Version: 0.1.2
+Version: 0.4
 Date: 2015-01-24
 Author: Sixiang Hu <sixiang.hu@gmail.com>
 Maintainer: Sixiang Hu <Sixiang.Hu@Gmail.Com>
@@ -10,9 +10,9 @@ Description: This package provides some simple function used for: Data Cleaning
     Analysis - an enhanced summary function to provide more info about variables in
     the given data.
 Depends:
-    ggplot2
+    rbokeh
 Imports:
-    data.table,scales,reshape2,googleVis,grid,gridExtra,Rcpp (>= 0.11.6),dplyr
+    data.table,Rcpp (>= 0.11.6),dplyr
 License: GPL (>= 2)
 LinkingTo: Rcpp, RcppArmadillo
 URL: https://github.com/SixiangHu/DataMan

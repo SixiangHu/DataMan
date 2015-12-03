@@ -4,12 +4,14 @@
 \alias{resiPlot}
 \title{resiPlot}
 \usage{
-resiPlot(act,pred,bucket=20)
+resiPlot(act,pred,weight=NULL,bucket=20)
 }
 \arguments{
 \item{act}{numerical vector for actual observation.}
 
 \item{pred}{numerical vector for model preidctions.  It must have the same length as act.}
+
+\item{weight}{numerical vector to give weight to observations.}
 
 \item{bucket}{Integer. It specifies the number of bucket of the AvsE plot.}
 }
@@ -18,13 +20,17 @@ This function assess the residual using given actual and predicted values.
 }
 \details{
 Currently, the residual in this function is defined as: Residual = actual - predicted.  I don't use `resi` or `reisdual` function
-from `stats` package because this function will be used for much wider model assess (e.g. `randomFoest`, `gbm`), but 2 functions
-mentioned about can only applied to `glm` and `lm`.  May code in some other residual function.
+from `stats` package because this function will be used for much wider model assess (e.g. `randomFoest`, `gbm`), and 2 functions
+mentioned above can only applied to `glm` and `lm`.
 
-This function will give 3 plots:
-Residual vs Prediction: This plot is used to assess the baise and heterogeneity
-Residual histogram: Check the residual distribution.
+This function will give 2 plots:
 AvsE plot: The aggregated (by provided number of bucket) average actual and predicted value, with a diagnal line for comparison.
+Residual vs Prediction: This plot is used to assess the baise and heterogeneity
+}
+\examples{
+act <- rnorm(10000)
+pred <- rgamma(10000,1)
+resiPlot(act,pred)
 }
 \author{
 Sixiang Hu

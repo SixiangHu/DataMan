@@ -19,6 +19,15 @@ liftPlot(data,weight=NULL,bucket=20,showas=NULL)
 With provided different model predictions, different lift curves will be 
 plot to compare model improvement.
 }
+\examples{
+
+glm1 <- glm(mpg~cyl,data=mtcars,family=Gamma(log))
+glm2 <- glm(mpg~cyl+vs,data=mtcars,family=Gamma(log))
+pred1 <- predict(glm1,mtcars)
+pred2 <- predict(glm2,mtcars)
+data <- cbind(pred1,pred2)
+liftPlot(data)
+}
 \author{
 Sixiang Hu
 }

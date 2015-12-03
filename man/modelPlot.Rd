@@ -5,7 +5,7 @@
 \title{modelPlot}
 \usage{
 modelPlot(model,xvar,type=c("response","link"),dataset=NULL,weights=NULL,
-by=NULL,modelType=c("glm","glm.nb","gbm","train"),interactive=FALSE,newGroupNum=10,...)
+by=NULL,modelType=c("glm","glm.nb","gbm","train"),newGroupNum=10)
 }
 \arguments{
 \item{model}{a model object. Currently this function supports glm, gbm and train object create by caret package.}
@@ -22,11 +22,7 @@ by=NULL,modelType=c("glm","glm.nb","gbm","train"),interactive=FALSE,newGroupNum=
 
 \item{modelType}{A character string. One of "glm", "glm.nb", "train" or "gbm".}
 
-\item{interactive}{logical. Set true to use googleVis package plotting interactively. Currently it doesn't work when using "by" method.}
-
 \item{newGroupNum}{Optional. An integer specifies number of new bands when levels of current plotting variable `xvar` or `by` is more than 100.}
-
-\item{...}{xlim and ylim can be used to set the range of the ggplot2 plot. For example, xlim=c(0,1) means restrict the xaxis within (0,1).  This does not work for goolgeVis interactive plot because, because, because it is interactive, which you can zoom in and out with your mouse. :)}
 }
 \description{
 This function allows you visulise the GLM or GBM fitting by comparing observation, fitted and mean fitted on the same plot.
@@ -42,19 +38,21 @@ Fitted_mean line for xvar is the predictions of the current model on a Mode data
 
 For GBM model, currently, can only create response plot.  Because of the fact that link function is not explicitly saved in its model object hence I need to create link function for each of the GBM family.  Will think about how to do this.
 
-The difference between `plot.gbm` in `gbm` package and this modelPlot function is that `plot.gbm` is plotting "marginal effect" as oppose to overall fitting.
+The difference between `plot.gbm` in `gbm` package and this modelPlot function is that `plot.gbm` is plotting "marginal effect" as oppose to overall fitting.    
+
+It is now support the `caret` package's `train` model.
 }
 \examples{
 
 ## glm example
 
 glm1 <- glm(formula = mpg ~ cyl + hp, family = Gamma(log), data = mtcars, weights = wt)
-modelPlot(glm1,"cyl",modelType="glm",interactive=TRUE)
+modelPlot(glm1,"cyl",modelType="glm")
 }
 \author{
 Sixiang Hu
 }
 \seealso{
-\code{\link{glm}}
+\code{\link{glm}} \code{\link{train}}
 }
 

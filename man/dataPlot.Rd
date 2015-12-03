@@ -4,7 +4,7 @@
 \alias{dataPlot}
 \title{dataPlot}
 \usage{
-dataPlot(data,xvar,yvar,byvar=NULL,weights=NULL,interactive=FALSE,newGroupNum=10,...)
+dataPlot(data,xvar,yvar,byvar=NULL,weights=NULL,newGroupNum=10)
 }
 \arguments{
 \item{data}{a data frame.}
@@ -23,11 +23,7 @@ a numerical vector to specify the weights used for calculating weighted average 
 a character string to specify the name of weight variable in the data frame,
 an integer to specify the position of the weight variable in the data frame.}
 
-\item{interactive}{logical. Set true to use googleVis package plotting interactively, which can be used in shiny apps. Currently it doesn't work when using "by" method.}
-
-\item{newGroupNum}{Optional. An integer specifies number of new bands when levels of current plotting variable `xvar` or `by` is more than 100.}
-
-\item{...}{xlim and ylim can be used to set the range of the ggplot2 plot. For example, xlim=c(0,1) means restrict the xaxis within (0,1).  This does not work for goolgeVis interactive plot because, because, because it is interactive, which you can zoom in and out with your mouse. :)}
+\item{newGroupNum}{An integer specifies number of new bands when levels of current plotting variable `xvar` or `by` is more than 100.}
 }
 \description{
 This function allows you to visualise features of a dataset by specifying dependent and response variable.

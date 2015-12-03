@@ -28,7 +28,7 @@ Currently, there is only one function provided:
 
 * `modelPlot`: visualise `glm`, `glm.nb` ,`train` and `gbm` model fitting effect using `ggplot2` and `googleVis` packages.
 
-```r
+```{r}
 glm1 <- glm(formula = mpg ~ cyl + hp, family = Gamma(log), data = mtcars, weights = wt)
 modelPlot(glm1,"cyl",modelType="glm")
 ```
@@ -37,7 +37,7 @@ modelPlot(glm1,"cyl",modelType="glm")
 
 * `tree2data`: function used to collect information from `gbm` or `randomForest` model object to create data for `sankeyNetwork` plot in `networkD3` package.
 
-```r
+```{r}
 library(networkD3)
 data(iris)
 iris.mod <- gbm(Species ~ ., distribution="multinomial", data=iris, n.trees=2000, shrinkage=0.01, cv.folds=5, verbose=FALSE, n.cores=1)
@@ -46,6 +46,7 @@ sankeyNetwork(tree_data[[1]],tree_data[[2]],Source="src",Target="tar",Value="val
 ```
 
 * `resiPlot`: This function assess the residual using given actual and predicted values.
+
 
 * `sankeyPlot`: (Descoped) Used to visualise `rpart` model fitted by `rpart`.  This idea has already been implemented by `sankeyNetwork` in `networkD3` package, hence descoped from this package.
 
