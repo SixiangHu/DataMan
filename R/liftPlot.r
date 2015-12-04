@@ -9,7 +9,8 @@
 #' @param bucket An integer to specify the number of groups that the total predictions are split into.
 #' @param showas A string vector to give names for each predictions on the lift curve.
 #' @author Sixiang Hu
-#' @importFrom dplyr group_by summarise %>% 
+#' @importFrom dplyr group_by summarise %>%
+#' @importFrom rbokeh figure ly_lines ly_points ly_hist grid_plot 
 #' @export liftPlot
 #' @examples
 #' 
@@ -22,12 +23,14 @@
 
 liftPlot <- function(data,weight=NULL,bucket=20,showas=NULL){
   newNameFlag <- TRUE
-  
-  if(dim(data)[1]<bucket) stop("Default or given bucket number is more than data obs.") 
-  if(dim(data)[1]<bucket*10) warning("Number of obs per bucket is less than 10, which may not give a reliable weighted mean.") 
+
+  if(dim(data)[1]<bucket*10) 
+    warning("Number of obs per bucket is less than 10, which may not give a reliable weighted mean.") 
 
   if (is.null(weight)) weight <- rep(1,dim(data)[1])
-  if (!is.null(showas) && length(showas) != dim(data)[2]) stop("Names provided in `showas` has a different length with column provided.") 
+  
+  if (!is.null(showas) && length(showas) != dim(data)[2]) 
+    stop("Names provided in `showas` has a different length with column provided.") 
   else if (is.null(showas)) newNameFlag <- FALSE
   
   P <- data.frame(Group=NULL,Pred = NULL,ModelNames=NULL)
@@ -37,33 +40,26 @@ liftPlot <- function(data,weight=NULL,bucket=20,showas=NULL){
 
     if (newNameFlag) temp$ModelNames <- showas[i]
     else if (!is.null(names(data)[i])) temp$ModelNames <- names(data)[i]
-    else temp$ModelNames <- paste("Mode; ",i,sep="")
+    else temp$ModelNames <- paste("Model ",i,sep="")
 
     P <- rbind(P,temp)
   }
 
-  tools <- c("pan", "wheel_zoom", "box_zoom", "box_select", "resize", "reset")
-  
-  p1 <- figure(tools = tools,height=400) %>%
-    ly_lines(Group, Pred, data = P, color = ModelNames)
-  
-  p2 <- figure(tools = tools,height=200) %>%
-    ly_hist(Group,data=P,breaks=bucket)
-  
-  grid_plot(list(p1, p2), same_axes = TRUE,
-            nrow=2,ncol=1,byrow=TRUE,width=800)
-  
+  rbokeh::figure(tools = .tools,height=500,ylab="Prediction") %>%
+    rbokeh::ly_lines(Group, Pred, data = P, width=1.5, color = ModelNames) %>%
+    rbokeh::ly_points(Group, Pred, data = P, size=10, color = ModelNames,
+              hover="<strong>Model:</strong> @ModelNames<br><strong>y value:</strong> @Pred")
 }
 
 .liftGroup <- function(pred,weight=NULL,bucket){
 
   df <- data.frame(cbind(pred,weight))
   df <- df[order(df[,1]),]
-  df$group <- floor((1:length(pred))/ ceiling(length(pred)/bucket))+1
+  df$group <- ceiling((1:length(pred)) / ceiling(length(pred)/bucket))
   
   df_plot <-df %>% 
-    group_by(group) %>% 
-    summarise(wmean = weighted.mean(pred, weight))
+    dplyr::group_by(group) %>% 
+    dplyr::summarise(wmean = weighted.mean(pred, weight))
                                                                                                                                                                                                        
   names(df_plot) <- c("Group","Pred")
   df_plot

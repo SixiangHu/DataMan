@@ -129,7 +129,7 @@ modelPlot <- function(model,
     if ( is.null(newGroupNum) ) newGroupNum <- 10
     
     new_band <- seq(min(dataset[,xvar], na.rm = TRUE),max(dataset[,xvar], na.rm = TRUE),length.out=newGroupNum)
-    dataset[,xvar] <- cut(dataset[,xvar],new_band,include.lowest = TRUE)
+    dataset[,xvar] <- as.character(cut(dataset[,xvar],new_band,include.lowest = TRUE))
   }
   
   #fitted mean
@@ -143,8 +143,7 @@ modelPlot <- function(model,
   dataset[covf2c] <- lapply(dataset[covf2c], as.character)
   
   strTitle <- paste("Fitting Analysis on: ",xvar,"(",type,")")
-  tools <- c("wheel_zoom","box_zoom","resize","reset","save")
-  
+ 
   #any difference between trans before and after aggregate?
   if(type=="link") {
     tran_lnk_fun <- family(model)$linkfun
@@ -152,32 +151,36 @@ modelPlot <- function(model,
     observed <- tran_lnk_fun(observed)
   }
   
-  if( !is.null(by) && !by %in% colnames(dataset) ) stop(paste("Selected factor (",by,") is not in the data.",""))
+  if( !is.null(by) && (!by %in% colnames(dataset)) ) stop(paste("Selected factor (",by,") is not in the data.",""))
   else if ( !is.null(by) ) {
     
-    if ( (is.numeric(dataset[,by]) || is.integer(dataset[,by])) && nlevels(as.factor(dataset[,by]))>100 ) {
+    strTitle <- paste(strTitle," by ",by,sep="")
+    by_val <- dataset[,by]
+    
+    if ( (is.numeric(by_val) || is.integer(by_val)) && nlevels(as.factor(by_val))>100 ) {
       if ( is.null(newGroupNum) ) newGroupNum <- 10
       
-      new_band <- seq(min(dataset[,by], na.rm = TRUE),max(dataset[,by], na.rm = TRUE),length.out=newGroupNum)
-      dataset[,by] <- cut(dataset[,by],new_band,include.lowest = TRUE)
+      new_band <- seq(min(by_val, na.rm = TRUE),max(by_val, na.rm = TRUE),length.out=newGroupNum)
+      by_val <- cut(by_val,new_band,include.lowest = TRUE)
     }
+    by_val <- as.character(by_val)
     
-    data.plot <- data.table::as.data.table(as.data.frame(cbind(xvar=dataset[,xvar],by=dataset[,by],fitted,observed,weights),stringsAsFactors=FALSE))
+    data.plot <- data.table::as.data.table(as.data.frame(cbind(xvar=dataset[,xvar],by=by_val,fitted,observed,weights),stringsAsFactors=FALSE))
     setkey(data.plot,xvar,by)
     
     data.plot <- data.plot[,lapply(.SD,as.numeric),by=list(xvar,by),.SDcols=c("fitted","observed","weights")]
     data.agg  <- data.plot[,lapply(.SD,weighted.mean,w=weights),by=list(xvar,by),.SDcols=c("fitted","observed","weights")]
 
     #line graph fitted
-    p1 <- rbokeh::figure(title=strTitle,xlab="",ylab=type,height=500) %>%
+    p1 <- rbokeh::figure(tools = .tools,title=strTitle,xlab="",ylab=type,height=500) %>%
       rbokeh::ly_lines(xvar,fitted,color=by,type=list(2),
                        width=2,data=data.agg) %>%
-      rbokeh::ly_points(xvar,fitted,group=by,color=by,
+      rbokeh::ly_points(xvar,fitted,color=by,
                         data=data.agg,glyph=2,size=10,
                         hover="<strong>x value:</strong> @xvar<br><strong>fitted value:</strong> @fitted<br><strong>by value:</strong> @by") %>%
       rbokeh::ly_lines(xvar,observed,color=by,
                        width=2,data=data.agg) %>% 
-      rbokeh::ly_points(xvar,observed,group=by,color=by,
+      rbokeh::ly_points(xvar,observed,color=by,
                         data=data.agg,glyph=0,size=10,
                         hover="<strong>x value:</strong> @xvar<br><strong>obsered value:</strong> @observed<br><strong>by value:</strong> @by")
 
@@ -189,9 +192,7 @@ modelPlot <- function(model,
       p2 <- rbokeh::figure(xlab="",ylab="Frequency",height=250) %>%
       rbokeh::ly_bar(xvar,color=by,data=data.plot)
       
-    grid_plot(list(p1,p2),ncol=1,nrow=2,
-              width=900,
-              same_axes = c(TRUE,FALSE))
+    grid_plot(list(p1,p2),ncol=1,nrow=2,width=900,same_axes = c(TRUE,FALSE))
   }
   else {
     #use as.data.table to speed up
@@ -203,7 +204,7 @@ modelPlot <- function(model,
     
     #line graph
     p1 <- rbokeh::figure(xlab="",ylab=type,title=strTitle,
-                         tools=tools,height=500) %>%
+                         tools=.tools,height=500) %>%
       rbokeh::ly_lines(xvar,fitted,color="#336633",data=data.agg,
                        width=1,type=2,legend="Fitted") %>%
       rbokeh::ly_points(xvar,fitted,color="#336633",size=10,
@@ -228,35 +229,6 @@ modelPlot <- function(model,
       p2 <- rbokeh::figure(xlab="",ylab="Frequency",height=250) %>%
       rbokeh::ly_bar(xvar,data=data.plot)
     
-    grid_plot(list(p1,p2),ncol=1,nrow=2,
-              width=900,
-              same_axes = c(TRUE,FALSE))
+    grid_plot(list(p1,p2),ncol=1,nrow=2,width=900,same_axes = c(TRUE,FALSE))
   }
-}
-
-.ModeData <- function(data,weights){
-
-  if(!(class(data) %in% c("data.frame","ore.frame"))){
-    if(length(data)==0) stop("data set is empty.")
-  }
-  else{
-    if(dim(data)[1]>0 && dim(data)[2]>0 ){
-      VarName <- names(data)
-      iLen <- length(VarName)
-    }
-    else stop("data set is empty.")
-  }
-  
-  if(is.null(weights)) weights<-rep(1,dim(data)[1])
-  
-  for(i in 1:iLen) {
-    x_dt<-data.table::as.data.table(cbind(x=data[,VarName[i]],weights))
-    
-    if( sum(c("character","factor") %in% class(data[,VarName[i]]))>0 )
-      data[,VarName[i]] <- as.character(x_dt[,sum(weights),by=x][order(-V1)][1,1,with=FALSE])
-    else
-      data[,VarName[i]] <- x_dt[,sum(weights),by=x][order(-V1)][1,1,with=FALSE]
-  }
-  
-  return(data)
 }

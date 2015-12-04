@@ -1,8 +1,8 @@
 Package: DataMan
 Type: Package
 Title: This is an R package for data cleaning and preliminary data analysis
-Version: 0.4
-Date: 2015-01-24
+Version: 0.4.1
+Date: 2015-12-04
 Author: Sixiang Hu <sixiang.hu@gmail.com>
 Maintainer: Sixiang Hu <Sixiang.Hu@Gmail.Com>
 Description: This package provides some simple function used for: Data Cleaning

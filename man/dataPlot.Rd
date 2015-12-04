@@ -23,17 +23,20 @@ a numerical vector to specify the weights used for calculating weighted average 
 a character string to specify the name of weight variable in the data frame,
 an integer to specify the position of the weight variable in the data frame.}
 
-\item{newGroupNum}{An integer specifies number of new bands when levels of current plotting variable `xvar` or `by` is more than 100.}
+\item{newGroupNum}{An integer specifies number of new bands 
+when levels of current plotting variable `xvar` or `by` is more than 100.}
 }
 \description{
-This function allows you to visualise features of a dataset by specifying dependent and response variable.
+This function allows you to visualise features of a dataset 
+by specifying dependent and response variable.
 }
 \details{
 Before entering modelling stage, we may want to go through variable by variable in a data set to find the 
 features for response variable. This function provides this functionality.
 
 \code{\link{modelPlot}} function in this package provides similar function, but \code{\link{modelPlot}} can 
-only visualise the feature in a specific model. What's more, \code{\link{modelPlot}} takes longer time to create plots.
+only visualise the feature in a specific model. 
+What's more, \code{\link{modelPlot}} takes longer time to create plots.
 }
 \examples{
 

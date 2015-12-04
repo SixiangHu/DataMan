@@ -55,6 +55,9 @@ sankeyNetwork(tree_data[[1]],tree_data[[2]],Source="src",Target="tar",Value="val
 You can install `DataMan` from GitHub as follows:
 
 ```r
+#need this development version of rbokeh package which including ly_bar chart:
+devtools::install_github("bokeh/rbokeh@dev")
+
 devtools::install_github('SixiangHu/DataMan')
 ```
 

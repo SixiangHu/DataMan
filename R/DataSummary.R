@@ -158,4 +158,5 @@ DataSummary.data.table <- function(data,wt=NULL,sparkline=FALSE){
   }
 }
 
-V1 =.N=f=N=.SD=NULL #global variable to pass R CMD CHECK
+#global variable to pass R CMD CHECK
+V1 =.N=f=N=.SD=NULL

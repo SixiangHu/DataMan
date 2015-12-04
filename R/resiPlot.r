@@ -15,9 +15,8 @@
 #' AvsE plot: The aggregated (by provided number of bucket) average actual and predicted value, with a diagnal line for comparison.
 #' Residual vs Prediction: This plot is used to assess the baise and heterogeneity
 #' 
-#'  
 #' @author Sixiang Hu
-#' @importFrom dplyr left_join
+#' @importFrom dplyr left_join group_by summarise
 #' @importFrom rbokeh ly_abline ly_points ly_hexbin grid_plot
 #' @export resiPlot
 #' @examples
@@ -51,20 +50,21 @@ resiPlot <- function(act,pred,weight=NULL,bucket=20){
   temp_lab <- data.table::as.data.table(cbind(label,cuts=label_cuts))
     
   temp_act <- temp %>% 
-    group_by(cuts) %>% 
-    summarise(x = weighted.mean(act, weight))
+    dplyr::group_by(cuts) %>% 
+    dplyr::summarise(x = weighted.mean(act, weight))
 
   df_act <- dplyr::left_join(temp_lab,temp_act,by= "cuts")
       
   #AvsE plot
-  AvsE <- rbokeh::figure(xlab="Predicted",ylab="Actual",height=400) %>%
-    rbokeh::ly_points(label,x,data=df_act,color="blue",size=10) %>%
+  AvsE <- rbokeh::figure(tools=.tools,xlab="Predicted",ylab="Actual",height=500) %>%
+    rbokeh::ly_points(label,x,data=df_act,color="blue",size=10,
+                      hover="<strong>Actual: </strong> @x<br><strong>Predict: </strong> @label") %>%
     rbokeh::ly_abline(a=0,b=1,size=1,color="red")
 
   #residual
   res <- data.frame(res=act - pred,pred=pred)
   
-  Resi <- figure(xlab="Predicted",ylab="Residuals (Actual - Expected)",height=400) %>% 
+  Resi <- figure(xlab="Predicted",ylab="Residuals (Actual - Expected)",height=250) %>% 
     ly_hexbin(pred,res,data=res)  
   
   grid_plot(list(AvsE,Resi),nrow=2,ncol=1,width=900,same_axes = c(TRUE,FALSE))
