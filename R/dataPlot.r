@@ -136,7 +136,7 @@ dataPlot <- function(data,xvar,yvar,byvar=NULL,weights=NULL,
 
     if (class(x) %in% c("integer","numeric","Date")) { 
       p2 <- rbokeh::figure(xlab="",ylab="Frequency",height = 250, width = 900) %>%
-        rbokeh::ly_hist(x,breaks=bucket)
+        rbokeh::ly_hist(x,breaks=nlevels(as.factor(x)))
     }
     else {
       p2 <- rbokeh::figure(xlab="",ylab="Frequency",height = 250, width = 900) %>%
