@@ -25,7 +25,7 @@
 #' What's more, \code{\link{modelPlot}} takes longer time to create plots.
 #'  
 #' @author Sixiang Hu
-#' @importFrom data.table as.data.table setkey :=
+#' @importFrom data.table as.data.table data.table setkey :=
 #' @importFrom rbokeh figure ly_lines ly_points ly_hist grid_plot
 #' @export dataPlot
 #' @examples

@@ -27,9 +27,9 @@
 #' It is now support the `caret` package's `train` model.
 #' 
 #' @author Sixiang Hu
-#' @importFrom data.table as.data.table setkey :=
+#' @importFrom data.table as.data.table data.table setkey :=
 #' @importFrom rbokeh figure ly_lines ly_points ly_hist grid_plot
-#' @seealso \code{\link{glm}} \code{\link{train}}
+#' @seealso \code{\link{glm}}
 #' @export modelPlot
 #' @examples
 #' 
@@ -208,7 +208,7 @@ modelPlot <- function(model,
       rbokeh::ly_lines(xvar,fitted,color="#336633",data=data.agg,
                        width=1,type=2,legend="Fitted") %>%
       rbokeh::ly_points(xvar,fitted,color="#336633",size=10,
-                        data=data.agg,glyph=2,
+                        data=data.agg,glyph=24,
                         hover="<strong>x value:</strong> @xvar<br><strong>fitted value:</strong> @fitted") %>%
       rbokeh::ly_lines(xvar,observed,color="#CC3399",data=data.agg,
                        width=1,legend="Observed")%>% 
@@ -218,7 +218,7 @@ modelPlot <- function(model,
       rbokeh::ly_lines(xvar,fitted_mean,color="#33CC33",data=data.agg,
                      width=1,legend="fitted_mean")%>% 
       rbokeh::ly_points(xvar,fitted_mean,color="#33CC33",size=10,
-                        data=data.agg,glyph=0,
+                        data=data.agg,glyph=25,
                         hover="<strong>x value:</strong> @xvar<br><strong>fitted mean value:</strong> @fitted_mean")
     
     #histogram graph

@@ -53,6 +53,6 @@ modelPlot(glm1,"cyl",modelType="glm")
 Sixiang Hu
 }
 \seealso{
-\code{\link{glm}} \code{\link{train}}
+\code{\link{glm}}
 }
 

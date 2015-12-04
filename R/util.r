@@ -1,6 +1,13 @@
+#.onLoad function to test whether rbokeh package is available
+.onLoad <- function(libname = find.package("DataMan"), pkgname = "DataMan") {
+  if(!require(rbokeh))
+    devtools::install_github("bokeh/rbokeh@dev")
+}
+
 #rbokeh tool sets
 .tools <- c("pan", "wheel_zoom", "box_zoom", "resize", "reset", "save")
 
+#return position index and name of a given variable in the data
 .VarPosition <- function(data,var){
   tmp <- list(posi=NULL,name=NULL)
   
@@ -23,11 +30,11 @@
   else tmp
 }
 
+#whether a dataset is data frame.
 .isDFnull <- function(data){
-  tmp <- FALSE
-  if ( ("data.frame" %in% class(data)) && (dim(data)[1]==0 || dim(data)[2]==0)) 
-    tmp <- TRUE
-  tmp
+  if ( ("data.frame" %in% class(data)) && dim(data)[1]>0 && dim(data)[2]>0) 
+    return(FALSE)
+  else return(TRUE)
 }
 
 #Mean Data For Fitted Mean
