@@ -64,3 +64,6 @@ liftPlot <- function(data,weight=NULL,bucket=20,showas=NULL){
   names(df_plot) <- c("Group","Pred")
   df_plot
 }
+
+#global variable
+globalVariables(c("Group","Pred","ModelNames","group"))

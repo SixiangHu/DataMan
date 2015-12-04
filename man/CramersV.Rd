@@ -2,9 +2,18 @@
 % Please edit documentation in R/CramersV.r
 \name{CramersV}
 \alias{CramersV}
+\alias{CramersV.data.frame}
+\alias{CramersV.default}
+\alias{CramersV.matrix}
 \title{Cramers' V Test}
 \usage{
 CramersV(x,y=NULL)
+
+\method{CramersV}{default}(x, y = NULL)
+
+\method{CramersV}{data.frame}(x, y = NULL)
+
+\method{CramersV}{matrix}(x, y = NULL)
 }
 \arguments{
 \item{x}{It could be non-numerical variable, data.frame or matrix.}

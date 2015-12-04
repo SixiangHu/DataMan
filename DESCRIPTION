@@ -1,6 +1,6 @@
 Package: DataMan
 Type: Package
-Title: This is an R package for data cleaning and preliminary data analysis
+Title: This is an R package for data and model analysis
 Version: 0.4.1
 Date: 2015-12-04
 Author: Sixiang Hu <sixiang.hu@gmail.com>
@@ -11,9 +11,16 @@ Description: This package provides functions used for: Data Cleaning
     the given data; Model Assessing - different model assessing methods applied to 
     different modeling.
 Imports:
-    data.table,Rcpp (>= 0.11.6),dplyr,rbokeh,devtools,ROCR
+    data.table,
+    Rcpp (>= 0.11.6),
+    dplyr,
+    rbokeh,
+    ROCR,
+    gbm,
+    randomForest
 License: GPL (>= 2)
-LinkingTo: Rcpp, RcppArmadillo
+LinkingTo: Rcpp, 
+    RcppArmadillo
 URL: https://github.com/SixiangHu/DataMan
 BugReports: https://github.com/SixiangHu/DataMan/issues
 RoxygenNote: 5.0.1

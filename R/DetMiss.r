@@ -15,11 +15,13 @@ DetMiss <- function(data){
 }
 
 #' @export
+#' @rdname DetMiss
 DetMiss.matrix <- function(data){
 	v <- DetMiss(as.vector(data))
 }
 
 #' @export
+#' @rdname DetMiss
 DetMiss.default<-function(data){
   if(length(data)==0) stop(paste("object '",deparse(substitute(data)),"' blank or not found.\n"))
   RetTab<-data.frame(class(data),sum(is.na(data)),stringsAsFactors=FALSE)
@@ -28,6 +30,7 @@ DetMiss.default<-function(data){
 }
 
 #' @export
+#' @rdname DetMiss
 DetMiss.data.frame<-function(data){
   
   RetTab<-data.frame()

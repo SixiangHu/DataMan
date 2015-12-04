@@ -2,9 +2,30 @@
 % Please edit documentation in R/PopMiss.r
 \name{PopMiss}
 \alias{PopMiss}
+\alias{PopMiss.character}
+\alias{PopMiss.data.frame}
+\alias{PopMiss.data.table}
+\alias{PopMiss.factor}
+\alias{PopMiss.integer}
+\alias{PopMiss.matrix}
+\alias{PopMiss.numeric}
 \title{Populate Missing Value}
 \usage{
 PopMiss(data,na.treatment=c("mean.or.mode","delete","replace"),replace=NULL)
+
+\method{PopMiss}{factor}(data, na.treatment, replace)
+
+\method{PopMiss}{character}(data, na.treatment, replace)
+
+\method{PopMiss}{integer}(data, na.treatment, replace)
+
+\method{PopMiss}{numeric}(data, na.treatment, replace)
+
+\method{PopMiss}{data.frame}(data, na.treatment, replace)
+
+\method{PopMiss}{data.table}(data, na.treatment, replace)
+
+\method{PopMiss}{matrix}(data, na.treatment, replace)
 }
 \arguments{
 \item{data}{This could be data frame, matrix or a vector.}

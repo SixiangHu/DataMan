@@ -2,9 +2,15 @@
 % Please edit documentation in R/DataSummary.R
 \name{DataSummary}
 \alias{DataSummary}
+\alias{DataSummary.data.frame}
+\alias{DataSummary.data.table}
 \title{DataSummary}
 \usage{
 DataSummary(data,wt=NULL,sparkline=FALSE)
+
+\method{DataSummary}{data.frame}(data, wt = NULL, sparkline = FALSE)
+
+\method{DataSummary}{data.table}(data, wt = NULL, sparkline = FALSE)
 }
 \arguments{
 \item{data}{This could be data frame or a vector.}

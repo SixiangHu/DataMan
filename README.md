@@ -35,6 +35,10 @@ modelPlot(glm1,"cyl",modelType="glm")
 
 * `liftPlot`: This function visualise different model predictiveness by plotting lift curves on the same graph.
 
+* `resiPlot`: This function assess the residual using given actual and predicted values.
+
+* `rocPlot`: This function compares binary model predictions in roc curve (AUC).
+
 * `tree2data`: function used to collect information from `gbm` or `randomForest` model object to create data for `sankeyNetwork` plot in `networkD3` package.
 
 ```{r}
@@ -44,9 +48,6 @@ iris.mod <- gbm(Species ~ ., distribution="multinomial", data=iris, n.trees=2000
 tree_data <- tree2data(iris.mod,1)
 sankeyNetwork(tree_data[[1]],tree_data[[2]],Source="src",Target="tar",Value="value",NodeID="name")
 ```
-
-* `resiPlot`: This function assess the residual using given actual and predicted values.
-
 
 * `sankeyPlot`: (Descoped) Used to visualise `rpart` model fitted by `rpart`.  This idea has already been implemented by `sankeyNetwork` in `networkD3` package, hence descoped from this package.
 

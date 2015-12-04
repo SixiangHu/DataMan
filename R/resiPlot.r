@@ -69,3 +69,6 @@ resiPlot <- function(act,pred,weight=NULL,bucket=20){
   
   grid_plot(list(AvsE,Resi),nrow=2,ncol=1,width=900,same_axes = c(TRUE,FALSE))
 }
+
+#global variable
+globalVariables(c("x"))

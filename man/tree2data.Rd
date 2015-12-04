@@ -2,9 +2,19 @@
 % Please edit documentation in R/tree2data.R
 \name{tree2data}
 \alias{tree2data}
-\title{Prepare data for sankeyPlot from GBM or randomForest model object}
+\alias{tree2data.default}
+\alias{tree2data.gbm}
+\alias{tree2data.randomForest}
+\title{Prepare data from GBM or randomForest model object
+for `sankeyNetwork` in `networkD3` package}
 \usage{
 tree2data(tree_model,treeInd = 1)
+
+\method{tree2data}{default}(tree_model, treeInd = 1)
+
+\method{tree2data}{randomForest}(tree_model, treeInd = 1)
+
+\method{tree2data}{gbm}(tree_model, treeInd = 1)
 }
 \arguments{
 \item{tree_model}{This could be either GBM or randomForest model object.}
@@ -17,10 +27,13 @@ Prepare data for sankeyPlot from GBM or randomForest model object.
 \examples{
 \dontrun{
 data(iris)
-iris.mod <- gbm(Species ~ ., distribution="multinomial", data=iris, n.trees=2000, shrinkage=0.01, cv.folds=5, verbose=FALSE, n.cores=1)
+iris.mod <- gbm(Species ~ ., distribution="multinomial", 
+                 data=iris, n.trees=2000, shrinkage=0.01, 
+                 cv.folds=5, verbose=FALSE, n.cores=1)
 tree_data <- tree2data(iris.mod,1)
 library(networkD3)
-sankeyNetwork(tree_data[[1]],tree_data[[2]],Source="src",Target="tar",Value="value",NodeID="name")
+sankeyNetwork(tree_data[[1]],tree_data[[2]],Source="src",Target="tar",
+               Value="value",NodeID="name")
 }
 }
 \author{

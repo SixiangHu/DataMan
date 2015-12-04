@@ -19,6 +19,7 @@ DataSummary <- function(data,wt=NULL,sparkline=FALSE){
 }
 
 #' @export
+#' @rdname DataSummary
 DataSummary.data.frame <- function(data,wt=NULL,sparkline=FALSE){
 
   if(is.null(wt)) weight <- rep(1,nrow(data))
@@ -89,6 +90,7 @@ DataSummary.data.frame <- function(data,wt=NULL,sparkline=FALSE){
 }
 
 #' @export
+#' @rdname DataSummary
 DataSummary.data.table <- function(data,wt=NULL,sparkline=FALSE){
   
   if(is.null(wt)) weight <- rep(1,nrow(data))
@@ -158,5 +160,5 @@ DataSummary.data.table <- function(data,wt=NULL,sparkline=FALSE){
   }
 }
 
-#global variable to pass R CMD CHECK
-V1 =.N=f=N=.SD=NULL
+#global variable
+globalVariables(c("V1",".N","f","N",".SD"))

@@ -21,6 +21,7 @@ CramersV <- function(x,y=NULL){
 }
 
 #' @export
+#' @rdname CramersV
 CramersV.default <- function(x,y=NULL){
   if (is.double(x) || is.double(y)) stop("Cramers' V Test is used on nominal or discrete variables.")
   if (is.null(x) || is.null(y))
@@ -34,6 +35,7 @@ CramersV.default <- function(x,y=NULL){
 }
 
 #' @export
+#' @rdname CramersV
 CramersV.data.frame <- function(x,y=NULL){
   if(!is.null(y)) 
     warning("y will be ignored.")
@@ -61,6 +63,7 @@ CramersV.data.frame <- function(x,y=NULL){
 }
 
 #' @export
+#' @rdname CramersV
 CramersV.matrix <- function(x,y=NULL){
   if(!is.null(y)) warning("y will be ignored.")
   CramersV.data.frame(as.data.frame(x,stringsAsFactors = TRUE))

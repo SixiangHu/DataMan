@@ -232,3 +232,6 @@ modelPlot <- function(model,
     grid_plot(list(p1,p2),ncol=1,nrow=2,width=900,same_axes = c(TRUE,FALSE))
   }
 }
+
+#global variable
+globalVariables(c(".SD"))

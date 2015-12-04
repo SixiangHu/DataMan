@@ -54,3 +54,6 @@ rocPlot <- function(data,actual){
     rbokeh::ly_lines(x,y,data = auc,color=ModelName) %>%
     rbokeh::ly_abline(a=0,b=1,color="red")
 }
+
+#global variable
+globalVariables(c("x","y","ModelName"))

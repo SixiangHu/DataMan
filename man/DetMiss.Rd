@@ -2,9 +2,18 @@
 % Please edit documentation in R/DetMiss.r
 \name{DetMiss}
 \alias{DetMiss}
+\alias{DetMiss.data.frame}
+\alias{DetMiss.default}
+\alias{DetMiss.matrix}
 \title{Detect Missing Value}
 \usage{
 DetMiss(data)
+
+\method{DetMiss}{matrix}(data)
+
+\method{DetMiss}{default}(data)
+
+\method{DetMiss}{data.frame}(data)
 }
 \arguments{
 \item{data}{This could be data frame, matrix or a vector.}
