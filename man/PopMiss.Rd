@@ -2,6 +2,7 @@
 % Please edit documentation in R/PopMiss.r
 \name{PopMiss}
 \alias{PopMiss}
+\alias{PopMiss.Date}
 \alias{PopMiss.character}
 \alias{PopMiss.data.frame}
 \alias{PopMiss.data.table}
@@ -18,6 +19,8 @@ PopMiss(data,na.treatment=c("mean.or.mode","delete","replace"),replace=NULL)
 \method{PopMiss}{character}(data, na.treatment, replace)
 
 \method{PopMiss}{integer}(data, na.treatment, replace)
+
+\method{PopMiss}{Date}(data, na.treatment, replace)
 
 \method{PopMiss}{numeric}(data, na.treatment, replace)
 

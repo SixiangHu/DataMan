@@ -26,7 +26,7 @@
 #'  
 #' @author Sixiang Hu
 #' @importFrom data.table as.data.table data.table setkey :=
-#' @importFrom rbokeh figure ly_lines ly_points ly_hist grid_plot
+#' @importFrom rbokeh figure ly_lines ly_points ly_hist grid_plot y_axis
 #' @export dataPlot
 #' @examples
 #' 
@@ -78,7 +78,7 @@ dataPlot <- function(data,xvar,yvar,byvar=NULL,weights=NULL,
                     length.out=newGroupNum
                     )
     x <- cut(x,new_band,include.lowest = TRUE)
-    x <- as.character(x)
+    x <- as.character(paste(as.integer(x),as.character(x),sep=";"))
   }
 
   #New Group for byvar if it has too many levels.
@@ -89,6 +89,7 @@ dataPlot <- function(data,xvar,yvar,byvar=NULL,weights=NULL,
                       length.out=newGroupNum
                       )
       by <- cut(by,new_band,include.lowest = TRUE)
+      by <- as.character(paste(as.integer(by),as.character(by),sep=";"))
     }
     by <- as.character(by)
   }
@@ -106,15 +107,17 @@ dataPlot <- function(data,xvar,yvar,byvar=NULL,weights=NULL,
     p1 <- rbokeh::figure(title = strTitle,ylab=yname,height = 500, width = 900) %>%
       rbokeh::ly_lines(x,y,data=data.agg,color="#CC3399") %>%
       rbokeh::ly_points(x,y,data=data.agg,glyph=22,color="#CC3399",
-                        hover=data.agg)
+                        hover="<strong>x value:</strong>@x<br><strong>y value:</strong>@y")
     
-    if (class(x) %in% c("integer","numeric","Date")) { 
+    if (sum(c("integer","numeric","Date") %in% class(x))>0) { 
       p2 <- rbokeh::figure(xlab="",ylab="Frequency",height = 250, width = 900) %>%
-        rbokeh::ly_hist(x,breaks=nlevels(as.factor(x)))
+        rbokeh::ly_hist(x,breaks=nlevels(as.factor(x))) %>%
+        rbokeh::y_axis(use_scientific = TRUE)
     }
     else {
       p2 <- rbokeh::figure(xlab="",ylab="Frequency",height = 250, width = 900) %>%
-        rbokeh::ly_bar(x[order(x)])
+        rbokeh::ly_bar(x) %>%
+        rbokeh::y_axis(use_scientific = TRUE)
     }
     
     rbokeh::grid_plot(list(p1,p2),nrow=2,ncol=1,same_axes = c(TRUE, FALSE))
@@ -132,17 +135,19 @@ dataPlot <- function(data,xvar,yvar,byvar=NULL,weights=NULL,
     p1 <- rbokeh::figure(title = strTitle,xlab="",ylab=yname,height = 500, width = 900) %>%
       rbokeh::ly_lines(x,y,data=data.agg,color=by) %>%
       rbokeh::ly_points(x,y,data=data.agg,color=by,glyph=22,
-                        hover=data.agg)
+                        hover="<strong>x value:</strong>@x<br><strong>y value:</strong>@y<br><strong>by value:</strong>@by")
 
-    if (class(x) %in% c("integer","numeric","Date")) { 
+    if (sum(c("integer","numeric","Date") %in% class(x))>0) { 
       p2 <- rbokeh::figure(xlab="",ylab="Frequency",height = 250, width = 900) %>%
-        rbokeh::ly_hist(x,breaks=nlevels(as.factor(x)))
+        rbokeh::ly_hist(x,breaks=nlevels(as.factor(x))) %>%
+        rbokeh::y_axis(use_scientific = TRUE)
     }
     else {
       p2 <- rbokeh::figure(xlab="",ylab="Frequency",height = 250, width = 900) %>%
-        rbokeh::ly_bar(x,color=by,data=data.plot)
+        rbokeh::ly_bar(x,color=by,data=data.plot) %>%
+        rbokeh::y_axis(use_scientific = TRUE)
     }
     
-    grid_plot(list(p1,p2),nrow=2,ncol=1,byrow=TRUE,same_axes = c(TRUE, FALSE))
+    rbokeh::grid_plot(list(p1,p2),nrow=2,ncol=1,byrow=TRUE,same_axes = c(TRUE, FALSE))
   }
 }

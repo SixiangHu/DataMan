@@ -58,7 +58,7 @@ resiPlot <- function(act,pred,weight=NULL,bucket=20){
   #AvsE plot
   AvsE <- rbokeh::figure(tools=.tools,xlab="Predicted",ylab="Actual",height=500) %>%
     rbokeh::ly_points(label,x,data=df_act,color="blue",size=10,
-                      hover="<strong>Actual: </strong> @x<br><strong>Predict: </strong> @label") %>%
+                      hover="<strong>Actual: </strong>@x<br><strong>Predict: </strong>@label") %>%
     rbokeh::ly_abline(a=0,b=1,size=1,color="red")
 
   #residual

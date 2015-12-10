@@ -28,7 +28,7 @@
 #' 
 #' @author Sixiang Hu
 #' @importFrom data.table as.data.table data.table setkey :=
-#' @importFrom rbokeh figure ly_lines ly_points ly_hist grid_plot
+#' @importFrom rbokeh figure ly_lines ly_points ly_hist grid_plot y_axis
 #' @seealso \code{\link{glm}}
 #' @export modelPlot
 #' @examples
@@ -187,10 +187,12 @@ modelPlot <- function(model,
     #histogram graph
     if (sum(c("integer","numeric") %in% class(data.plot[,xvar]))>0)
       p2 <- rbokeh::figure(xlab="",ylab="Frequency",height=250) %>%
-      rbokeh::ly_hist(xvar,data=data.plot)
+      rbokeh::ly_hist(xvar,data=data.plot) %>%
+      rbokeh::y_axis(use_scientific = TRUE)
     else
       p2 <- rbokeh::figure(xlab="",ylab="Frequency",height=250) %>%
-      rbokeh::ly_bar(xvar,color=by,data=data.plot)
+      rbokeh::ly_bar(xvar,color=by,data=data.plot) %>%
+      rbokeh::y_axis(use_scientific = TRUE)
       
     grid_plot(list(p1,p2),ncol=1,nrow=2,width=900,same_axes = c(TRUE,FALSE))
   }
@@ -224,10 +226,12 @@ modelPlot <- function(model,
     #histogram graph
     if (sum(c("integer","numeric") %in% class(data.plot[,xvar]))>0)
       p2 <- rbokeh::figure(xlab="",ylab="Frequency",height=250) %>%
-      rbokeh::ly_hist(xvar,data=data.plot)
+      rbokeh::ly_hist(xvar,data=data.plot) %>%
+      rbokeh::y_axis(use_scientific = TRUE)
     else
       p2 <- rbokeh::figure(xlab="",ylab="Frequency",height=250) %>%
-      rbokeh::ly_bar(xvar,data=data.plot)
+      rbokeh::ly_bar(xvar,data=data.plot) %>%
+      rbokeh::y_axis(use_scientific = TRUE)
     
     grid_plot(list(p1,p2),ncol=1,nrow=2,width=900,same_axes = c(TRUE,FALSE))
   }

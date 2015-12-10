@@ -56,6 +56,12 @@ PopMiss.integer<-function(data,na.treatment,replace){
 
 #' @export
 #' @rdname PopMiss
+PopMiss.Date<-function(data,na.treatment,replace){
+  PopMiss.character(data,na.treatment,replace)
+}
+
+#' @export
+#' @rdname PopMiss
 PopMiss.numeric<-function(data,na.treatment,replace){
   num_miss <- length(which(is.na(data)))
   if(isTRUE(na.treatment=="delete")) {
@@ -82,7 +88,7 @@ PopMiss.data.frame<-function(data,na.treatment,replace){
   else if(isTRUE(na.treatment=="mean.or.mode")){
     str_name <- names(data)
     for(i in num_miss){
-      if(class(data[,str_name[i]]) %in% c("character","date","factor"))
+      if(class(data[,str_name[i]]) %in% c("character","Date","factor"))
         replace <- names(table(data[,str_name[i]]))[order(table(data[,str_name[i]]),decreasing=TRUE)[1]]
       else if(class(data[,str_name[i]])=="integer" )
         replace <- floor(mean(data[,str_name[i]],na.rm=TRUE))
@@ -116,7 +122,7 @@ PopMiss.data.table <-function(data,na.treatment,replace){
   else if(isTRUE(na.treatment=="mean.or.mode")){
     str_name <- names(data)
     for(i in num_miss){
-      if( data[,class(get(str_name[i]))] %in% c("character","date","factor"))
+      if( data[,class(get(str_name[i]))] %in% c("character","Date","factor"))
         replace <- as.data.frame(data[,.N,get(str_name[i])][order(-N)])[1,1]
       else if( data[,class(get(str_name[i]))]=="integer" )
         replace <- data[,floor(mean(get(str_name[i]),na.rm=TRUE))]

@@ -45,7 +45,7 @@ liftPlot <- function(data,weight=NULL,bucket=20,showas=NULL){
     P <- rbind(P,temp)
   }
 
-  rbokeh::figure(tools = .tools,width=800,height=500,ylab="Prediction") %>%
+  rbokeh::figure(tools = .tools,width=800,height=700,ylab="Prediction") %>%
     rbokeh::ly_lines(Group, Pred, data = P, width=1.5, color = ModelNames) %>%
     rbokeh::ly_points(Group, Pred, data = P, size=10, color = ModelNames,
               hover="<strong>Model:</strong> @ModelNames<br><strong>y value:</strong> @Pred")
