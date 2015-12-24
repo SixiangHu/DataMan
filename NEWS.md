@@ -2,6 +2,8 @@ DataMan 0.4.1
 -------------------------------------------------------------
 NEW FEATURES
 
+* Add `interPlot` that gives 3D surface plot utilising `plotly` package.
+
 * Add `liftPlot` that compares different model predictions.
 
 * Add `rocPlot` that assesses binary classification under `ROCR` package. It plots ROC curves with one or more predictions. AUC will be calculated and showed in legend.
@@ -17,3 +19,5 @@ BUG FIXES AND MINOR IMPROVEMENTS
 * Change the glyphs of points in `modelPlot`
 
 * Change `.travis.yaml` to install `rbokeh` from github.
+
+* Improve the `PopMiss`.

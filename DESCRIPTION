@@ -1,6 +1,6 @@
 Package: DataMan
 Type: Package
-Title: This is an R package for data and model analysis
+Title: a R package for data and model analysis
 Version: 0.4.1
 Date: 2015-12-04
 Author: Sixiang Hu <sixiang.hu@gmail.com>
@@ -15,6 +15,7 @@ Imports:
     Rcpp (>= 0.11.6),
     dplyr,
     rbokeh,
+    plotly,
     ROCR,
     gbm,
     randomForest

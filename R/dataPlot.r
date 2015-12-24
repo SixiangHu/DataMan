@@ -78,6 +78,9 @@ dataPlot <- function(data,xvar,yvar,byvar=NULL,weights=NULL,
                     length.out=newGroupNum
                     )
     x <- cut(x,new_band,include.lowest = TRUE)
+    
+    # solve the order issue when plotting using rbokeh.
+    # can also set the label in cut function.
     x <- as.character(paste(as.integer(x),as.character(x),sep=";"))
   }
 

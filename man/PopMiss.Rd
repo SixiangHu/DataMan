@@ -31,7 +31,7 @@ PopMiss(data,na.treatment=c("mean.or.mode","delete","replace"),replace=NULL)
 \method{PopMiss}{matrix}(data, na.treatment, replace)
 }
 \arguments{
-\item{data}{This could be data frame, matrix or a vector.}
+\item{data}{This could be data frame,data.table, matrix or a vector.}
 
 \item{na.treatment}{One of "mean.or.mode", "delete", or "replace", to specify the method to populate missing values.}
 
