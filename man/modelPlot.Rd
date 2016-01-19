@@ -4,8 +4,8 @@
 \alias{modelPlot}
 \title{modelPlot}
 \usage{
-modelPlot(model,xvar,type=c("response","link"),dataset=NULL,weights=NULL,
-by=NULL,modelType=c("glm","glm.nb","gbm","train"),newGroupNum=10)
+modelPlot(model,xvar,type="response",dataset=NULL,weights=NULL,
+by=NULL,modelType="glm",base=NULL,newGroupNum=10)
 }
 \arguments{
 \item{model}{a model object. Currently this function supports glm, gbm and train object create by caret package.}
@@ -21,6 +21,10 @@ by=NULL,modelType=c("glm","glm.nb","gbm","train"),newGroupNum=10)
 \item{by}{Optinal. A character string indicates the variable name you want to plot the fit by.}
 
 \item{modelType}{A character string. One of "glm", "glm.nb", "train" or "gbm".}
+
+\item{base}{A list. To specify the base of a dataset. i.e. `base <- list(a=1,b="A")`.
+Set this parameter will not triger a model refit.  
+Providing this parameter just to align with the `relevel` function (if it is used on a dataset before `glm`).}
 
 \item{newGroupNum}{Optional. An integer specifies number of new bands when levels of current plotting variable `xvar` or `by` is more than 100.}
 }
@@ -47,7 +51,7 @@ It is now support the `caret` package's `train` model.
 ## glm example
 
 glm1 <- glm(formula = mpg ~ cyl + hp, family = Gamma(log), data = mtcars, weights = wt)
-modelPlot(glm1,"cyl",modelType="glm")
+modelPlot(glm1,"cyl")
 }
 \author{
 Sixiang Hu

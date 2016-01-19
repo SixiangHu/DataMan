@@ -33,7 +33,7 @@ globalVariables(c("V1",".N","f","N"))
 }
 
 #Mean Data For Fitted Mean
-.ModeData <- function(data,weights){
+.ModeData <- function(data,weights,base){
   
   if(!("data.frame" %in% class(data))){
     if(length(data)==0) stop("data set is empty.")
@@ -52,9 +52,11 @@ globalVariables(c("V1",".N","f","N"))
     x_dt<-data.table::as.data.table(cbind(x=data[,VarName[i]],weights))
     
     if( sum(c("character","factor") %in% class(data[,VarName[i]]))>0 )
-      data[,VarName[i]] <- as.character(x_dt[,sum(weights),by=x][order(-V1)][1,1,with=FALSE])
+      if (!is.null(base[[VarName[i]]])) data[,VarName[i]] <- as.character(base[[VarName[i]]])
+      else data[,VarName[i]] <- as.character(x_dt[,sum(weights),by=x][order(-V1)][1,1,with=FALSE])
     else
-      data[,VarName[i]] <- x_dt[,sum(weights),by=x][order(-V1)][1,1,with=FALSE]
+      if (!is.null(base[[VarName[i]]])) data[,VarName[i]] <- base[[VarName[i]]]
+      else data[,VarName[i]] <- x_dt[,sum(weights),by=x][order(-V1)][1,1,with=FALSE]
   }
   
   return(data)

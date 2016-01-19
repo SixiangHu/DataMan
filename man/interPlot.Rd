@@ -4,7 +4,7 @@
 \alias{interPlot}
 \title{interPlot}
 \usage{
-interPlot(data,xvar,yvar,zvar)
+interPlot(data,xvar,yvar,zvar,wvar=NULL)
 }
 \arguments{
 \item{data}{a data frame.}
@@ -14,6 +14,8 @@ interPlot(data,xvar,yvar,zvar)
 \item{yvar}{either an integer to specify the position of the variable in the data frame, or the name of the variable.}
 
 \item{zvar}{either an integer to specify the position of the variable in the data frame, or the name of the variable.}
+
+\item{wvar}{either an integer to specify the position of the variable in the data frame, or the name of the variable.}
 }
 \description{
 Interactive 3D plot by calling `plotly` package functions.

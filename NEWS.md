@@ -1,4 +1,19 @@
-DataMan 0.4.1
+DataMan 0.4.3
+-------------------------------------------------------------
+NEW FEATURES
+
+* add modelMetric function to conduct statistical analysis on predictions.
+
+* add dataComp function to check whether the factors in a new dataset is consistent as before.
+
+* add multiParts function to split a vector into different parts by provided proportion.
+
+CHANGES
+* interPlot now support weights parameter. 
+
+* modelPlot can specify the base of a factor when viewing a glm model.
+
+DataMan 0.4.2
 -------------------------------------------------------------
 NEW FEATURES
 

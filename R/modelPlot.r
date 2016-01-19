@@ -1,8 +1,8 @@
 #' modelPlot
 #'
 #' @description This function allows you visulise the GLM or GBM fitting by comparing observation, fitted and mean fitted on the same plot.
-#' @usage modelPlot(model,xvar,type=c("response","link"),dataset=NULL,weights=NULL,
-#' by=NULL,modelType=c("glm","glm.nb","gbm","train"),newGroupNum=10)
+#' @usage modelPlot(model,xvar,type="response",dataset=NULL,weights=NULL,
+#' by=NULL,modelType="glm",base=NULL,newGroupNum=10)
 #' @param model a model object. Currently this function supports glm, gbm and train object create by caret package. 
 #' @param xvar a character string indicates the variable name you want to visulise.
 #' @param type either "response" or "link". By default ("response") will plot on GLM response as oppose to linear predictor ("link").
@@ -10,6 +10,9 @@
 #' @param weights Optional. A numerical vector to specify the weights used for updating the glm model for plotting.
 #' @param modelType A character string. One of "glm", "glm.nb", "train" or "gbm".
 #' @param by Optinal. A character string indicates the variable name you want to plot the fit by.
+#' @param base A list. To specify the base of a dataset. i.e. `base <- list(a=1,b="A")`.
+#' Set this parameter will not triger a model refit.  
+#' Providing this parameter just to align with the `relevel` function (if it is used on a dataset before `glm`).
 #' @param newGroupNum Optional. An integer specifies number of new bands when levels of current plotting variable `xvar` or `by` is more than 100. 
 #' @details 
 #' For those used Emblem before, you will find this plot quite familiar.  The purpose of this function is the same that to put observation, fitted, and mean fit on the same plot for better understanding about model fitting.
@@ -36,20 +39,21 @@
 #' ## glm example
 #' 
 #' glm1 <- glm(formula = mpg ~ cyl + hp, family = Gamma(log), data = mtcars, weights = wt)
-#' modelPlot(glm1,"cyl",modelType="glm")
+#' modelPlot(glm1,"cyl")
 
 modelPlot <- function(model,
                       xvar,
-                      type=c("response","link"),
+                      type="response",
                       dataset=NULL,
                       weights=NULL,
                       by=NULL,
-                      modelType=c("glm","glm.nb","gbm","train"),
+                      modelType="glm",
+                      base=NULL,
                       newGroupNum=10){
   
-  type <- match.arg(type)
+  type <- match.arg(type,c("response","link"))
 
-  modelType <- match.arg(modelType)
+  modelType <- match.arg(modelType,c("glm","glm.nb","gbm","train"))
   if (modelType == "gbm" && type =="link") warning("modelPlot: no link function in gbm, using response for plotting.\n")
   
   if(!exists(deparse(substitute(model)))){
@@ -121,7 +125,7 @@ modelPlot <- function(model,
   }
   
   #Calculate mean data set for mean_fit line
-  MeanData <- .ModeData(dataset,weights)
+  MeanData <- .ModeData(dataset,weights,base)
   MeanData[,xvar] <- dataset[,xvar]
 
   #New Group for data which has too much levels.

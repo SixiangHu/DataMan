@@ -1,11 +1,12 @@
 #' interPlot
 #'
 #' @description Interactive 3D plot by calling `plotly` package functions.
-#' @usage interPlot(data,xvar,yvar,zvar)
+#' @usage interPlot(data,xvar,yvar,zvar,wvar=NULL)
 #' @param data a data frame.
 #' @param xvar either an integer to specify the position of the variable in the data frame, or the name of the variable.
 #' @param yvar either an integer to specify the position of the variable in the data frame, or the name of the variable.
 #' @param zvar either an integer to specify the position of the variable in the data frame, or the name of the variable.
+#' @param wvar either an integer to specify the position of the variable in the data frame, or the name of the variable.
 #' @details This functions gives a 3D interactive view of between factors.
 #' This is really useful when modeller wants to assess the interaction terms.
 #' Hence the "zvar" can be actual response data or model predictions.
@@ -17,7 +18,7 @@
 #' 
 #' interPlot(mtcars,"wt","mpg","vs")
 
-interPlot <- function(data,xvar,yvar,zvar){
+interPlot <- function(data,xvar,yvar,zvar,wvar=NULL){
   # Error Trap
   if( .isDFnull(data) ) stop("data set provided is null.")
   if( is.null(xvar) ) stop("X variable provided is null.") 
@@ -34,13 +35,23 @@ interPlot <- function(data,xvar,yvar,zvar){
   posi <- .VarPosition(data,zvar)
   z <- data[[posi$posi]]
   
+  if( is.null(wvar)) {
+    w <- rep(1,dim(data)[1])
+  }
+  else {
+    posi <- .VarPosition(data,wvar)
+    w <- data[[posi$posi]]
+  }
+  
   dt <- data.table::data.table(x = x,
                    y = y,
-                   z = z)
+                   z = z,
+                   w = w)
   data.table::setkey(dt,x,y)
   
-  dt2 <- data.table::dcast(dt,x~y,fun.aggregate=mean,
-                           na.rm=TRUE,
+  dt2  <- dt[,lapply(.SD,weighted.mean,w=w),by=list(x,y),.SDcols=c("z","w")]
+  
+  dt2 <- data.table::dcast(dt2,x~y,
                            value.var="z",
                            drop=FALSE)
   
