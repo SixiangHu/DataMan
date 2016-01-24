@@ -4,7 +4,7 @@
 \alias{interPlot}
 \title{interPlot}
 \usage{
-interPlot(data,xvar,yvar,zvar,wvar=NULL)
+interPlot(data,xvar,yvar,zvar,wvar=NULL,numGrpx=10,numGrpy=10)
 }
 \arguments{
 \item{data}{a data frame.}
@@ -16,6 +16,8 @@ interPlot(data,xvar,yvar,zvar,wvar=NULL)
 \item{zvar}{either an integer to specify the position of the variable in the data frame, or the name of the variable.}
 
 \item{wvar}{either an integer to specify the position of the variable in the data frame, or the name of the variable.}
+
+\item{numGrpx, numGrpy}{integer. Give the number of buckets for either x or y factors.}
 }
 \description{
 Interactive 3D plot by calling `plotly` package functions.

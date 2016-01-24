@@ -1,3 +1,20 @@
+DataMan 0.5
+-------------------------------------------------------------
+NEW FEATURES
+* add dmBreak function to give pretty groups
+
+* interPlot function will automatically group x or y if there are too many levels
+
+* utilising `plotly` package for graphics, instead of `rbokeh`
+
+CHANGES
+* modelPlot function has been rewritten which has been generised.
+
+* `base` parameter in `ModelData` has been depricated as this is not practical to
+change the base for all models.
+
+* dataComp function has been rewritten to provide a varComp function.
+
 DataMan 0.4.3
 -------------------------------------------------------------
 NEW FEATURES

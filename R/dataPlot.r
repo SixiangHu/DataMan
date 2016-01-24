@@ -26,7 +26,7 @@
 #'  
 #' @author Sixiang Hu
 #' @importFrom data.table as.data.table data.table setkey :=
-#' @importFrom rbokeh figure ly_lines ly_points ly_hist grid_plot y_axis
+#' @importFrom plotly plot_ly add_trace layout
 #' @export dataPlot
 #' @examples
 #' 
@@ -73,32 +73,32 @@ dataPlot <- function(data,xvar,yvar,byvar=NULL,weights=NULL,
   
   #New group for xvar if it has too many levels.
   if ( (is.numeric(x) || is.integer(x) ) && nlevels(as.factor(x))>=100 ) {
-    new_band <- seq(min(x, na.rm = TRUE),
-                    max(x, na.rm = TRUE),
-                    length.out=newGroupNum
-                    )
-    x <- cut(x,new_band,include.lowest = TRUE)
-    
-    # solve the order issue when plotting using rbokeh.
-    # can also set the label in cut function.
-    x <- as.character(paste(as.integer(x),as.character(x),sep=";"))
+    new_band <- dmBreak(x,newGroupNum)
+    x <- cut(x,new_band,include.lowest = TRUE,ordered_result=TRUE)
   }
 
   #New Group for byvar if it has too many levels.
   if(!is.null(by)){
     if ( (is.numeric(by) || is.integer(by)) && nlevels(as.factor(by))>20 ) {
-      new_band <- seq(min(by, na.rm = TRUE),
-                      max(by, na.rm = TRUE),
-                      length.out=newGroupNum
-                      )
-      by <- cut(by,new_band,include.lowest = TRUE)
-      by <- as.character(paste(as.integer(by),as.character(by),sep=";"))
+      new_band <- dmBreak(by,newGroupNum)
+      by <- cut(by,new_band,include.lowest = TRUE,ordered_result=TRUE)
     }
-    by <- as.character(by)
   }
   
   #Data for plot
   strTitle <- paste("Observation Analysis on: ",xname)
+  
+  #set axis
+  ay1 <- list(overlaying = "y2", side = "left", title=yname, 
+              linecolor = "#000000", gridcolor = "#E5E5E5")
+  
+  ay2 <- list(side = "right", showgrid=FALSE, title="Weights",
+              linecolor = "#000000")
+  
+  ax <- list(title=xname, showline=TRUE, linecolor = "#000000",
+             gridcolor = "#E5E5E5")
+  
+  l <- list(bordercolor = "#000000",borderwidth=1)
 
   if (is.null(by)) {
     data.plot <- data.table::data.table(x=x,y=y,w=w)
@@ -106,24 +106,14 @@ dataPlot <- function(data,xvar,yvar,byvar=NULL,weights=NULL,
 
     data.plot <- data.plot[,lapply(.SD,as.numeric),by=x,.SDcols=c("y","w")]
     data.agg <- data.plot[,lapply(.SD,weighted.mean,w=w),by=x,.SDcols=c("y","w")]
+    data.hist <- data.plot[,sum(w),by=x][,freq:=V1/sum(V1)][order(x)]
     
-    p1 <- rbokeh::figure(title = strTitle,ylab=yname,height = 500, width = 900) %>%
-      rbokeh::ly_lines(x,y,data=data.agg,color="#CC3399") %>%
-      rbokeh::ly_points(x,y,data=data.agg,glyph=22,color="#CC3399",
-                        hover="<strong>x value:</strong>@x<br><strong>y value:</strong>@y")
-    
-    if (sum(c("integer","numeric","Date") %in% class(x))>0) { 
-      p2 <- rbokeh::figure(xlab="",ylab="Frequency",height = 250, width = 900) %>%
-        rbokeh::ly_hist(x,breaks=nlevels(as.factor(x))) %>%
-        rbokeh::y_axis(use_scientific = TRUE)
-    }
-    else {
-      p2 <- rbokeh::figure(xlab="",ylab="Frequency",height = 250, width = 900) %>%
-        rbokeh::ly_bar(x) %>%
-        rbokeh::y_axis(use_scientific = TRUE)
-    }
-    
-    rbokeh::grid_plot(list(p1,p2),nrow=2,ncol=1,same_axes = c(TRUE, FALSE))
+    plotly::plot_ly(data=data.agg, x=x, y=y, line=list(color="#CC3399",shape="linear"),
+                    marker=list(symbol="square",size=10), name="Observed",yaxis="y1") %>%
+      plotly::add_trace(x=x,y=freq,data=data.hist,type="bar",showlegend=FALSE,
+                        marker=list(color="#99CCFF",line=list(color="#606060",width=1.5)),
+                        opacity=0.5,yaxis = "y2") %>%
+      plotly::layout(title=strTitle, xaxis=ax, yaxis=ay1, yaxis2=ay2, legend=l)
   }
   else{
     strTitle <- paste(strTitle," by ",byname,sep="")
@@ -133,24 +123,16 @@ dataPlot <- function(data,xvar,yvar,byvar=NULL,weights=NULL,
 
     data.plot <- data.plot[,lapply(.SD,as.numeric),by=list(x,by),.SDcols=c("y","w")]
     data.agg <- data.plot[,lapply(.SD,weighted.mean,w=w),by=list(x,by),.SDcols=c("y","w")]
- 
-    #line graph
-    p1 <- rbokeh::figure(title = strTitle,xlab="",ylab=yname,height = 500, width = 900) %>%
-      rbokeh::ly_lines(x,y,data=data.agg,color=by) %>%
-      rbokeh::ly_points(x,y,data=data.agg,color=by,glyph=22,
-                        hover="<strong>x value:</strong>@x<br><strong>y value:</strong>@y<br><strong>by value:</strong>@by")
-
-    if (sum(c("integer","numeric","Date") %in% class(x))>0) { 
-      p2 <- rbokeh::figure(xlab="",ylab="Frequency",height = 250, width = 900) %>%
-        rbokeh::ly_hist(x,breaks=nlevels(as.factor(x))) %>%
-        rbokeh::y_axis(use_scientific = TRUE)
-    }
-    else {
-      p2 <- rbokeh::figure(xlab="",ylab="Frequency",height = 250, width = 900) %>%
-        rbokeh::ly_bar(x,color=by,data=data.plot) %>%
-        rbokeh::y_axis(use_scientific = TRUE)
-    }
+    data.hist <- data.plot[,sum(w),by=list(x,by)][,freq:=V1/sum(V1)][order(x,by)]
     
-    rbokeh::grid_plot(list(p1,p2),nrow=2,ncol=1,byrow=TRUE,same_axes = c(TRUE, FALSE))
+    #line graph
+    suppressWarnings(
+      plotly::plot_ly(data=data.agg,x=x,y=y,color=paste("Observed",by,sep="-"),yaxis = "y1")%>%
+        plotly::add_trace(x=x, y=freq, color=by, data=data.hist, type="bar",
+                          marker=list(line=list(color="#606060", width=1.5)),
+                          showlegend=FALSE, opacity=0.5, yaxis="y2") %>%
+        plotly::layout(title=strTitle, legend=l, barmode="stack",
+                       xaxis=ax, yaxis=ay1, yaxis2=ay2)
+    )
   }
 }

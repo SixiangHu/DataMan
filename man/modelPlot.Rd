@@ -4,54 +4,55 @@
 \alias{modelPlot}
 \title{modelPlot}
 \usage{
-modelPlot(model,xvar,type="response",dataset=NULL,weights=NULL,
-by=NULL,modelType="glm",base=NULL,newGroupNum=10)
+modelPlot(model,xvar,act,wvar=NULL,
+by=NULL,dataset=NULL,newGroupNum=10,predFUN=predict,...)
 }
 \arguments{
-\item{model}{a model object. Currently this function supports glm, gbm and train object create by caret package.}
+\item{model}{a model object. It can be any model object that has a 
+corresponding prediction function.}
 
-\item{xvar}{a character string indicates the variable name you want to visulise.}
+\item{xvar}{either an integer to specify the position of the dependent variable 
+in the data frame, 
+or a character string to indicate the dependent variable name.}
 
-\item{type}{either "response" or "link". By default ("response") will plot on GLM response as oppose to linear predictor ("link").}
-
-\item{dataset}{Optional. A data frame. update the glm model plot with a new dataset.}
-
-\item{weights}{Optional. A numerical vector to specify the weights used for updating the glm model for plotting.}
+\item{wvar}{Optional. A numerical vector, integer, or variable name to 
+specify the weights used for model visualisation.}
 
 \item{by}{Optinal. A character string indicates the variable name you want to plot the fit by.}
 
-\item{modelType}{A character string. One of "glm", "glm.nb", "train" or "gbm".}
+\item{dataset}{A data frame.}
 
-\item{base}{A list. To specify the base of a dataset. i.e. `base <- list(a=1,b="A")`.
-Set this parameter will not triger a model refit.  
-Providing this parameter just to align with the `relevel` function (if it is used on a dataset before `glm`).}
+\item{newGroupNum}{Optional. An integer specifies number of new bands 
+when levels of current plotting variable `xvar` or `by` is more than 100.}
 
-\item{newGroupNum}{Optional. An integer specifies number of new bands when levels of current plotting variable `xvar` or `by` is more than 100.}
+\item{predFUN}{prediction function to the corresponding model.}
+
+\item{...}{optional augments to predFUN. For example, 
+glm model needs `type="response"` to predict actual values.}
 }
 \description{
-This function allows you visulise the GLM or GBM fitting by comparing observation, fitted and mean fitted on the same plot.
+This function allows you visulise the model fitting by 
+comparing observation, fitted and mean fitted in one plot.
 }
 \details{
-For those used Emblem before, you will find this plot quite familiar.  The purpose of this function is the same that to put observation, fitted, and mean fit on the same plot for better understanding about model fitting.
+For the purpose of comparing across different types of statistical or
+machine learning models, this plot function gives a general method to 
+put actual (observation), model predictions (fitted), and marginal effect
+(fitted mean) on the same graph.
 
-Observation line for xvar is simply the weighted average on target varaible, hence if xvar is a numeric, the plot could be very messy. Will improve this in the future to banded those numeric factor.
-  
-Fitted line for xvar is the weighted average on model prediction.
+Currently, this function is not restricted to any package or models as long
+as it has a corresponding prediction function. 
 
-Fitted_mean line for xvar is the predictions of the current model on a Mode dataset which keeps xvar as it is but fix all other variabel as its mean or mode.   
-
-For GBM model, currently, can only create response plot.  Because of the fact that link function is not explicitly saved in its model object hence I need to create link function for each of the GBM family.  Will think about how to do this.
-
-The difference between `plot.gbm` in `gbm` package and this modelPlot function is that `plot.gbm` is plotting "marginal effect" as oppose to overall fitting.    
-
-It is now support the `caret` package's `train` model.
+To give the best experience, `plotly` package has been chosen (other than
+`ggplot`, `googlevis` or `rbokeh`) because of its interactive, simple, and
+ability.
 }
 \examples{
 
 ## glm example
 
 glm1 <- glm(formula = mpg ~ cyl + hp, family = Gamma(log), data = mtcars, weights = wt)
-modelPlot(glm1,"cyl")
+modelPlot(glm1,"cyl","mpg","wt",dataset=mtcars,type="response")
 }
 \author{
 Sixiang Hu

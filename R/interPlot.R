@@ -1,12 +1,13 @@
 #' interPlot
 #'
 #' @description Interactive 3D plot by calling `plotly` package functions.
-#' @usage interPlot(data,xvar,yvar,zvar,wvar=NULL)
+#' @usage interPlot(data,xvar,yvar,zvar,wvar=NULL,numGrpx=10,numGrpy=10)
 #' @param data a data frame.
 #' @param xvar either an integer to specify the position of the variable in the data frame, or the name of the variable.
 #' @param yvar either an integer to specify the position of the variable in the data frame, or the name of the variable.
 #' @param zvar either an integer to specify the position of the variable in the data frame, or the name of the variable.
 #' @param wvar either an integer to specify the position of the variable in the data frame, or the name of the variable.
+#' @param numGrpx,numGrpy integer. Give the number of buckets for either x or y factors.
 #' @details This functions gives a 3D interactive view of between factors.
 #' This is really useful when modeller wants to assess the interaction terms.
 #' Hence the "zvar" can be actual response data or model predictions.
@@ -18,7 +19,7 @@
 #' 
 #' interPlot(mtcars,"wt","mpg","vs")
 
-interPlot <- function(data,xvar,yvar,zvar,wvar=NULL){
+interPlot <- function(data,xvar,yvar,zvar,wvar=NULL,numGrpx=10,numGrpy=10){
   # Error Trap
   if( .isDFnull(data) ) stop("data set provided is null.")
   if( is.null(xvar) ) stop("X variable provided is null.") 
@@ -28,9 +29,17 @@ interPlot <- function(data,xvar,yvar,zvar,wvar=NULL){
   # Find data column
   posi <- .VarPosition(data,xvar)
   x <- data[[posi$posi]]
+  if ( (is.numeric(x) || is.integer(x) ) && nlevels(as.factor(x))>=100 ) {
+    new_band <- dmBreak(x,numGrpx)
+    x <- cut(x,new_band,include.lowest = TRUE,ordered_result = TRUE)
+  }
 
   posi <- .VarPosition(data,yvar)
   y <- data[[posi$posi]]
+  if ( (is.numeric(y) || is.integer(y) ) && nlevels(as.factor(y))>=100 ) {
+    new_band <- dmBreak(y,numGrpy)
+    y <- cut(y,new_band,include.lowest = TRUE,ordered_result = TRUE)
+  }
 
   posi <- .VarPosition(data,zvar)
   z <- data[[posi$posi]]
@@ -55,7 +64,7 @@ interPlot <- function(data,xvar,yvar,zvar,wvar=NULL){
                            value.var="z",
                            drop=FALSE)
   
-  zvalue <- suppressWarnings(DataMan::PopMiss(as.matrix(dt2[,-1,with=FALSE]),
+  zvalue <- suppressWarnings(PopMiss(as.matrix(dt2[,-1,with=FALSE]),
                                      na.treatment = "replace",
                                      0))
 
@@ -63,8 +72,7 @@ interPlot <- function(data,xvar,yvar,zvar,wvar=NULL){
           x=dt2[[1]],
           y=colnames(dt2),
           z=zvalue, 
-          type = "surface",
-          showlegend=FALSE) %>%
+          type = "surface") %>%
     plotly::layout(xaxis=list(title=xvar),
            yaxis=list(title=yvar),
            zaxis=list(title=zvar))

@@ -2,16 +2,29 @@
 % Please edit documentation in R/dataComp.R
 \name{dataComp}
 \alias{dataComp}
+\alias{varComp}
 \title{dataComp}
 \usage{
-dataComp(old,new,alpha=0.05)
+dataComp(old,new,alpha=0.01,obs.lim=5)
+
+varComp(old, new, alpha = 0.05, obs.lim)
 }
 \arguments{
 \item{old}{data frame or vector. It holds the original data or data you are expecting.}
 
 \item{new}{data frame or vector. It holds the data you want to test.}
 
-\item{alpha}{significant level. By defaul, is 0.05.}
+\item{alpha}{significant level. By defaul, is 0.01.}
+
+\item{obs.lim}{integer. To specify the a limit that factor levels with no more
+than this integer will not be tested.}
+}
+\value{
+This function will return a data.frame if inputs are data.frame.
+`NULL`     - means there are no levels have more than obs.lim, hence Chi-square test is not conducted.
+`NA`       - p-value is `NA`, because some levels have 0 observations.
+`Nochange` - cannot reject the null hypothesis that there is no change.
+`Changed`  - reject the null hypothesis that there is no change.
 }
 \description{
 This function judges whether a dataset has a profile changes.
@@ -20,7 +33,8 @@ This function judges whether a dataset has a profile changes.
 A string vector will be return indicating factors that have a profile change 
 if both old and new are data frame. If old and new are vector, then TRUE / FALSE will be returned.
 
-This method is not robust when frequency of a factor level i sless than 5. 
+Currently, this function will not test those levels with less than 5 obs.
+
 A fisher exact test would be more suitable.
 }
 \examples{

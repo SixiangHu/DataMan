@@ -1,6 +1,10 @@
 #rbokeh tool sets
 .tools <- c("pan", "wheel_zoom", "box_zoom", "resize", "reset", "save")
 
+#color
+.cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+.cbbPalette <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+
 #global variable
 globalVariables(c("V1",".N","f","N"))
 
@@ -9,15 +13,16 @@ globalVariables(c("V1",".N","f","N"))
   tmp <- list(posi=NULL,name=NULL)
   
   if (is.character(var)) {
-    if(!var %in% colnames(data)) 
-      stop(paste("Variable (",var,") cannot be found in the data provided.",""))
+    if (!var %in% colnames(data)) 
+      stop(paste("Variable (",var,") cannot be found.",""))
     
     tmp$posi <- match(var,names(data))
     tmp$name <- var
   }
   else if (is.integer(var)) { 
-    if (var > dim(data)[2])
-      stop("Position specified: (",var,") is outside of the data.")
+    if (var > nrow(data))
+      stop(paste("Position specified (",var,"): subscript out of bounds.",""))
+    
     tmp$posi <- var
     tmp$name <- names(data)[var]
   }
@@ -33,7 +38,7 @@ globalVariables(c("V1",".N","f","N"))
 }
 
 #Mean Data For Fitted Mean
-.ModeData <- function(data,weights,base){
+.ModeData <- function(data,weights,base=NULL){
   
   if(!("data.frame" %in% class(data))){
     if(length(data)==0) stop("data set is empty.")
@@ -60,4 +65,25 @@ globalVariables(c("V1",".N","f","N"))
   }
   
   return(data)
+}
+
+#' dmBreak
+#' @description Give breaks for pretty plot
+#' @usage dmBreak(x,n,method="pretty")
+#' @param x a vector that needs to break down
+#' @param n number of groups
+#' @param method Either "pretty" or "equal".
+#' @author Sixiang Hu
+#' @export dmBreak
+dmBreak <- function(x,n,method="pretty"){
+  if(is.null(x)) stop("Vector provided is null.")
+  if(length(unique(x))<=n) return(x)
+  
+  x <- x[!is.na(x)]
+  method <- match.arg(method,c("pretty","equal"))
+  
+  if(method == "pretty") 
+    return(pretty(x,n))
+  else if(method == "equal") 
+    return(seq(min(x, na.rm = TRUE),max(x, na.rm = TRUE),length.out=n))
 }
