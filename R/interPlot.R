@@ -73,7 +73,8 @@ interPlot <- function(data,xvar,yvar,zvar,wvar=NULL,numGrpx=10,numGrpy=10){
           y=colnames(dt2),
           z=zvalue, 
           type = "surface") %>%
-    plotly::layout(xaxis=list(title=xvar),
-           yaxis=list(title=yvar),
-           zaxis=list(title=zvar))
+    plotly::layout(scene=list(xaxis=list(title=xvar),
+                           yaxis=list(title=yvar),
+                           zaxis=list(title=zvar))
+                   )
 }

@@ -1,3 +1,9 @@
+DataMan 0.5.1
+-------------------------------------------------------------
+BUG FIXES AND MINOR IMPROVEMENTS
+* The axis title of 3d plot can now be set correctly with latest version of `plotly` on github. (#31)
+
+
 DataMan 0.5
 -------------------------------------------------------------
 NEW FEATURES

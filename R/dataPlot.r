@@ -123,9 +123,8 @@ dataPlot <- function(data,xvar,yvar,byvar=NULL,weights=NULL,
 
     data.plot <- data.plot[,lapply(.SD,as.numeric),by=list(x,by),.SDcols=c("y","w")]
     data.agg <- data.plot[,lapply(.SD,weighted.mean,w=w),by=list(x,by),.SDcols=c("y","w")]
-    data.hist <- data.plot[,sum(w),by=list(x,by)][,freq:=V1/sum(V1)][order(x,by)]
-    
-    #line graph
+    data.hist <- data.plot[,sum(w),by=list(x,by)][,freq:=V1/sum(V1)][order(by,x)]
+
     suppressWarnings(
       plotly::plot_ly(data=data.agg,x=x,y=y,color=paste("Observed",by,sep="-"),yaxis = "y1")%>%
         plotly::add_trace(x=x, y=freq, color=by, data=data.hist, type="bar",
