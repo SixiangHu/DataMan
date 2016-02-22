@@ -60,7 +60,7 @@ compPlot <- function(x,act,pred,by=NULL,weights=NULL,newGroupNum=10){
     data.plot <- data.plot[,lapply(.SD,as.numeric),by=list(xvar,by),.SDcols=dp_name_str]
     data.agg  <- data.plot[,lapply(.SD,weighted.mean,w=weights),by=list(xvar,by),.SDcols=dp_name_str]
     data.agg2 <- data.table::melt(data.agg,id.vars = c("xvar","act","weights","by"),measure.vars =str_pred)[order(variable,by,xvar)]
-    data.hist <- data.plot[,sum(w),by=list(xvar,by)][,freq:=V1/sum(V1)][order(by,xvar)]
+    data.hist <- data.plot[,sum(weights),by=list(xvar,by)][,freq:=V1/sum(V1)][order(by,xvar)]
     
     suppressWarnings(
       plotly::plot_ly(data=data.agg,x=xvar,y=act,color=paste("Observed",by,sep="-"),yaxis = "y1")%>%
@@ -80,7 +80,7 @@ compPlot <- function(x,act,pred,by=NULL,weights=NULL,newGroupNum=10){
     data.plot <- data.plot[,lapply(.SD,as.numeric),by=xvar,.SDcols=dp_name_str]
     data.agg  <- data.plot[,lapply(.SD,weighted.mean,w=weights),by=xvar,.SDcols=dp_name_str]
     data.agg2 <- data.table::melt(data.agg,id.vars = c("xvar","act","weights"),measure.vars =str_pred)[order(variable,xvar)]
-    data.hist <- data.plot[,sum(w),by=xvar][,freq:=V1/sum(V1)][order(xvar)]
+    data.hist <- data.plot[,sum(weights),by=xvar][,freq:=V1/sum(V1)][order(xvar)]
     
     plotly::plot_ly(data=data.agg, x=xvar, y=act, color="Observed", yaxis="y1") %>%
       plotly::add_trace(data=data.agg2, x=xvar, y=value,color=variable, yaxis="y1") %>%
