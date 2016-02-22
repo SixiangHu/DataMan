@@ -3,7 +3,7 @@
 #' @description compare model predictions
 #' @usage compPlot(x,act,pred,by=NULL,weights=NULL,newGroupNum=10)
 #' @author Sixiang Hu
-#' @importFrom data.table as.data.table data.table setkey :=
+#' @importFrom data.table as.data.table data.table setkey := setnames
 #' @importFrom plotly plot_ly add_trace layout
 #' @export compPlot
 #' @examples
@@ -39,29 +39,27 @@ compPlot <- function(x,act,pred,by=NULL,weights=NULL,newGroupNum=10){
     x <- cut(x,new_band,include.lowest = TRUE,ordered_result = TRUE)
   }
   
+  #set strings for plotting
   dp_name_str <- c("act",str_pred,"weights")
   strTitle <- paste("Fitting Analysis on:",deparse(substitute(x)))
   
   #set axis
   ay1 <- list(overlaying = "y2", side = "left", title="Response", 
               linecolor = "#000000", gridcolor = "#E5E5E5")
-  
   ay2 <- list(side = "right", showgrid=FALSE, title="Weights",
               linecolor = "#000000")
-  
   ax <- list(title="var", showline=TRUE, linecolor = "#000000",
              gridcolor = "#E5E5E5")
-  
   l <- list(bordercolor = "#000000",borderwidth=1)
   
   if(!is.null(by)){
     data.plot <- data.table::as.data.table(as.data.frame(cbind(x,by,act,pred,weights),stringsAsFactors=FALSE))
-    setnames(data.plot,c("xvar","by","act",str_pred,"weights"))
-    setkey(data.plot,xvar,by)
+    data.table::setnames(data.plot,c("xvar","by","act",str_pred,"weights"))
+    data.table::setkey(data.plot,xvar,by)
 
     data.plot <- data.plot[,lapply(.SD,as.numeric),by=list(xvar,by),.SDcols=dp_name_str]
     data.agg  <- data.plot[,lapply(.SD,weighted.mean,w=weights),by=list(xvar,by),.SDcols=dp_name_str]
-    data.agg2  <- melt(data.agg,id.vars = c("xvar","act","weights","by"),measure.vars =str_pred)[order(variable,by,xvar)]
+    data.agg2 <- melt(data.agg,id.vars = c("xvar","act","weights","by"),measure.vars =str_pred)[order(variable,by,xvar)]
     data.hist <- data.plot[,sum(w),by=list(xvar,by)][,freq:=V1/sum(V1)][order(by,xvar)]
     
     suppressWarnings(
@@ -76,12 +74,12 @@ compPlot <- function(x,act,pred,by=NULL,weights=NULL,newGroupNum=10){
   }
   else {
     data.plot <- data.table::as.data.table(as.data.frame(cbind(x,act,pred,weights),stringsAsFactors=FALSE))
-    setnames(data.plot,c("xvar","act",str_pred,"weights"))
-    setkey(data.plot,xvar)
+    data.table::setnames(data.plot,c("xvar","act",str_pred,"weights"))
+    data.table::setkey(data.plot,xvar)
 
     data.plot <- data.plot[,lapply(.SD,as.numeric),by=xvar,.SDcols=dp_name_str]
     data.agg  <- data.plot[,lapply(.SD,weighted.mean,w=weights),by=xvar,.SDcols=dp_name_str]
-    data.agg2  <- melt(data.agg,id.vars = c("xvar","act","weights"),measure.vars =str_pred)[order(variable,xvar)]
+    data.agg2 <- melt(data.agg,id.vars = c("xvar","act","weights"),measure.vars =str_pred)[order(variable,xvar)]
     data.hist <- data.plot[,sum(w),by=xvar][,freq:=V1/sum(V1)][order(xvar)]
     
     plotly::plot_ly(data=data.agg, x=xvar, y=act, color="Observed", yaxis="y1") %>%
