@@ -1,3 +1,15 @@
+#' compPlot
+#' 
+#' @description compare model predictions
+#' @usage compPlot(x,act,pred,by=NULL,weights=NULL,newGroupNum=10)
+#' @author Sixiang Hu
+#' @importFrom data.table as.data.table data.table setkey :=
+#' @importFrom plotly plot_ly add_trace layout
+#' @export compPlot
+#' @examples
+#'  
+#' compPlot(mtcars$vs,act=rnorm(nrow(mtcars)),pred = data.frame(pred1=rnorm(nrow(mtcars)),pred2=rnorm(nrow(mtcars))),by=mtcars$cyl)
+
 compPlot <- function(x,act,pred,by=NULL,weights=NULL,newGroupNum=10){
   if (is.null(x)) stop("x provided is blank.")
   if (is.null(act)) stop("act provided is blank.")
