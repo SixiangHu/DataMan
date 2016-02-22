@@ -3,7 +3,7 @@
 #' @description compare model predictions
 #' @usage compPlot(x,act,pred,by=NULL,weights=NULL,newGroupNum=10)
 #' @author Sixiang Hu
-#' @importFrom data.table as.data.table data.table setkey := setnames
+#' @importFrom data.table as.data.table data.table setkey := setnames melt
 #' @importFrom plotly plot_ly add_trace layout
 #' @export compPlot
 #' @examples
@@ -59,7 +59,7 @@ compPlot <- function(x,act,pred,by=NULL,weights=NULL,newGroupNum=10){
 
     data.plot <- data.plot[,lapply(.SD,as.numeric),by=list(xvar,by),.SDcols=dp_name_str]
     data.agg  <- data.plot[,lapply(.SD,weighted.mean,w=weights),by=list(xvar,by),.SDcols=dp_name_str]
-    data.agg2 <- melt(data.agg,id.vars = c("xvar","act","weights","by"),measure.vars =str_pred)[order(variable,by,xvar)]
+    data.agg2 <- data.table::melt(data.agg,id.vars = c("xvar","act","weights","by"),measure.vars =str_pred)[order(variable,by,xvar)]
     data.hist <- data.plot[,sum(w),by=list(xvar,by)][,freq:=V1/sum(V1)][order(by,xvar)]
     
     suppressWarnings(
@@ -79,7 +79,7 @@ compPlot <- function(x,act,pred,by=NULL,weights=NULL,newGroupNum=10){
 
     data.plot <- data.plot[,lapply(.SD,as.numeric),by=xvar,.SDcols=dp_name_str]
     data.agg  <- data.plot[,lapply(.SD,weighted.mean,w=weights),by=xvar,.SDcols=dp_name_str]
-    data.agg2 <- melt(data.agg,id.vars = c("xvar","act","weights"),measure.vars =str_pred)[order(variable,xvar)]
+    data.agg2 <- data.table::melt(data.agg,id.vars = c("xvar","act","weights"),measure.vars =str_pred)[order(variable,xvar)]
     data.hist <- data.plot[,sum(w),by=xvar][,freq:=V1/sum(V1)][order(xvar)]
     
     plotly::plot_ly(data=data.agg, x=xvar, y=act, color="Observed", yaxis="y1") %>%
