@@ -2,13 +2,25 @@
 #' 
 #' @description compare model predictions
 #' @usage compPlot(x,act,pred,by=NULL,weights=NULL,newGroupNum=10)
+#' @param x a vector indicates the dependent variable
+#' @param act  a vector indicates the response variable
+#' @param pred a vector or data.frame indicates the model predictions 
+#' that each column is a prediction from one model.
+#' @param weights Optional. A numerical vector to specify the weights used for model visualisation.
+#' @param by Optinal. A vector indicates a `by` factor.
+#' @param newGroupNum Optional. An integer specifies number of new bands 
+#' when levels of current plotting variable `xvar` or `by` is more than 100. 
 #' @author Sixiang Hu
 #' @importFrom data.table as.data.table data.table setkey := setnames melt
 #' @importFrom plotly plot_ly add_trace layout
 #' @export compPlot
 #' @examples
 #'  
-#' compPlot(mtcars$vs,act=rnorm(nrow(mtcars)),pred = data.frame(pred1=rnorm(nrow(mtcars)),pred2=rnorm(nrow(mtcars))),by=mtcars$cyl)
+#' compPlot(mtcars$vs,
+#'          act=rnorm(nrow(mtcars)),
+#'          pred = data.frame(pred1=rnorm(nrow(mtcars)),
+#'                            pred2=rnorm(nrow(mtcars))),
+#'          by=mtcars$cyl)
 
 compPlot <- function(x,act,pred,by=NULL,weights=NULL,newGroupNum=10){
   if (is.null(x)) stop("x provided is blank.")
@@ -34,9 +46,17 @@ compPlot <- function(x,act,pred,by=NULL,weights=NULL,newGroupNum=10){
   
   #New Group for data which has too much levels.
   if ( (is.numeric(x) || is.integer(x)) && nlevels(as.factor(x))>100 ) {
-    if ( is.null(newGroupNum) ) newGroupNum <- 10
     new_band <- dmBreak(x,newGroupNum)
     x <- cut(x,new_band,include.lowest = TRUE,ordered_result = TRUE)
+  }
+  
+  #New Group for byvar if it has too many levels.
+  if (!is.null(by)) {
+    if ((is.numeric(by) || is.integer(by)) && nlevels(as.factor(by))>20 ) {
+      new_band <- dmBreak(by,newGroupNum)
+      by <- cut(by,new_band,include.lowest = TRUE,ordered_result=TRUE)
+    }
+    if (is.numeric(by)) by <- as.factor(by)
   }
   
   #set strings for plotting
@@ -53,7 +73,7 @@ compPlot <- function(x,act,pred,by=NULL,weights=NULL,newGroupNum=10){
   l <- list(bordercolor = "#000000",borderwidth=1)
   
   if(!is.null(by)){
-    data.plot <- data.table::as.data.table(as.data.frame(cbind(x,by,act,pred,weights),stringsAsFactors=FALSE))
+    data.plot <- data.table::data.table(x,by,act,pred,weights)
     data.table::setnames(data.plot,c("xvar","by","act",str_pred,"weights"))
     data.table::setkey(data.plot,xvar,by)
 
@@ -61,7 +81,7 @@ compPlot <- function(x,act,pred,by=NULL,weights=NULL,newGroupNum=10){
     data.agg  <- data.plot[,lapply(.SD,weighted.mean,w=weights),by=list(xvar,by),.SDcols=dp_name_str]
     data.agg2 <- data.table::melt(data.agg,id.vars = c("xvar","act","weights","by"),measure.vars =str_pred)[order(variable,by,xvar)]
     data.hist <- data.plot[,sum(weights),by=list(xvar,by)][,freq:=V1/sum(V1)][order(by,xvar)]
-    
+    print(data.hist)
     suppressWarnings(
       plotly::plot_ly(data=data.agg,x=xvar,y=act,color=paste("Observed",by,sep="-"),yaxis = "y1")%>%
         plotly::add_trace(data=data.agg2,x=xvar,y=value,color=paste("Model",variable,by,sep="-"),yaxis = "y1")%>%
@@ -73,7 +93,7 @@ compPlot <- function(x,act,pred,by=NULL,weights=NULL,newGroupNum=10){
     )
   }
   else {
-    data.plot <- data.table::as.data.table(as.data.frame(cbind(x,act,pred,weights),stringsAsFactors=FALSE))
+    data.plot <- data.table::data.table(x,act,pred,weights)
     data.table::setnames(data.plot,c("xvar","act",str_pred,"weights"))
     data.table::setkey(data.plot,xvar)
 
@@ -82,12 +102,14 @@ compPlot <- function(x,act,pred,by=NULL,weights=NULL,newGroupNum=10){
     data.agg2 <- data.table::melt(data.agg,id.vars = c("xvar","act","weights"),measure.vars =str_pred)[order(variable,xvar)]
     data.hist <- data.plot[,sum(weights),by=xvar][,freq:=V1/sum(V1)][order(xvar)]
     
-    plotly::plot_ly(data=data.agg, x=xvar, y=act, color="Observed", yaxis="y1") %>%
+    suppressWarnings(
+      plotly::plot_ly(data=data.agg, x=xvar, y=act, color="Observed", yaxis="y1") %>%
       plotly::add_trace(data=data.agg2, x=xvar, y=value,color=variable, yaxis="y1") %>%
       plotly::add_trace(x=xvar,y=freq,data=data.hist,type="bar",showlegend=FALSE,
                         marker=list(color="#99CCFF",line=list(color="#606060",width=1.5)),
                         opacity=0.5,yaxis = "y2") %>%
       plotly::layout(title=strTitle, xaxis=ax, yaxis=ay1, yaxis2=ay2, legend=l)
+    )
   }
 
 }

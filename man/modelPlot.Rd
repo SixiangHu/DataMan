@@ -12,8 +12,10 @@ by=NULL,dataset=NULL,newGroupNum=10,predFUN=predict,...)
 corresponding prediction function.}
 
 \item{xvar}{either an integer to specify the position of the dependent variable 
-in the data frame, 
-or a character string to indicate the dependent variable name.}
+in the data frame, or a character string to indicate the dependent variable name.}
+
+\item{act}{either an integer to specify the position of the dependent variable 
+in the data frame, or a character string to indicate the response variable}
 
 \item{wvar}{Optional. A numerical vector, integer, or variable name to 
 specify the weights used for model visualisation.}

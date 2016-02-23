@@ -1,3 +1,9 @@
+DataMan 0.5.2
+-------------------------------------------------------------
+
+BUG FIXES AND MINOR IMPROVEMENTS
+* fix issue when `byvar` is numeric orinteger format, the histogram is not showing properly.
+
 DataMan 0.5.1
 -------------------------------------------------------------
 NEW FEATURES

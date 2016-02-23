@@ -6,12 +6,31 @@
 \usage{
 compPlot(x,act,pred,by=NULL,weights=NULL,newGroupNum=10)
 }
+\arguments{
+\item{x}{a vector indicates the dependent variable}
+
+\item{act}{a vector indicates the response variable}
+
+\item{pred}{a vector or data.frame indicates the model predictions 
+that each column is a prediction from one model.}
+
+\item{by}{Optinal. A vector indicates a `by` factor.}
+
+\item{weights}{Optional. A numerical vector to specify the weights used for model visualisation.}
+
+\item{newGroupNum}{Optional. An integer specifies number of new bands 
+when levels of current plotting variable `xvar` or `by` is more than 100.}
+}
 \description{
 compare model predictions
 }
 \examples{
  
-compPlot(mtcars$vs,act=rnorm(nrow(mtcars)),pred = data.frame(pred1=rnorm(nrow(mtcars)),pred2=rnorm(nrow(mtcars))),by=mtcars$cyl)
+compPlot(mtcars$vs,
+         act=rnorm(nrow(mtcars)),
+         pred = data.frame(pred1=rnorm(nrow(mtcars)),
+                           pred2=rnorm(nrow(mtcars))),
+         by=mtcars$cyl)
 }
 \author{
 Sixiang Hu

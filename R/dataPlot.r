@@ -83,6 +83,7 @@ dataPlot <- function(data,xvar,yvar,byvar=NULL,weights=NULL,
       new_band <- dmBreak(by,newGroupNum)
       by <- cut(by,new_band,include.lowest = TRUE,ordered_result=TRUE)
     }
+    if (is.numeric(by)) by <- as.factor(by)
   }
   
   #Data for plot

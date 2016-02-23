@@ -7,8 +7,9 @@
 #' @param model a model object. It can be any model object that has a 
 #' corresponding prediction function. 
 #' @param xvar either an integer to specify the position of the dependent variable 
-#' in the data frame, 
-#' or a character string to indicate the dependent variable name.
+#' in the data frame, or a character string to indicate the dependent variable name.
+#' @param act either an integer to specify the position of the dependent variable 
+#' in the data frame, or a character string to indicate the response variable
 #' @param wvar Optional. A numerical vector, integer, or variable name to 
 #' specify the weights used for model visualisation.
 #' @param by Optinal. A character string indicates the variable name you want to plot the fit by.
@@ -83,10 +84,9 @@ modelPlot <- function(model,
       by_val <- dataset[[tmp$posi]]
       if ( (is.numeric(by_val) || is.integer(by_val)) && nlevels(as.factor(by_val))>100 ) {
         new_band <- dmBreak(by_val,newGroupNum)
-        #new_band <- seq(min(by_val, na.rm = TRUE),max(by_val, na.rm = TRUE),length.out=newGroupNum)
         by_val <- cut(by_val,new_band,include.lowest = TRUE,ordered_result=TRUE)
       }
-      by_val <- as.character(by_val)
+      if (is.numeric(by_val)) by <- as.factor(by_val)
     }
   }
 
@@ -110,8 +110,6 @@ modelPlot <- function(model,
   fitted_mean <- as.numeric(predFUN(model,MeanData,...))
   
   #Plotting
-  covf2c <- sapply(dataset, is.factor)
-  dataset[covf2c] <- lapply(dataset[covf2c], as.character)
   strTitle <- paste("Fitting Analysis on: ",xvar)
   
   #New Group for data which has too much levels.
