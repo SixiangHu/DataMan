@@ -37,7 +37,8 @@
 #' dataPlot(mtcars,"wt","mpg",byvar="vs")
 
 dataPlot <- function(data,xvar,yvar,byvar=NULL,weights=NULL,
-                     newGroupNum=10, legend_x= 0.45, legend_y = -0.1, x_maxBins = 100){
+                     newGroupNum=10, legend_x= 0.45, legend_y = -0.1,
+                     x_maxBins = 100, by_maxBins = 20){
   
   # Error Trap
   if( .isDFnull(data) ) stop("data set provided is null.")
