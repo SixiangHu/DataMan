@@ -15,7 +15,9 @@
 #' @param byvar Optinal. either an integer to specify the position of the <by> variable in the data frame, 
 #' or a character string to indicate the <by> variable name.
 #' @param newGroupNum An integer specifies number of new bands 
-#' when levels of current plotting variable `xvar` or `by` is more than 100. 
+#' when levels of current plotting variable `xvar` or `by` is more than 100.
+#' @param legend_x,legend_y numerical value. give the position of the legend
+#' @param x_maxBins integer. If number of unique level over this value, than a banding will be triggered.
 #' @details 
 #' Before entering modelling stage, we may want to go through variable by variable in a data set to find the 
 #' features for response variable. This function provides this functionality.
@@ -35,7 +37,7 @@
 #' dataPlot(mtcars,"wt","mpg",byvar="vs")
 
 dataPlot <- function(data,xvar,yvar,byvar=NULL,weights=NULL,
-                     newGroupNum=10){
+                     newGroupNum=10, legend_x= 0.45, legend_y = -0.1, x_maxBins = 100){
   
   # Error Trap
   if( .isDFnull(data) ) stop("data set provided is null.")
@@ -72,11 +74,11 @@ dataPlot <- function(data,xvar,yvar,byvar=NULL,weights=NULL,
   else w <- rep(1,dim(data)[1])
   
   #New group for xvar if it has too many levels.
-  if ( (is.numeric(x) || is.integer(x) ) && nlevels(as.factor(x))>=100 ) {
+  if ( (is.numeric(x) || is.integer(x) ) && nlevels(as.factor(x))>=x_maxBins ) {
     new_band <- dmBreak(x,newGroupNum)
     x <- cut(x,new_band,include.lowest = TRUE,ordered_result=TRUE)
   }
-
+  
   #New Group for byvar if it has too many levels.
   if(!is.null(by)){
     if ( (is.numeric(by) || is.integer(by)) && nlevels(as.factor(by))>20 ) {
@@ -99,12 +101,12 @@ dataPlot <- function(data,xvar,yvar,byvar=NULL,weights=NULL,
   ax <- list(title=xname, showline=TRUE, linecolor = "#000000",
              gridcolor = "#E5E5E5")
   
-  l <- list(bordercolor = "#000000",borderwidth=1)
-
+  l <- list(bordercolor = "#000000",borderwidth=1,x = legend_x, y = legend_y)
+  
   if (is.null(by)) {
     data.plot <- data.table::data.table(x=x,y=y,w=w)
     data.table::setkey(data.plot,x)
-
+    
     data.plot <- data.plot[,lapply(.SD,as.numeric),by=x,.SDcols=c("y","w")]
     data.agg <- data.plot[,lapply(.SD,weighted.mean,w=w),by=x,.SDcols=c("y","w")]
     data.hist <- data.plot[,sum(w),by=x][,freq:=V1/sum(V1)][order(x)]
@@ -121,11 +123,11 @@ dataPlot <- function(data,xvar,yvar,byvar=NULL,weights=NULL,
     
     data.plot <- data.table::data.table(x=x,y=y,w=w,by=by)
     data.table::setkey(data.plot,x,by)
-
+    
     data.plot <- data.plot[,lapply(.SD,as.numeric),by=list(x,by),.SDcols=c("y","w")]
-    data.agg <- data.plot[,lapply(.SD,weighted.mean,w=w),by=list(x,by),.SDcols=c("y","w")]
+    data.agg  <- data.plot[,lapply(.SD,weighted.mean,w=w),by=list(x,by),.SDcols=c("y","w")]
     data.hist <- data.plot[,sum(w),by=list(x,by)][,freq:=V1/sum(V1)][order(by,x)]
-
+    
     suppressWarnings(
       plotly::plot_ly(data=data.agg,x=x,y=y,color=paste("Observed",by,sep="-"),yaxis = "y1")%>%
         plotly::add_trace(x=x, y=freq, color=by, data=data.hist, type="bar",
