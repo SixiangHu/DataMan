@@ -17,7 +17,7 @@
 #' @param newGroupNum An integer specifies number of new bands 
 #' when levels of current plotting variable `xvar` or `by` is more than 100.
 #' @param legend_x,legend_y numerical value. give the position of the legend
-#' @param x_maxBins integer. If number of unique level over this value, than a banding will be triggered.
+#' @param x_maxBins,by_maxBins integer. If number of unique level over this value, than a banding will be triggered.
 #' @details 
 #' Before entering modelling stage, we may want to go through variable by variable in a data set to find the 
 #' features for response variable. This function provides this functionality.
@@ -81,7 +81,7 @@ dataPlot <- function(data,xvar,yvar,byvar=NULL,weights=NULL,
   
   #New Group for byvar if it has too many levels.
   if(!is.null(by)){
-    if ( (is.numeric(by) || is.integer(by)) && nlevels(as.factor(by))>20 ) {
+    if ( (is.numeric(by) || is.integer(by)) && nlevels(as.factor(by))>=by_maxBins ) {
       new_band <- dmBreak(by,newGroupNum)
       by <- cut(by,new_band,include.lowest = TRUE,ordered_result=TRUE)
     }
