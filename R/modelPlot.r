@@ -26,15 +26,12 @@
 #' (fitted mean) on the same graph.
 #' 
 #' Currently, this function is not restricted to any package or models as long
-#' as it has a corresponding prediction function. 
-#' 
-#' To give the best experience, `plotly` package has been chosen (other than
-#' `ggplot`, `googlevis` or `rbokeh`) because of its interactive, simple, and
-#' ability.
+#' as it has a prediction function for the model. 
 #' 
 #' @author Sixiang Hu
-#' @importFrom data.table data.table setkey :=
-#' @importFrom plotly plot_ly add_trace layout
+#' @importFrom data.table data.table setkey := uniqueN
+#' @importFrom plotly plot_ly add_lines add_bars layout %>%
+#' @importFrom stats predict
 #' @seealso \code{\link{glm}}
 #' @export modelPlot
 #' @examples
@@ -82,7 +79,7 @@ modelPlot <- function(model,
     else {
       tmp <- .VarPosition(dataset,by)
       by_val <- dataset[[tmp$posi]]
-      if ( (is.numeric(by_val) || is.integer(by_val)) && nlevels(as.factor(by_val))>100 ) {
+      if ( (is.numeric(by_val) || is.integer(by_val)) && data.table::uniqueN(by_val)>100 ) {
         new_band <- dmBreak(by_val,newGroupNum)
         by_val <- cut(by_val,new_band,include.lowest = TRUE,ordered_result=TRUE)
       }
@@ -113,7 +110,7 @@ modelPlot <- function(model,
   strTitle <- paste("Fitting Analysis on: ",xvar)
   
   #New Group for data which has too much levels.
-  if ( (is.numeric(dataset[,xvar]) || is.integer(dataset[,xvar])) && nlevels(as.factor(dataset[,xvar]))>100 ) {
+  if ( (is.numeric(dataset[,xvar]) || is.integer(dataset[,xvar])) && data.table::uniqueN(dataset[,xvar])>100 ) {
     new_band <- dmBreak(dataset[,xvar],newGroupNum)
     dataset[,xvar] <- cut(dataset[,xvar],new_band,include.lowest = TRUE,ordered_result=TRUE)
   }
@@ -122,31 +119,39 @@ modelPlot <- function(model,
   ay1 <- list(overlaying = "y2", side = "left", title="Response", 
               linecolor = "#000000", gridcolor = "#E5E5E5")
   
-  ay2 <- list(side = "right", showgrid=FALSE, title="Weights",
+  ay2 <- list(side = "right", showgrid=FALSE, title="Weights (%)",
               linecolor = "#000000")
   
-  ax <- list(title=xvar, showline=TRUE, linecolor = "#000000",
-             gridcolor = "#E5E5E5")
+  if(is.character(dataset[,xvar])) {
+    ax <- list(title=xvar, showline=TRUE, linecolor = "#000000",
+               gridcolor = "#E5E5E5",type = "category",
+               categoryorder = "category ascending")
+  }
+  else{
+    ax <- list(title=xvar, showline=TRUE, linecolor = "#000000",
+               gridcolor = "#E5E5E5")
+  }
   
-  l <- list(bordercolor = "#000000",borderwidth=1)
+  l <- list(bordercolor = "#000000",borderwidth=1,orientation="h")
   
   if (!is.null(by)) {
     strTitle <- paste(strTitle," by ",by,sep="")
 
     data.plot <- data.table::data.table(xvar=dataset[,xvar],by=by_val,fitted,observed,weights)
-    setkey(data.plot,xvar,by)
+    data.table::setkey(data.plot,xvar,by)
     
     data.plot <- data.plot[,lapply(.SD,as.numeric),by=list(xvar,by),.SDcols=c("fitted","observed","weights")]
     data.agg  <- data.plot[,lapply(.SD,weighted.mean,w=weights),by=list(xvar,by),.SDcols=c("fitted","observed","weights")]
-    data.hist <- data.plot[,sum(weights),by=list(xvar,by)][,freq:=V1/sum(V1)][order(xvar,by)]
+    data.hist <- data.plot[,sum(weights),by=list(xvar,by)][,freq:=round(V1/sum(V1)*100)][order(xvar,by)]
     
-    suppressWarnings(
-      plotly::plot_ly(data = data.agg,x=xvar,y=observed,color=paste("Observed",by,sep="-"),yaxis = "y1")%>%
-        plotly::add_trace(x=xvar,y=fitted,color=paste("Fitted",by,sep="-"),
-                          line=list(dash="dot"),type="scatter",yaxis = "y1") %>%
-        plotly::add_trace(x=xvar,y=fitted_mean,color=paste("Fitted Mean",by,sep="-"),
-                          line=list(dash="dash"),type="scatter",yaxis = "y1") %>%
-        plotly::add_trace(x=xvar,y=freq,color=by,data=data.hist,type="bar",
+    suppressMessages(
+      plotly::plot_ly(data = data.agg,x=~xvar,y=~observed,color=~paste0("Observed: ",by)) %>%
+        plotly::add_lines(yaxis = "y1")%>%
+        plotly::add_lines(x=~xvar,y=~fitted,color=~paste0("Fitted: ",by),
+                          line=list(dash="dot"),yaxis = "y1") %>%
+        plotly::add_lines(x=~xvar,y=~fitted_mean,color=~paste("Fitted Mean: ",by),
+                          line=list(dash="dash"),yaxis = "y1") %>%
+        plotly::add_bars(x=~xvar,y=~freq,color=~by,data=data.hist,
                           marker=list(line=list(color="#606060",width=1.5)),
                           showlegend=FALSE, opacity=0.5,yaxis = "y2") %>%
         plotly::layout(title = strTitle,legend=l,barmode = "stack",
@@ -154,24 +159,27 @@ modelPlot <- function(model,
       )
   }
   else {
-    #use as.data.table to speed up
+    #use data.table to speed up
     data.plot <-data.table::data.table(xvar=dataset[,xvar],fitted,fitted_mean,observed,weights)
-    setkey(data.plot,xvar)
+    data.table::setkey(data.plot,xvar)
     
     data.plot <- data.plot[,lapply(.SD,as.numeric),by=xvar,.SDcols=c("fitted","fitted_mean","observed","weights")]
     data.agg  <- data.plot[,lapply(.SD,weighted.mean,w=weights),by=xvar,.SDcols=c("fitted","fitted_mean","observed","weights")]
-    data.hist <- data.plot[,sum(weights),by=xvar][,freq:=V1/sum(V1)][order(xvar)]
-    
-    plotly::plot_ly(data = data.agg,x=xvar,y=observed, line=list(color="#CC3399",shape = "linear"),
-                    marker=list(symbol="square",size=10),  name="Observed",yaxis = "y1")%>%
-      plotly::add_trace(x=xvar,y=fitted, line=list(color="#336633",shape = "linear"),
+    data.hist <- data.plot[,sum(weights),by=xvar][,freq:=round(V1/sum(V1)*100)][order(xvar)]
+  
+    suppressWarnings(
+    plotly::plot_ly(data = data.agg,x=~xvar,y=~observed,name="Observed")%>%
+      plotly::add_lines(line=list(color="#CC3399"),yaxis="y1",mode="markers",
+                        marker=list(color="#CC3399",symbol="square",size=10)) %>%
+      plotly::add_lines(x=~xvar,y=~fitted, line=list(color="#336633",shape = "linear"),mode="lines+markers",
                         marker=list(symbol="triangle-up",size=10), name="Fitted",yaxis = "y1") %>%
-      plotly::add_trace(x=xvar,y=fitted_mean, line=list(color="#33CC33",shape = "linear"),
-                marker=list(symbol="triangle-down",size=10), name="Fitted Mean",yaxis = "y1") %>%
-      plotly::add_trace(x=xvar,y=freq,data=data.hist,type="bar",showlegend=FALSE,
+      plotly::add_lines(x=~xvar,y=~fitted_mean, line=list(color="#33CC33",shape = "linear"),mode="lines+markers",
+                        marker=list(symbol="triangle-down",size=10), name="Fitted Mean",yaxis = "y1") %>%
+      plotly::add_bars(x=~xvar,y=~freq,data=data.hist,showlegend=FALSE,
                         marker=list(color="#99CCFF",line=list(color="#606060",width=1.5)),
                         opacity=0.5,yaxis = "y2") %>%
       plotly::layout(title = strTitle, xaxis=ax,yaxis = ay1,yaxis2 = ay2,legend=l)
+    )
   }
 }
 

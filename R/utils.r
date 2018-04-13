@@ -1,12 +1,5 @@
-#rbokeh tool sets
-.tools <- c("pan", "wheel_zoom", "box_zoom", "resize", "reset", "save")
-
-#color
-.cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
-.cbbPalette <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
-
 #global variable
-globalVariables(c("V1",".N","f","N"))
+globalVariables(c("V1",".N","f","N","Freq.x","Freq.y","value","xvar","variable","freq"))
 
 #return position index and name of a given variable in the data
 .VarPosition <- function(data,var){

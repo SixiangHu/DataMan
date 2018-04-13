@@ -2,9 +2,9 @@
 % Please edit documentation in R/DetMiss.r
 \name{DetMiss}
 \alias{DetMiss}
-\alias{DetMiss.data.frame}
-\alias{DetMiss.default}
 \alias{DetMiss.matrix}
+\alias{DetMiss.default}
+\alias{DetMiss.data.frame}
 \title{Detect Missing Value}
 \usage{
 DetMiss(data)
@@ -25,10 +25,9 @@ This function allows you to detect missing values in given dataset.
 a <- c(sample(LETTERS,5),NA)
 DetMiss(a)
 }
-\author{
-Sixiang Hu
-}
 \seealso{
 PopMiss
 }
-
+\author{
+Sixiang Hu
+}

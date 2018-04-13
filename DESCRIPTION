@@ -24,4 +24,4 @@ LinkingTo: Rcpp,
     RcppArmadillo
 URL: https://github.com/SixiangHu/DataMan
 BugReports: https://github.com/SixiangHu/DataMan/issues
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1

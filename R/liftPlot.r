@@ -1,16 +1,18 @@
-#' Model Lift Plot
+#' Lift Plot
 #'
 #' @description 
 #' With provided different model predictions, different lift curves will be 
 #' plot to compare model improvement. 
-#' @usage liftPlot(data,weight=NULL,bucket=20,showas=NULL)
-#' @param data A `data.frame` includes columns which are model predictions.
+#' @usage liftPlot(act,pred1,pred2,weight=NULL,breaks=seq(0,2,0.05),showas=NULL)
+#' @param act A numeric vector to give actual for different.
+#' @param pred1 A numeric vector to give actual for different.
+#' @param pred2 A numeric vector to give actual for different.
 #' @param weight A numeric vector to give weights for different predictions.
-#' @param bucket An integer to specify the number of groups that the total predictions are split into.
+#' @param breaks A sequence of the numericals defining breaks that differences are split into.
 #' @param showas A string vector to give names for each predictions on the lift curve.
 #' @author Sixiang Hu
-#' @importFrom dplyr group_by summarise %>%
-#' @importFrom rbokeh figure ly_lines ly_points ly_hist grid_plot 
+#' @importFrom data.table set setkey data.table
+#' @importFrom plotly plot_ly add_lines add_bars layout %>%
 #' @export liftPlot
 #' @examples
 #' 
@@ -18,52 +20,63 @@
 #' glm2 <- glm(mpg~cyl+vs,data=mtcars,family=Gamma(log))
 #' pred1 <- predict(glm1,mtcars)
 #' pred2 <- predict(glm2,mtcars)
-#' data <- cbind(pred1,pred2)
-#' liftPlot(data)
+#' liftPlot(mtcars$mpg,pred1,pred2)
 
-liftPlot <- function(data,weight=NULL,bucket=20,showas=NULL){
-  newNameFlag <- TRUE
+liftPlot <- function(act,pred1,pred2,weight=NULL,breaks=seq(0,2,0.05),showas=NULL){
 
-  if(dim(data)[1]<bucket*10) 
-    warning("Number of obs per bucket is less than 10, which may not give a reliable weighted mean.") 
-
-  if (is.null(weight)) weight <- rep(1,dim(data)[1])
+  if((length(act)!=length(pred1)) | (length(act)!=length(pred2)) | (length(pred1)!=length(pred2)))
+    stop("Provided act, pred1, and pred2 have different length.")
   
-  if (!is.null(showas) && length(showas) != dim(data)[2]) 
-    stop("Names provided in `showas` has a different length with column provided.") 
-  else if (is.null(showas)) newNameFlag <- FALSE
+  if(length(act)<length(breaks)*10) 
+      warning("Number of obs per bucket is less than 10, which may not give a reliable weighted mean.") 
   
-  P <- data.frame(Group=NULL,Pred = NULL,ModelNames=NULL)
+  if (is.null(weight)) weight <- rep(1,length(act))
   
-  for(i in 1:dim(data)[2]){
-    temp <- as.data.frame(.liftGroup(data[,i],weight,bucket))
-
-    if (newNameFlag) temp$ModelNames <- showas[i]
-    else if (!is.null(names(data)[i])) temp$ModelNames <- names(data)[i]
-    else temp$ModelNames <- paste("Model ",i,sep="")
-
-    P <- rbind(P,temp)
-  }
-
-  rbokeh::figure(tools = .tools,width=800,height=700,ylab="Prediction") %>%
-    rbokeh::ly_lines(Group, Pred, data = P, width=1.5, color = ModelNames) %>%
-    rbokeh::ly_points(Group, Pred, data = P, size=10, color = ModelNames,
-              hover="<strong>Model:</strong> @ModelNames<br><strong>y value:</strong> @Pred")
-}
-
-.liftGroup <- function(pred,weight=NULL,bucket){
-
-  df <- data.frame(cbind(pred,weight))
-  df <- df[order(df[,1]),]
-  df$group <- ceiling((1:length(pred)) / ceiling(length(pred)/bucket))
+  if (is.null(showas) )  showas <- c("pred1","pred2") 
+  else if (!is.null(showas) & length(showas)<2 ) stop("Only one new name has been provided.")
   
-  df_plot <-df %>% 
-    dplyr::group_by(group) %>% 
-    dplyr::summarise(wmean = weighted.mean(pred, weight))
-                                                                                                                                                                                                       
-  names(df_plot) <- c("Group","Pred")
-  df_plot
+  dt <- data.table::data.table(act,pred1,pred2,weight)
+  dt[,ratio:=pred1/pred2]
+  dt[,breaks:=cut(ratio,breaks,include.lowest = FALSE,ordered_result = TRUE)]
+  data.table::setkey(dt,breaks)
+  dt_agg  <- dt[,c(obs=sum(weight),lapply(.SD,weighted.mean,w=weight)),
+                by=breaks,.SDcols=c("act","pred1","pred2","weight")]
+  dt_full <- data.table::data.table(breaks=cut(breaks,breaks,include.lowest = FALSE,ordered_result = TRUE))
+  data.table::setkey(dt_full,breaks)
+  dt_final <- dt_agg[dt_full,on="breaks"]
+  
+  for (j in seq_len(ncol(dt_final)))
+    data.table::set(dt_final,which(is.na(dt_final[[j]])),j,0L)
+  
+  #set axis
+  ay1 <- list(overlaying = "y2", side = "left", title="Response", 
+              linecolor = "#000000", gridcolor = "#E5E5E5")
+  
+  ay2 <- list(side = "right", showgrid=FALSE, title="Weights (%)",
+              linecolor = "#000000")
+  
+  ax <- list(title=paste0(showas[1],"/",showas[2]), showline=TRUE, linecolor = "#000000",
+             gridcolor = "#E5E5E5",type = "category",
+             categoryorder = "category ascending")
+  
+  l <- list(bordercolor = "#000000",borderwidth=1,orientation="h")
+  
+  #Plotting
+  strTitle <- paste("Impact Analysis comparing: ",showas[1]," and ",showas[2])
+  
+  plotly::plot_ly(data = dt_final,x=~breaks,y=~act,name="Observed")%>%
+    plotly::add_lines(line=list(color="#CC3399"),yaxis="y1",mode="markers",
+                      marker=list(color="#CC3399",symbol="square",size=10)) %>%
+    plotly::add_lines(x=~breaks,y=~pred1, line=list(color="#336633",shape = "linear"),mode="lines+markers",
+                      marker=list(symbol="triangle-up",size=10), name=showas[1],yaxis = "y1") %>%
+    plotly::add_lines(x=~breaks,y=~pred2, line=list(color="#33CC33",shape = "linear"),mode="lines+markers",
+                      marker=list(symbol="triangle-down",size=10), name=showas[2],yaxis = "y1") %>%
+    plotly::add_bars(x=~breaks,y=~obs,showlegend=FALSE,
+                     marker=list(color="#99CCFF",line=list(color="#606060",width=1.5)),
+                     opacity=0.5,yaxis = "y2") %>%
+    plotly::layout(title = strTitle, xaxis=ax,yaxis = ay1,yaxis2 = ay2,legend=l)
+
 }
 
 #global variable
-globalVariables(c("Group","Pred","ModelNames","group"))
+globalVariables(c("ratio"))

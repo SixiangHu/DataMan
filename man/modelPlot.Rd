@@ -43,11 +43,7 @@ put actual (observation), model predictions (fitted), and marginal effect
 (fitted mean) on the same graph.
 
 Currently, this function is not restricted to any package or models as long
-as it has a corresponding prediction function. 
-
-To give the best experience, `plotly` package has been chosen (other than
-`ggplot`, `googlevis` or `rbokeh`) because of its interactive, simple, and
-ability.
+as it has a prediction function for the model.
 }
 \examples{
 
@@ -56,10 +52,9 @@ ability.
 glm1 <- glm(formula = mpg ~ cyl + hp, family = Gamma(log), data = mtcars, weights = wt)
 modelPlot(glm1,"cyl","mpg","wt",dataset=mtcars,type="response")
 }
-\author{
-Sixiang Hu
-}
 \seealso{
 \code{\link{glm}}
 }
-
+\author{
+Sixiang Hu
+}

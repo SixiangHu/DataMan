@@ -2,8 +2,8 @@
 % Please edit documentation in R/CramersV.r
 \name{CramersV}
 \alias{CramersV}
-\alias{CramersV.data.frame}
 \alias{CramersV.default}
+\alias{CramersV.data.frame}
 \alias{CramersV.matrix}
 \title{Cramers' V Test}
 \usage{
@@ -34,4 +34,3 @@ CramersV(dm)
 \author{
 Sixiang Hu
 }
-

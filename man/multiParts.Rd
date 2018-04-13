@@ -12,7 +12,7 @@ multiParts(y,p)
 \item{p}{numeric vector. The proportion of each parts.}
 }
 \description{
-This function splits a vector into several parts depends on the proportion provided.
+This function splits a vector into several parts depends on the proportions provided.
 }
 \details{
 By calling `sample` function with `replace=FALSE`, the provided vector can be splited into
@@ -26,4 +26,3 @@ multiParts(1:100,c(0.25,0.25,0.5))
 \author{
 Sixiang Hu
 }
-

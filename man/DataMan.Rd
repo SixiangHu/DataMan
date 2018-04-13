@@ -8,4 +8,3 @@
 \description{
 a data clearning, analysis and statistical modeling assessing tool.
 }
-

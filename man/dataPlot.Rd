@@ -4,27 +4,23 @@
 \alias{dataPlot}
 \title{dataPlot}
 \usage{
-dataPlot(data,xvar,yvar,byvar=NULL,weights=NULL,newGroupNum=10)
+dataPlot(x,y,by=NULL,weights=NULL,newGroupNum=10,xlim=NULL,xname="x",yname="y",byname="by")
 }
 \arguments{
-\item{data}{a data frame.}
+\item{x}{a vector indicates the dependent variable}
 
-\item{xvar}{either an integer to specify the position of the dependent variable in the data frame, 
-or a character string to indicate the dependent variable name.}
+\item{y}{a vector indicates the response variable}
 
-\item{yvar}{either an integer to specify the position of the response variable in the data frame, 
-or a character string to indicate the response variable name.}
+\item{by}{Optinal.A numerical vector to specify the <by> variable}
 
-\item{byvar}{Optinal. either an integer to specify the position of the <by> variable in the data frame, 
-or a character string to indicate the <by> variable name.}
-
-\item{weights}{Optional. One of: 
-a numerical vector to specify the weights used for calculating weighted average of response,
-a character string to specify the name of weight variable in the data frame,
-an integer to specify the position of the weight variable in the data frame.}
+\item{weights}{Optional. A numerical vector to specify the weights used for calculating weighted average of response,}
 
 \item{newGroupNum}{An integer specifies number of new bands 
 when levels of current plotting variable `xvar` or `by` is more than 100.}
+
+\item{xlim}{Optional. A vector provides the range of the variable e.g. xlim=c(0,100).}
+
+\item{xname, yname, byname}{Optional. Characters of axis to be shown on plot.}
 }
 \description{
 This function allows you to visualise features of a dataset 
@@ -40,11 +36,10 @@ What's more, \code{\link{modelPlot}} takes longer time to create plots.
 }
 \examples{
 
-dataPlot(mtcars,"wt","mpg")
+dataPlot(mtcars$gear,mtcars$mpg)
 
-dataPlot(mtcars,"wt","mpg",byvar="vs")
+dataPlot(mtcars$gear,mtcars$mpg,mtcars$wt)
 }
 \author{
 Sixiang Hu
 }
-

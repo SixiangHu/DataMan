@@ -26,4 +26,3 @@ rocPlot(cbind(b,c),a)
 \author{
 Sixiang Hu
 }
-

@@ -13,7 +13,7 @@
 #' Hence the "zvar" can be actual response data or model predictions.
 #' @author Sixiang Hu
 #' @importFrom data.table data.table setkey key := dcast
-#' @importFrom plotly plot_ly layout
+#' @importFrom plotly plot_ly layout %>%
 #' @export interPlot
 #' @examples
 #' 
@@ -52,29 +52,18 @@ interPlot <- function(data,xvar,yvar,zvar,wvar=NULL,numGrpx=10,numGrpy=10){
     w <- data[[posi$posi]]
   }
   
-  dt <- data.table::data.table(x = x,
-                   y = y,
-                   z = z,
-                   w = w)
+  dt <- data.table::data.table(x = x,y = y,z = z,w = w)
   data.table::setkey(dt,x,y)
   
   dt2  <- dt[,lapply(.SD,weighted.mean,w=w),by=list(x,y),.SDcols=c("z","w")]
+  dt2 <- data.table::dcast(dt2,x~y,value.var="z",drop=FALSE)
   
-  dt2 <- data.table::dcast(dt2,x~y,
-                           value.var="z",
-                           drop=FALSE)
-  
-  zvalue <- suppressWarnings(PopMiss(as.matrix(dt2[,-1,with=FALSE]),
-                                     na.treatment = "replace",
-                                     0))
+  zvalue <- suppressWarnings(DataMan::PopMiss(as.matrix(dt2[,-1,with=FALSE]),
+                                     na.treatment = "replace",0))
 
-  plotly::plot_ly(
-          x=dt2[[1]],
-          y=colnames(dt2),
-          z=zvalue, 
-          type = "surface") %>%
-    plotly::layout(scene=list(xaxis=list(title=xvar),
-                           yaxis=list(title=yvar),
-                           zaxis=list(title=zvar))
+  plotly::plot_ly(x=~x,y=~y,z=~zvalue,type = "surface") %>%
+    plotly::layout(scene=list(xaxis=list(title=paste0(xvar," (x)")),
+                           yaxis=list(title=paste0(yvar," (y)")),
+                           zaxis=list(title=paste0(zvar," (z)")))
                    )
 }

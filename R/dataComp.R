@@ -19,6 +19,7 @@
 #' `Nochange` - cannot reject the null hypothesis that there is no change.
 #' `Changed`  - reject the null hypothesis that there is no change.
 #' @author Sixiang Hu
+#' @importFrom stats chisq.test
 #' @export dataComp
 #' @examples
 #' 
@@ -34,10 +35,9 @@ dataComp <- function(old,new,alpha=0.01,obs.lim=5){
     if(.isDFnull(new)) stop("No test data given.")
     
     strName <- colnames(old)
-    res <- data.frame(Name=strName,Result="Nochange")
+    res <- data.frame(Name=character(),Result=character())
     
     for (i in strName){
-      print(i)
       if (i %in% colnames(new)){
         x <- varComp(old[,i],new[,i],alpha,obs.lim)
         if (is.null(x)) {
@@ -61,7 +61,7 @@ dataComp <- function(old,new,alpha=0.01,obs.lim=5){
   }
   else {
     
-    if(is.null(old)) stop("No expectation data given.")
+    if(is.null(old)) stop("No expected data given.")
     if(is.null(new)) stop("No test data given.")
     
     if(is.data.frame(new)) stop("new dataset must be a vector if a vector has provided as expected.")
@@ -78,8 +78,8 @@ dataComp <- function(old,new,alpha=0.01,obs.lim=5){
 #' @export varComp
 #' @rdname dataComp
 varComp <- function(old,new,alpha=0.05,obs.lim){
-  if(is.null(old)) stop("No expectation data given.")
-  if(is.null(new)) stop("No test data given.")
+  if(is.null(old)) stop("Expected data is not given.")
+  if(is.null(new)) stop("Test data is not given.")
 
   df_o <- as.data.frame(table(old,useNA="no"))
   df_n <- as.data.frame(table(new,useNA="no"))
@@ -87,7 +87,7 @@ varComp <- function(old,new,alpha=0.05,obs.lim){
 
   #get rid of any NA generated in merging
   df <- DataMan::PopMiss(df,na.treatment = "delete")
-  
+   
   #Chisq is not suitable for obs less than 5
   df <- subset(df,Freq.x>obs.lim && Freq.y>obs.lim)
   

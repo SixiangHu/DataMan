@@ -3,8 +3,8 @@
 \name{tree2data}
 \alias{tree2data}
 \alias{tree2data.default}
-\alias{tree2data.gbm}
 \alias{tree2data.randomForest}
+\alias{tree2data.gbm}
 \title{Prepare data from GBM or randomForest model object
 for `sankeyNetwork` in `networkD3` package}
 \usage{
@@ -39,4 +39,3 @@ sankeyNetwork(tree_data[[1]],tree_data[[2]],Source="src",Target="tar",
 \author{
 Sixiang Hu
 }
-

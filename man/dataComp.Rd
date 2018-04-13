@@ -47,4 +47,3 @@ dataComp(x,y)
 \author{
 Sixiang Hu
 }
-

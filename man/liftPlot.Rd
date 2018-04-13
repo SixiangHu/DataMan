@@ -2,16 +2,20 @@
 % Please edit documentation in R/liftPlot.r
 \name{liftPlot}
 \alias{liftPlot}
-\title{Model Lift Plot}
+\title{Lift Plot}
 \usage{
-liftPlot(data,weight=NULL,bucket=20,showas=NULL)
+liftPlot(act,pred1,pred2,weight=NULL,breaks=seq(0,2,0.05),showas=NULL)
 }
 \arguments{
-\item{data}{A `data.frame` includes columns which are model predictions.}
+\item{act}{A numeric vector to give actual for different.}
+
+\item{pred1}{A numeric vector to give actual for different.}
+
+\item{pred2}{A numeric vector to give actual for different.}
 
 \item{weight}{A numeric vector to give weights for different predictions.}
 
-\item{bucket}{An integer to specify the number of groups that the total predictions are split into.}
+\item{breaks}{A sequence of the numericals defining breaks that differences are split into.}
 
 \item{showas}{A string vector to give names for each predictions on the lift curve.}
 }
@@ -25,10 +29,8 @@ glm1 <- glm(mpg~cyl,data=mtcars,family=Gamma(log))
 glm2 <- glm(mpg~cyl+vs,data=mtcars,family=Gamma(log))
 pred1 <- predict(glm1,mtcars)
 pred2 <- predict(glm2,mtcars)
-data <- cbind(pred1,pred2)
-liftPlot(data)
+liftPlot(mtcars$mpg,pred1,pred2)
 }
 \author{
 Sixiang Hu
 }
-

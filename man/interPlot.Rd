@@ -34,4 +34,3 @@ interPlot(mtcars,"wt","mpg","vs")
 \author{
 Sixiang Hu
 }
-

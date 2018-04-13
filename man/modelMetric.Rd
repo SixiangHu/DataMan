@@ -20,13 +20,12 @@ Currently, it conducts MSE, RMSE, MAE, RMAE, and LogLoss (for clasification) ana
 }
 \examples{
 
-x <- rnorm(1000)
+actual <- rnorm(1000)
 y <- rnorm(1000)
 z <- rnorm(1000)
 pred <- data.frame(model1=y,model2=z)
-modelMetric(x,pred)
+modelMetric(actual,pred)
 }
 \author{
 Sixiang Hu
 }
-

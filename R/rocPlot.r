@@ -8,9 +8,8 @@
 #' that each column standards predictions from a model.
 #' @param actual Numerical vector for actual or true result.
 #' @author Sixiang Hu
-#' @importFrom dplyr %>%
 #' @importFrom ROCR prediction performance
-#' @importFrom rbokeh figure ly_lines ly_points ly_abline
+#' @importFrom plotly plot_ly add_lines layout %>%
 #' @export rocPlot
 #' @examples
 #' 
@@ -35,7 +34,7 @@ rocPlot <- function(data,actual){
     pref <- ROCR::performance(pred,measure = "tpr", x.measure = "fpr")
     pref2 <- ROCR::performance(pred,measure = "auc")
     num_auc <- signif(pref2@y.values[[1]],3)
-    
+ 
     strName <- names(data)[i]
     if (is.null(strName)) strName <- paste("Pred",i," (AUC: ",num_auc,")",sep="")
     else strName <- paste(strName," (AUC:",num_auc,")",sep="")
@@ -45,14 +44,20 @@ rocPlot <- function(data,actual){
     
     auc <- rbind(auc, tmp)
   }
+  
+  #set axis
+  ay1 <- list(overlaying = "y2", side = "left", title="True Positive Rate", 
+              linecolor = "#000000", gridcolor = "#E5E5E5")
 
-  rbokeh::figure(title="ROC (AUC) Curve", tools=.tools,
-                 width=700, height=700,
-                 xlab="False Positive Rate",ylab="True Positive Rate",
-                 xlim=c(0,1),ylim=c(0,1),
-                 legend_location = "bottom_right") %>%
-    rbokeh::ly_lines(x,y,data = auc,color=ModelName) %>%
-    rbokeh::ly_abline(a=0,b=1,color="red")
+  ax <- list(title="False Positive Rate", showline=TRUE, linecolor = "#000000",
+             gridcolor = "#E5E5E5")
+
+  l <- list(bordercolor = "#000000",borderwidth=1,orientation="h")
+  
+  plotly::plot_ly(data = auc) %>%
+    plotly::add_lines(x=~x,y=~y,color=~ModelName) %>%
+    plotly::add_lines(x=c(0,1),y=c(0,1),color="red",name="Diagnal Line") %>%
+    plotly::layout(title="ROC (AUC) Curve",xaxis=ax,yaxis = ay1,legend=l)
 }
 
 #global variable

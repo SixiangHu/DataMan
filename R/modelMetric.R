@@ -10,11 +10,11 @@
 #' @export modelMetric
 #' @examples
 #' 
-#' x <- rnorm(1000)
+#' actual <- rnorm(1000)
 #' y <- rnorm(1000)
 #' z <- rnorm(1000)
 #' pred <- data.frame(model1=y,model2=z)
-#' modelMetric(x,pred)
+#' modelMetric(actual,pred)
 
 modelMetric <- function(act,pred){
   #Mean square error
@@ -29,6 +29,10 @@ modelMetric <- function(act,pred){
 
   MM_mse <- as.numeric(as.matrix(unlist(lapply(pred,mse,act=act))))
   MM_mae <- as.numeric(as.matrix(unlist(lapply(pred,mae,act=act))))
+  
+  #logloss
+  
+  #mlogloss
   
   res <- data.frame(MSE = MM_mse,RMSE = sqrt(MM_mse),
                     MAE = MM_mae,RMAE = sqrt(MM_mae))

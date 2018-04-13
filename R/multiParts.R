@@ -1,6 +1,6 @@
 #' multiParts
 #' 
-#' @description This function splits a vector into several parts depends on the proportion provided.
+#' @description This function splits a vector into several parts depends on the proportions provided.
 #' @usage multiParts(y,p)
 #' @param y vector. to be splited.
 #' @param p numeric vector. The proportion of each parts.

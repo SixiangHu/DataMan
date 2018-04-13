@@ -2,14 +2,14 @@
 % Please edit documentation in R/PopMiss.r
 \name{PopMiss}
 \alias{PopMiss}
-\alias{PopMiss.Date}
+\alias{PopMiss.factor}
 \alias{PopMiss.character}
+\alias{PopMiss.integer}
+\alias{PopMiss.Date}
+\alias{PopMiss.numeric}
 \alias{PopMiss.data.frame}
 \alias{PopMiss.data.table}
-\alias{PopMiss.factor}
-\alias{PopMiss.integer}
 \alias{PopMiss.matrix}
-\alias{PopMiss.numeric}
 \title{Populate Missing Value}
 \usage{
 PopMiss(data,na.treatment=c("mean.or.mode","delete","replace"),replace=NULL)
@@ -44,10 +44,9 @@ This function allows you to populate missing values.
 a <- c(sample(LETTERS,5),NA)
 PopMiss(a,"mean.or.mode")
 }
-\author{
-Sixiang Hu
-}
 \seealso{
 DetMiss
 }
-
+\author{
+Sixiang Hu
+}

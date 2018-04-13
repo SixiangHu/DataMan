@@ -35,4 +35,3 @@ compPlot(mtcars$vs,
 \author{
 Sixiang Hu
 }
-
