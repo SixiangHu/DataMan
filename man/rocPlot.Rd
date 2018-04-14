@@ -17,7 +17,7 @@ With provided different model predictions, different lift curves will be
 plot to compare model improvement.
 }
 \examples{
-
+set.seed(1L)
 a <- sample(c(0,1),10000,replace=TRUE)
 b <- runif(10000)
 c <- runif(10000)

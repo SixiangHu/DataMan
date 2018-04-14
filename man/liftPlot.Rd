@@ -4,7 +4,7 @@
 \alias{liftPlot}
 \title{Lift Plot}
 \usage{
-liftPlot(act,pred1,pred2,weight=NULL,breaks=seq(0,2,0.05),showas=NULL)
+liftPlot(act,pred1,pred2,weight=NULL,exposure=NULL,breaks=seq(0,2,0.05),showas=NULL)
 }
 \arguments{
 \item{act}{A numeric vector to give actual for different.}
@@ -15,9 +15,11 @@ liftPlot(act,pred1,pred2,weight=NULL,breaks=seq(0,2,0.05),showas=NULL)
 
 \item{weight}{A numeric vector to give weights for different predictions.}
 
+\item{exposure}{A numeric vector to give exposure for different predictions.}
+
 \item{breaks}{A sequence of the numericals defining breaks that differences are split into.}
 
-\item{showas}{A string vector to give names for each predictions on the lift curve.}
+\item{showas}{A string vectors to give names for each model on the lift curve.}
 }
 \description{
 With provided different model predictions, different lift curves will be 
@@ -29,7 +31,7 @@ glm1 <- glm(mpg~cyl,data=mtcars,family=Gamma(log))
 glm2 <- glm(mpg~cyl+vs,data=mtcars,family=Gamma(log))
 pred1 <- predict(glm1,mtcars)
 pred2 <- predict(glm2,mtcars)
-liftPlot(mtcars$mpg,pred1,pred2)
+liftPlot(mtcars$mpg,pred1,pred2,breaks=seq(0.9,1.1,0.01))
 }
 \author{
 Sixiang Hu

@@ -4,20 +4,22 @@
 \alias{interPlot}
 \title{interPlot}
 \usage{
-interPlot(data,xvar,yvar,zvar,wvar=NULL,numGrpx=10,numGrpy=10)
+interPlot(x,y,z,weight=NULL,exposure=NULL,numGrpx=10,numGrpy=10,
+xname="x",yname="y",zname="z")
 }
 \arguments{
-\item{data}{a data frame.}
+\item{x, y}{a vector indicates the dependent variable that you want to visulise on (i.e. Age)}
 
-\item{xvar}{either an integer to specify the position of the variable in the data frame, or the name of the variable.}
+\item{z}{a vector indicates the response variable that you want to visulise on (i.e. Age)}
 
-\item{yvar}{either an integer to specify the position of the variable in the data frame, or the name of the variable.}
+\item{weight}{Optional. A numerical vector to specify the weights used for calculating weighted average of response.
+normally this is the figures from over/down-samping.}
 
-\item{zvar}{either an integer to specify the position of the variable in the data frame, or the name of the variable.}
-
-\item{wvar}{either an integer to specify the position of the variable in the data frame, or the name of the variable.}
+\item{exposure}{Optional. A numerical vector to specify the exposure used for calculating weighted average of response.}
 
 \item{numGrpx, numGrpy}{integer. Give the number of buckets for either x or y factors.}
+
+\item{xname, yname, zname}{Optional. Characters to be shown on plot.}
 }
 \description{
 Interactive 3D plot by calling `plotly` package functions.
@@ -25,11 +27,11 @@ Interactive 3D plot by calling `plotly` package functions.
 \details{
 This functions gives a 3D interactive view of between factors.
 This is really useful when modeller wants to assess the interaction terms.
-Hence the "zvar" can be actual response data or model predictions.
+Hence the `z` can be actual response data or model predictions.
 }
 \examples{
 
-interPlot(mtcars,"wt","mpg","vs")
+interPlot(mtcars$disp,mtcars$mpg,mtcars$qsec)
 }
 \author{
 Sixiang Hu

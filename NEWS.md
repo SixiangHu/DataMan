@@ -1,3 +1,13 @@
+DataMan 0.6.0
+-------------------------------------------------------------
+NEW FEATURES
+* `Datasummary` becomes more efficient
+* `Datasummary` adding data entrophy
+
+BUG FIXES AND MINOR IMPROVEMENTS
+* Get rid of "Add marker to mode" output from `plotly`
+
+
 DataMan 0.5.3
 -------------------------------------------------------------
 NEW FEATURES

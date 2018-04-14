@@ -4,7 +4,7 @@
 \alias{resiPlot}
 \title{resiPlot}
 \usage{
-resiPlot(act,pred,weight=NULL,bucket=20)
+resiPlot(act,pred,weight=NULL,exposure=NULL,bucket=20)
 }
 \arguments{
 \item{act}{numerical vector for actual observation.}
@@ -14,6 +14,8 @@ length as act.}
 
 \item{weight}{numerical vector to give weight to observations.}
 
+\item{exposure}{numerical vector to give exposure to observations.}
+
 \item{bucket}{Integer. It specifies the number of bucket of the AvsE plot.}
 }
 \description{
@@ -22,8 +24,8 @@ This function assess the residual using given actual and
 }
 \details{
 Currently, the residual in this function is defined as: Residual =
-actual - predicted.  I don't use `resi` or `reisdual` function from `stats`
-package because this function will be used for much wider model assess (e.g.
+actual - predicted.  `resi` or `reisdual` function from `stats`
+package are not used because this function will be used for much wider model assess (e.g.
 `randomFoest`, `gbm`), and 2 functions mentioned above can only applied to
 `glm` and `lm`.
 
@@ -33,8 +35,9 @@ comparison. Residual vs Prediction: This plot is used to assess the baise and
 heterogeneity
 }
 \examples{
-act <- rnorm(10000)
-pred <- rgamma(10000,1)
+set.seed(1L)
+act <- rgamma(10000,1)
+pred <- rgamma(10000,1) + sample(c(0.001,0),10000,replace=TRUE)
 resiPlot(act,pred)
 }
 \author{

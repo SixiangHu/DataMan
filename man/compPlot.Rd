@@ -2,27 +2,37 @@
 % Please edit documentation in R/compPlot.r
 \name{compPlot}
 \alias{compPlot}
-\title{compPlot}
+\title{compPlot: data visualisation comparing observation and model prediction(s).}
 \usage{
-compPlot(x,act,pred,by=NULL,weights=NULL,newGroupNum=10)
+compPlot(x, act, pred, by = NULL, weights = NULL, exposure = NULL, 
+breaks = NULL, missing=TRUE, newGroupNum = 10,xname = "x",yname="y",byname="by")
 }
 \arguments{
-\item{x}{a vector indicates the dependent variable}
+\item{x}{a vector indicates the dependent variable that you want to visulise on (i.e. Age)}
 
-\item{act}{a vector indicates the response variable}
+\item{act}{a vector indicates the actual response variable (observation)}
 
-\item{pred}{a vector or data.frame indicates the model predictions 
-that each column is a prediction from one model.}
+\item{pred}{a vector or data frame that provides model predictions. Each column must be from the same model predictions.}
 
-\item{by}{Optinal. A vector indicates a `by` factor.}
+\item{by}{Optinal.A numerical vector to specify the <by> variable}
 
-\item{weights}{Optional. A numerical vector to specify the weights used for model visualisation.}
+\item{weights}{Optional. A numerical vector to specify the weights used for calculating weighted average of response.
+normally this is the figures from over/down-samping.}
 
-\item{newGroupNum}{Optional. An integer specifies number of new bands 
-when levels of current plotting variable `xvar` or `by` is more than 100.}
+\item{exposure}{Optional. A numerical vector to specify the exposure used for calculating weighted average of response.}
+
+\item{breaks}{Optional. A vector to specify the breaks for `x`}
+
+\item{missing}{logical. whether to show the `NA` as `Missing` in plot.
+If a `Missing` level is already existed, then `NA` will combined}
+
+\item{newGroupNum}{An integer specifies number of new bands 
+when levels of current plotting variable `x` or `by` is more than 100.}
+
+\item{xname, yname, byname}{Optional. Characters to be shown on plot.}
 }
 \description{
-compare model predictions
+This function allows you to visualise different model predictions and observations by certain factors.
 }
 \examples{
  
@@ -33,5 +43,5 @@ compPlot(mtcars$vs,
          by=mtcars$cyl)
 }
 \author{
-Sixiang Hu
+Sixiang.Hu
 }

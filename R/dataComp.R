@@ -22,7 +22,7 @@
 #' @importFrom stats chisq.test
 #' @export dataComp
 #' @examples
-#' 
+#' data(mtcars)
 #' x <- mtcars
 #' y <- rbind(mtcars,mtcars)
 #' y$am[1:10] <- 1

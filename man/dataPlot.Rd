@@ -2,9 +2,10 @@
 % Please edit documentation in R/dataPlot.r
 \name{dataPlot}
 \alias{dataPlot}
-\title{dataPlot}
+\title{dataPlot: visualise observation}
 \usage{
-dataPlot(x,y,by=NULL,weights=NULL,newGroupNum=10,xlim=NULL,xname="x",yname="y",byname="by")
+dataPlot(x,y,by=NULL,weights=NULL, exposure = NULL,newGroupNum=10, 
+xlim=NULL, breaks = NULL, missing=TRUE, xname="x",yname="Response",byname="by")
 }
 \arguments{
 \item{x}{a vector indicates the dependent variable}
@@ -13,12 +14,20 @@ dataPlot(x,y,by=NULL,weights=NULL,newGroupNum=10,xlim=NULL,xname="x",yname="y",b
 
 \item{by}{Optinal.A numerical vector to specify the <by> variable}
 
-\item{weights}{Optional. A numerical vector to specify the weights used for calculating weighted average of response,}
+\item{weights}{Optional. A numerical vector to specify the weights used for calculating weighted average of response.
+normally this is the figures from over/down-samping.}
+
+\item{exposure}{Optional. A numerical vector to specify the exposure used for calculating weighted average of response.}
 
 \item{newGroupNum}{An integer specifies number of new bands 
 when levels of current plotting variable `xvar` or `by` is more than 100.}
 
 \item{xlim}{Optional. A vector provides the range of the variable e.g. xlim=c(0,100).}
+
+\item{breaks}{Optional. A vector to specify the breaks for the xvar.}
+
+\item{missing}{logical. whether to show the `NA` as `Missing` in plot.
+If a `Missing` level is already existed, then `NA` will combined}
 
 \item{xname, yname, byname}{Optional. Characters of axis to be shown on plot.}
 }
@@ -26,20 +35,10 @@ when levels of current plotting variable `xvar` or `by` is more than 100.}
 This function allows you to visualise features of a dataset 
 by specifying dependent and response variable.
 }
-\details{
-Before entering modelling stage, we may want to go through variable by variable in a data set to find the 
-features for response variable. This function provides this functionality.
-
-\code{\link{modelPlot}} function in this package provides similar function, but \code{\link{modelPlot}} can 
-only visualise the feature in a specific model. 
-What's more, \code{\link{modelPlot}} takes longer time to create plots.
-}
 \examples{
-
-dataPlot(mtcars$gear,mtcars$mpg)
 
 dataPlot(mtcars$gear,mtcars$mpg,mtcars$wt)
 }
 \author{
-Sixiang Hu
+Sixiang.Hu
 }

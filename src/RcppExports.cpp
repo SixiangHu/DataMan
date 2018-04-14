@@ -8,7 +8,7 @@ using namespace Rcpp;
 
 // CramersV_C
 double CramersV_C(IntegerVector x, IntegerVector y);
-RcppExport SEXP DataMan_CramersV_C(SEXP xSEXP, SEXP ySEXP) {
+RcppExport SEXP _DataMan_CramersV_C(SEXP xSEXP, SEXP ySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -20,7 +20,7 @@ END_RCPP
 }
 // CramersV_DF
 Rcpp::NumericMatrix CramersV_DF(Rcpp::IntegerMatrix dm);
-RcppExport SEXP DataMan_CramersV_DF(SEXP dmSEXP) {
+RcppExport SEXP _DataMan_CramersV_DF(SEXP dmSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -28,4 +28,15 @@ BEGIN_RCPP
     rcpp_result_gen = Rcpp::wrap(CramersV_DF(dm));
     return rcpp_result_gen;
 END_RCPP
+}
+
+static const R_CallMethodDef CallEntries[] = {
+    {"_DataMan_CramersV_C", (DL_FUNC) &_DataMan_CramersV_C, 2},
+    {"_DataMan_CramersV_DF", (DL_FUNC) &_DataMan_CramersV_DF, 1},
+    {NULL, NULL, 0}
+};
+
+RcppExport void R_init_DataMan(DllInfo *dll) {
+    R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
+    R_useDynamicSymbols(dll, FALSE);
 }

@@ -2,10 +2,10 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 CramersV_C <- function(x, y) {
-    .Call('DataMan_CramersV_C', PACKAGE = 'DataMan', x, y)
+    .Call('_DataMan_CramersV_C', PACKAGE = 'DataMan', x, y)
 }
 
 CramersV_DF <- function(dm) {
-    .Call('DataMan_CramersV_DF', PACKAGE = 'DataMan', dm)
+    .Call('_DataMan_CramersV_DF', PACKAGE = 'DataMan', dm)
 }
 

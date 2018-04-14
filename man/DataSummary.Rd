@@ -6,31 +6,35 @@
 \alias{DataSummary.data.table}
 \title{DataSummary}
 \usage{
-DataSummary(data,missing=c(NA),sparkline=FALSE)
+DataSummary(data,missing=list(NA),wt=NULL,entropy_method="emp",sparkline=FALSE)
 
-\method{DataSummary}{data.frame}(data, missing = c(NA), sparkline = FALSE)
+\method{DataSummary}{data.frame}(data, missing = list(NA), wt = NULL,
+  entropy_method = "emp", sparkline = FALSE)
 
-\method{DataSummary}{data.table}(data, missing = c(NA), sparkline = FALSE)
+\method{DataSummary}{data.table}(data, missing = list(NA), wt = NULL,
+  entropy_method = "emp", sparkline = FALSE)
 }
 \arguments{
-\item{data}{This could be data frame,data.table or a vector.}
+\item{data}{This could be data frame or a vector.}
 
-\item{missing}{A vector of string values that all values will be treated as missing.
-E,g, missing = c("NA","","-99") will treat NA, blank and -99 as missing values.}
+\item{missing}{list of possible values stand for missing.}
+
+\item{wt}{For a sampled dataset, you may want to specify the wieght for stats calcualted.  It can be a character which is a column name in the dataset provided, 
+or integer (numeric) weights vector.}
+
+\item{entropy_method}{The name of the entropy estimator. The `infotheo` package implements four estimators : "emp", "mm", "shrink", "sg" (default:"emp").}
 
 \item{sparkline}{logical. If true, a string of level percentage will be generated, which can be used later in `shiny` app with `sparkline` package.}
 }
 \description{
-This function allows you to have a summary about the given dataset.
+function gives summary of the dataset.
 }
 \details{
 This function provides a data summary including min, max, number of unique values and number if missing values.
-The min and max will ignore missing value in the data.
-
-The number of unique levels includes the NA.
+The min and max will ignore missing value in the data.  The input should be a `data.frame`.
 }
 \examples{
-DataSummary(cars)
+DataSummary(mtcars,missing=list(NA,".","Unknown",-1))
 }
 \author{
 Sixiang Hu

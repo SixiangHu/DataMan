@@ -9,10 +9,10 @@
 #' @param actual Numerical vector for actual or true result.
 #' @author Sixiang Hu
 #' @importFrom ROCR prediction performance
-#' @importFrom plotly plot_ly add_lines layout %>%
+#' @importFrom plotly plot_ly add_trace layout %>%
 #' @export rocPlot
 #' @examples
-#' 
+#' set.seed(1L)
 #' a <- sample(c(0,1),10000,replace=TRUE)
 #' b <- runif(10000)
 #' c <- runif(10000)
@@ -55,8 +55,9 @@ rocPlot <- function(data,actual){
   l <- list(bordercolor = "#000000",borderwidth=1,orientation="h")
   
   plotly::plot_ly(data = auc) %>%
-    plotly::add_lines(x=~x,y=~y,color=~ModelName) %>%
-    plotly::add_lines(x=c(0,1),y=c(0,1),color="red",name="Diagnal Line") %>%
+    plotly::add_trace(x=~x,y=~y,color=~ModelName,mode = 'lines', type = 'scatter') %>%
+    plotly::add_trace(x=c(0,1),y=c(0,1),line=list(color="red"),name="Diagnal Line",
+                      mode = 'lines', type = 'scatter') %>%
     plotly::layout(title="ROC (AUC) Curve",xaxis=ax,yaxis = ay1,legend=l)
 }
 

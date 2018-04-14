@@ -38,7 +38,7 @@ Currently, this function will not test those levels with less than 5 obs.
 A fisher exact test would be more suitable.
 }
 \examples{
-
+data(mtcars)
 x <- mtcars
 y <- rbind(mtcars,mtcars)
 y$am[1:10] <- 1
