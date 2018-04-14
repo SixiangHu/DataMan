@@ -6,6 +6,7 @@ NEW FEATURES
 
 BUG FIXES AND MINOR IMPROVEMENTS
 * Get rid of "Add marker to mode" output from `plotly`
+* `modelPlot` function is now deprecated as its less effective than other package (e.g. LIME)
 
 
 DataMan 0.5.3
