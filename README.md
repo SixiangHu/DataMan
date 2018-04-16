@@ -24,12 +24,7 @@ Data cleaning have 3 functions at the moment:
 
 ### Model Assess
 
-* `modelPlot`: visualise model fitting effect.
-
-```{r}
-glm1 <- glm(formula = mpg ~ cyl + hp, family = Gamma(log), data = mtcars, weights = wt)
-modelPlot(glm1,"cyl","mpg","wt",dataset=mtcars,type="response")
-```
+* `compPlot`: compare model prediction with actual in one-way basis.
 
 * `liftPlot`: visualising different model predictiveness by plotting lift curves on the same graph.
 
@@ -56,8 +51,6 @@ sankeyNetwork(tree_data[[1]],tree_data[[2]],Source="src",Target="tar",Value="val
 You can install `DataMan` from GitHub as follows:
 
 ```r
-devtools::install_github("bokeh/rbokeh")
-
 devtools::install_github('SixiangHu/DataMan')
 ```
 

@@ -49,11 +49,14 @@ interPlot <- function(x,y,z,weight=NULL,exposure=NULL,numGrpx=10,numGrpy=10,
   dt2 <- dt[,lapply(.SD,function(x,w,e) sum(x*w,na.rm = TRUE)/sum(e*w,na.rm = TRUE),e=e,w=w),by=list(x,y),.SDcols="z"]
   dt2 <- as.matrix(data.table::dcast(dt2,x~y,value.var="z",drop=FALSE,fill=0)[,-1])
 
-  plotly::plot_ly(z=~dt2) %>%
+  plotly::plot_ly(z=~dt2, hoverinfo="text",text=~paste(xname," : ", x,"</br>",
+                                                   yname," : ", y,"</br>",
+                                                   zname," : ", z)) %>%
     plotly::add_surface() %>%
     plotly::layout(scene=list(xaxis=list(title=paste0(xname," (x)")),
                            yaxis=list(title=paste0(yname," (y)")),
-                           zaxis=list(title=paste0(zname," (z)")))
+                           zaxis=list(title=paste0(zname," (z)"))),
+                   legend = list(legendgroup="")
                    )
 }
 

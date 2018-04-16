@@ -3,17 +3,12 @@ Type: Package
 Title: a R package for data and model analysis
 Version: 0.6.0
 Date: 2018-4-14
-Author: Sixiang Hu <sixiang.hu@gmail.com>
+Author: Sixiang Hu <sixiang.hu@Gmail.com>
 Maintainer: Sixiang Hu <Sixiang.Hu@Gmail.Com>
-Description: This package provides functions used for: Data Cleaning
-    - detecting and populating missing value in a given data frame or vector; Data
-    Analysis - an enhanced summary function to provide more info about variables in
-    the given data; Model Assessing - different model assessing methods applied to 
-    different modeling.
+Description: DataMan package provides functions for data initial data analysis, EDA report, Model Assessing with different visualisation methods in 2D or 3D interactively.
 Imports:
     data.table,
     Rcpp (>= 0.11.6),
-    dplyr,
     plotly,
     ROCR,
     gbm,

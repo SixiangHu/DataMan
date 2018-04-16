@@ -7,32 +7,34 @@
 using namespace Rcpp;
 
 // CramersV_C
-double CramersV_C(IntegerVector x, IntegerVector y);
-RcppExport SEXP _DataMan_CramersV_C(SEXP xSEXP, SEXP ySEXP) {
+double CramersV_C(IntegerVector x, IntegerVector y, bool Bias_Cor);
+RcppExport SEXP _DataMan_CramersV_C(SEXP xSEXP, SEXP ySEXP, SEXP Bias_CorSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< IntegerVector >::type x(xSEXP);
     Rcpp::traits::input_parameter< IntegerVector >::type y(ySEXP);
-    rcpp_result_gen = Rcpp::wrap(CramersV_C(x, y));
+    Rcpp::traits::input_parameter< bool >::type Bias_Cor(Bias_CorSEXP);
+    rcpp_result_gen = Rcpp::wrap(CramersV_C(x, y, Bias_Cor));
     return rcpp_result_gen;
 END_RCPP
 }
 // CramersV_DF
-Rcpp::NumericMatrix CramersV_DF(Rcpp::IntegerMatrix dm);
-RcppExport SEXP _DataMan_CramersV_DF(SEXP dmSEXP) {
+Rcpp::NumericMatrix CramersV_DF(Rcpp::IntegerMatrix dm, bool Bias_Cor);
+RcppExport SEXP _DataMan_CramersV_DF(SEXP dmSEXP, SEXP Bias_CorSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::IntegerMatrix >::type dm(dmSEXP);
-    rcpp_result_gen = Rcpp::wrap(CramersV_DF(dm));
+    Rcpp::traits::input_parameter< bool >::type Bias_Cor(Bias_CorSEXP);
+    rcpp_result_gen = Rcpp::wrap(CramersV_DF(dm, Bias_Cor));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_DataMan_CramersV_C", (DL_FUNC) &_DataMan_CramersV_C, 2},
-    {"_DataMan_CramersV_DF", (DL_FUNC) &_DataMan_CramersV_DF, 1},
+    {"_DataMan_CramersV_C", (DL_FUNC) &_DataMan_CramersV_C, 3},
+    {"_DataMan_CramersV_DF", (DL_FUNC) &_DataMan_CramersV_DF, 2},
     {NULL, NULL, 0}
 };
 

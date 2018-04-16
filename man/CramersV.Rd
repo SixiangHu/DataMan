@@ -7,18 +7,20 @@
 \alias{CramersV.matrix}
 \title{Cramers' V Test}
 \usage{
-CramersV(x,y=NULL)
+CramersV(x,y=NULL,Bias_Cor=FALSE)
 
-\method{CramersV}{default}(x, y = NULL)
+\method{CramersV}{default}(x, y = NULL, Bias_Cor = FALSE)
 
-\method{CramersV}{data.frame}(x, y = NULL)
+\method{CramersV}{data.frame}(x, y = NULL, Bias_Cor = FALSE)
 
-\method{CramersV}{matrix}(x, y = NULL)
+\method{CramersV}{matrix}(x, y = NULL, Bias_Cor = FALSE)
 }
 \arguments{
 \item{x}{It could be non-numerical variable, data.frame or matrix.}
 
 \item{y}{Provided when x is a vector. Will be ignored when x is a data.frame or matrix.}
+
+\item{Bias_Cor}{logic. Whether a bias correction is needed.}
 }
 \description{
 Conduct Cramers V test. Please populate or delete missing value before runnign this function.

@@ -2,12 +2,13 @@
 #include <math.h> 
 #include <utility>
 #include <map>
+#include <stdio.h>
 #include <algorithm>
 
 using namespace Rcpp;
 
 // [[Rcpp::export]]
-double CramersV_C(IntegerVector x,IntegerVector y){
+double CramersV_C(IntegerVector x,IntegerVector y, bool Bias_Cor){
   //Counts the frequency
   std::map<std::pair<int, int>, int> counts_xy;
   std::map<int,int> counts_x;
@@ -71,11 +72,16 @@ double CramersV_C(IntegerVector x,IntegerVector y){
     }
   }
   
+  if (Bias_Cor) {
+    chisq = std::max((double)0,chisq-(double)(unique_x)*(unique_y)/(n-1) );
+    unique_x = unique_x - (unique_x*unique_x) /(n-1);
+    unique_y = unique_y - (unique_y*unique_y) /(n-1);
+  }
   return std::sqrt(abs(chisq)/((double)n * std::min(unique_x, unique_y)));
 }
 
 // [[Rcpp::export]]
-Rcpp::NumericMatrix CramersV_DF(Rcpp::IntegerMatrix dm) {
+Rcpp::NumericMatrix CramersV_DF(Rcpp::IntegerMatrix dm, bool Bias_Cor) {
   int iCol = dm.ncol();
   int i=0,j=0;
   
@@ -85,7 +91,7 @@ Rcpp::NumericMatrix CramersV_DF(Rcpp::IntegerMatrix dm) {
     for (j=i;j<iCol;j++){
         if(i==j) {ResCV(i,j)=1;}
         else {
-          ResCV(i,j) = CramersV_C((IntegerVector)dm(_,i),(IntegerVector)dm(_,j));
+          ResCV(i,j) = CramersV_C((IntegerVector)dm(_,i),(IntegerVector)dm(_,j),(bool)Bias_Cor);
           ResCV(j,i) = ResCV(i,j);
         }
     }

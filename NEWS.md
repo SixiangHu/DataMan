@@ -7,6 +7,9 @@ NEW FEATURES
 BUG FIXES AND MINOR IMPROVEMENTS
 * Get rid of "Add marker to mode" output from `plotly`
 * `modelPlot` function is now deprecated as its less effective than other package (e.g. LIME)
+* `interPlot` function has tooltip with correct name presented.
+* `CramersV`add option to have bias correction.
+* `DataSummary` add option to select whether to add entropy info in output.
 
 
 DataMan 0.5.3

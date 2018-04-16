@@ -6,25 +6,29 @@
 \alias{DataSummary.data.table}
 \title{DataSummary}
 \usage{
-DataSummary(data,missing=list(NA),wt=NULL,entropy_method="emp",sparkline=FALSE)
+DataSummary(data,missing=list(NA),wt=NULL,entropy=FALSE,entropy_method="emp",sparkline=FALSE)
 
 \method{DataSummary}{data.frame}(data, missing = list(NA), wt = NULL,
-  entropy_method = "emp", sparkline = FALSE)
+  entropy = FALSE, entropy_method = "emp", sparkline = FALSE)
 
 \method{DataSummary}{data.table}(data, missing = list(NA), wt = NULL,
-  entropy_method = "emp", sparkline = FALSE)
+  entropy = FALSE, entropy_method = "emp", sparkline = FALSE)
 }
 \arguments{
 \item{data}{This could be data frame or a vector.}
 
 \item{missing}{list of possible values stand for missing.}
 
-\item{wt}{For a sampled dataset, you may want to specify the wieght for stats calcualted.  It can be a character which is a column name in the dataset provided, 
-or integer (numeric) weights vector.}
+\item{wt}{For a sampled dataset, you may want to specify the wieght for stats calcualted.
+It can be a character which is a column name in the dataset provided, or integer (numeric) weights vector.}
 
-\item{entropy_method}{The name of the entropy estimator. The `infotheo` package implements four estimators : "emp", "mm", "shrink", "sg" (default:"emp").}
+\item{entropy}{logical. whether to include entropy as part of output. It will take quite a lot of time.}
 
-\item{sparkline}{logical. If true, a string of level percentage will be generated, which can be used later in `shiny` app with `sparkline` package.}
+\item{entropy_method}{The name of the entropy estimator. 
+The `infotheo` package implements four estimators : "emp", "mm", "shrink", "sg" (default:"emp").}
+
+\item{sparkline}{logical. If true, a string of level percentage will be generated, 
+which can be used later in `shiny` app with `sparkline` package.}
 }
 \description{
 function gives summary of the dataset.

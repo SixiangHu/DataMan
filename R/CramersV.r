@@ -2,9 +2,10 @@
 #'
 #' @description 
 #' Conduct Cramers V test. Please populate or delete missing value before runnign this function.
-#' @usage CramersV(x,y=NULL)
+#' @usage CramersV(x,y=NULL,Bias_Cor=FALSE)
 #' @param x It could be non-numerical variable, data.frame or matrix.
 #' @param y Provided when x is a vector. Will be ignored when x is a data.frame or matrix.
+#' @param Bias_Cor logic. Whether a bias correction is needed.
 #' @author Sixiang Hu
 #' @export
 #' @examples
@@ -15,14 +16,14 @@
 #' dm <- as.matrix(cbind(x,y,z))
 #' CramersV(dm)
 
-CramersV <- function(x,y=NULL){
+CramersV <- function(x,y=NULL,Bias_Cor=FALSE){
   if (is.double(x)) stop("Cramers' V Test is used on nominal or discrete variables.")
   UseMethod("CramersV",x)
 }
 
 #' @export
 #' @rdname CramersV
-CramersV.default <- function(x,y=NULL){
+CramersV.default <- function(x,y=NULL,Bias_Cor=FALSE){
   if (is.double(x) || is.double(y)) stop("Cramers' V Test is used on nominal or discrete variables.")
   if (is.null(x) || is.null(y))
     stop("When x is integer vector, y must be provided.")
@@ -31,12 +32,12 @@ CramersV.default <- function(x,y=NULL){
   if (length(x)<=1 || length(y) <=1 )
     stop("x and y should have more than 2 records,")
   if (class(y)!="integer") y<-as.integer(as.factor(y))
-  CramersV_C(x,y)
+  CramersV_C(x,y,Bias_Cor)
 }
 
 #' @export
 #' @rdname CramersV
-CramersV.data.frame <- function(x,y=NULL){
+CramersV.data.frame <- function(x,y=NULL,Bias_Cor=FALSE){
   if(!is.null(y)) 
     warning("y will be ignored.")
   if(dim(x)[1]<2 || dim(x)[2]<2)
@@ -59,12 +60,12 @@ CramersV.data.frame <- function(x,y=NULL){
     else xx
   })
   
-  CramersV_DF(dm)
+  CramersV_DF(dm,Bias_Cor)
 }
 
 #' @export
 #' @rdname CramersV
-CramersV.matrix <- function(x,y=NULL){
+CramersV.matrix <- function(x,y=NULL,Bias_Cor=FALSE){
   if(!is.null(y)) warning("y will be ignored.")
-  CramersV.data.frame(as.data.frame(x,stringsAsFactors = TRUE))
+  CramersV.data.frame(as.data.frame(x,stringsAsFactors = TRUE),Bias_Cor=Bias_Cor)
 }
