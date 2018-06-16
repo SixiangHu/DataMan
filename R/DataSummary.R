@@ -1,7 +1,8 @@
 #' DataSummary
 #'
 #' @description function gives summary of the dataset.
-#' @usage DataSummary(data,missing=list(NA),wt=NULL,entropy=FALSE,entropy_method="emp",sparkline=FALSE)
+#' @usage DataSummary(data,missing=list(NA),wt=NULL,entropy=FALSE,
+#' entropy_method="emp",sparkline=FALSE)
 #' @param data This could be data frame or a vector.
 #' @param missing list of possible values stand for missing.
 #' @param wt For a sampled dataset, you may want to specify the wieght for stats calcualted.  

@@ -1,3 +1,8 @@
+DataMan 0.6.1
+-------------------------------------------------------------
+NEW FEATURES
+* `compPlot` adding `xlim` paraneter to plot specific range
+
 DataMan 0.6.0
 -------------------------------------------------------------
 NEW FEATURES

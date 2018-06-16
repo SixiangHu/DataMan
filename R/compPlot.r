@@ -15,13 +15,14 @@
 #' If a `Missing` level is already existed, then `NA` will combined
 #' @param newGroupNum An integer specifies number of new bands 
 #' when levels of current plotting variable `x` or `by` is more than 100. 
+#' @param xlim Optional. A vector provides the range of the variable e.g. xlim=c(0,100).
 #' @param xname,yname,byname Optional. Characters to be shown on plot.
 #' 
 #' @author Sixiang.Hu
 #' 
 #' @importFrom data.table as.data.table data.table setkey := uniqueN
 #' @importFrom plotly plot_ly add_trace add_markers add_bars layout %>%
-#' 
+#' @importFrom assertthat is.date
 #' @export
 #'
 #' @examples
@@ -30,14 +31,28 @@
 #'          act=rnorm(nrow(mtcars)),
 #'          pred = data.frame(pred1=rnorm(nrow(mtcars)),
 #'                            pred2=rnorm(nrow(mtcars))),
-#'          by=mtcars$cyl)
+#'          by=mtcars$am)
         
-compPlot <- function(x, act, pred, by = NULL, weights = NULL, exposure = NULL, breaks = NULL,
-                     missing=TRUE, newGroupNum = 10,xname = "x",yname="y",byname="by"){
+compPlot <- function(x, act, pred, by = NULL, weights = NULL, exposure = NULL, 
+                     breaks = NULL,missing=TRUE, newGroupNum = 10, xlim=NULL, 
+                     xname = "x",yname="y",byname="by"){
   if (is.null(x)) stop("x provided is blank.")
   if (is.null(act)) stop("act provided is blank.")
   if (is.null(pred)) stop("pred provided is blank.")
   if (length(x) != length(act)) stop("x and act don't have the same length")
+  
+  # range index
+  if ( is.null(xlim) ) {
+    ind <- 1:length(x)
+  }else if ( !is.null(xlim) && !(is.numeric(x) || is.date(x)) ) {
+    ind <- 1:length(x)
+    warning("xlim is provided on character variable. Ignored")
+  }
+  else if (length(xlim)>2 || length(xlim)<2) {
+    ind <- 1:length(x)
+    warning("xlim provided must has 2 elements.")
+  }
+  else ind <- which(x>=xlim[1] && x<=xlim[2])
   
   str_pred <- character(0)
   num_pred <- numeric(0)
@@ -65,10 +80,13 @@ compPlot <- function(x, act, pred, by = NULL, weights = NULL, exposure = NULL, b
   }
   
   if (!is.null(by)) {
-    if ( is.numeric(by) & data.table::uniqueN(by)>20 ) {
+    if ( is.integer(by) & data.table::uniqueN(by[ind])>20 ) {
       new_band <- dmBreak(by,newGroupNum)
       by <- cut(by,new_band,include.lowest = TRUE,ordered_result=TRUE)
-    }else if (is.numeric(by)) by <- as.factor(by)
+    }else if (!is.integer(by)){
+      warning("'by' variable needs to be integer. Plot create will ignore 'by' variable.\n")
+      by <- NULL
+    }
   }
 
   dp_name_str <- c("act", str_pred, "weights","exposure")
@@ -82,7 +100,8 @@ compPlot <- function(x, act, pred, by = NULL, weights = NULL, exposure = NULL, b
   if (!is.null(by)) {
     strTitle  <- paste(strTitle," by ",byname,sep="")
     
-    data.plot <- data.table::data.table(x, by, act, pred, weights, exposure)
+    data.plot <- data.table::data.table(x=x[ind], by = by[ind], act=act[ind], pred[ind,], 
+                                        weights=weights[ind], exposure=exposure[ind])
     data.table::setnames(data.plot, c("xvar", "by", "act", str_pred, "weights","exposure"))
     data.table::setkey(data.plot, xvar, by)
     
@@ -114,7 +133,8 @@ compPlot <- function(x, act, pred, by = NULL, weights = NULL, exposure = NULL, b
                      margin=m)
   }
   else {
-    data.plot <- data.table::data.table(x, act, pred, weights, exposure)
+    data.plot <- data.table::data.table(x=x[ind], act=act[ind], pred[ind,], 
+                                        weights=weights[ind], exposure=exposure[ind])
     data.table::setnames(data.plot, c("xvar", "act", str_pred, "weights","exposure"))
     data.table::setkey(data.plot, xvar)
     

@@ -74,7 +74,7 @@ dataPlot <- function(x,y,by=NULL,weights=NULL, exposure = NULL,newGroupNum=10, x
 
   #New Group for byvar if it has too many levels.
   if(!is.null(by)){
-    if ( (is.numeric(by) || is.integer(by)) && data.table::uniqueN(by[ind])>20 ) {
+    if ( is.integer(by)& data.table::uniqueN(by[ind])>20 ) {
       new_band <- dmBreak(by,newGroupNum)
       by <- cut(by,new_band,include.lowest = TRUE,ordered_result=TRUE)
     }

@@ -1,11 +1,11 @@
 Package: DataMan
 Type: Package
-Title: a R package for data and model analysis
+Title: Data Summary, One-way Interactive Plot and Model Visualisation Analysis
 Version: 0.6.0
 Date: 2018-4-14
 Author: Sixiang Hu <sixiang.hu@Gmail.com>
 Maintainer: Sixiang Hu <Sixiang.Hu@Gmail.Com>
-Description: DataMan package provides functions for data initial data analysis, EDA report, Model Assessing with different visualisation methods in 2D or 3D interactively.
+Description: DataMan package provides functions for data summary, one-way plot, and model assess functionalities with 2D and 3D interactive visualisation.
 Imports:
     data.table,
     Rcpp (>= 0.11.6),

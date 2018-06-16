@@ -6,7 +6,8 @@
 \alias{DataSummary.data.table}
 \title{DataSummary}
 \usage{
-DataSummary(data,missing=list(NA),wt=NULL,entropy=FALSE,entropy_method="emp",sparkline=FALSE)
+DataSummary(data,missing=list(NA),wt=NULL,entropy=FALSE,
+entropy_method="emp",sparkline=FALSE)
 
 \method{DataSummary}{data.frame}(data, missing = list(NA), wt = NULL,
   entropy = FALSE, entropy_method = "emp", sparkline = FALSE)
