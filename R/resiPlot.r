@@ -22,7 +22,7 @@
 #' 
 #' @author Sixiang Hu
 #' @importFrom data.table setkey data.table
-#' @importFrom plotly plot_ly add_histogram2dcontour add_trace %>%
+#' @importFrom plotly plot_ly add_histogram2dcontour add_trace %>% subplot
 #' @export resiPlot
 #' @examples
 #' set.seed(1L)
@@ -48,7 +48,7 @@ resiPlot <- function(act,pred,weight=NULL,exposure=NULL,bucket=20){
   if (is.null(weight)) weight <- rep(1,length(act))
   if (is.null(exposure)) exposure <- rep(1,length(act))
 
-  temp <- data.table::data.table(act,pred,pred_cuts,weight,exposure)
+  temp <- data.table(act,pred,pred_cuts,weight,exposure)
   
   temp2 <- temp[,lapply(.SD,function(x,w,e)sum(x*w,na.rm = TRUE)/sum(e*w,na.rm = TRUE),e=exposure,w=weight),
        by=pred_cuts,.SDcols=c("act","pred")][order(pred_cuts)]
@@ -65,19 +65,19 @@ resiPlot <- function(act,pred,weight=NULL,exposure=NULL,bucket=20){
   #aveplot
   rng <- range(c(temp2$act,temp2$pred), na.rm = TRUE, finite = TRUE)
   
-  ave <- plotly::plot_ly(data=temp2) %>%
-    plotly::add_trace(x=~pred,y=~act,name="Fitted", type = 'scatter',
+  ave <- plot_ly(data=temp2) %>%
+    add_trace(x=~pred,y=~act,name="Fitted", type = 'scatter',
                       marker=list(color="blue"),mode = 'markers') %>%
-    plotly::add_trace(x=rng, y=rng, type = 'scatter',name="Reference",
+    add_trace(x=rng, y=rng, type = 'scatter',name="Reference",
                       line=list(color="red"),mode = 'lines')
 
   #residual
-  res <- data.table::data.table(res=act - pred,pred=pred)
+  res <- data.table(res=act - pred,pred=pred)
 
-  resP <- plotly::plot_ly(data=res)%>%
-    plotly::add_histogram2dcontour(x=~pred,y=~res)
+  resP <- plot_ly(data=res)%>%
+    add_histogram2dcontour(x=~pred,y=~res)
   
-  plotly::subplot(
+  subplot(
     ave,
     resP,
     nrows = 2, heights = c(0.6, 0.4),

@@ -16,14 +16,14 @@ entropy_method="emp",sparkline=FALSE)
   entropy = FALSE, entropy_method = "emp", sparkline = FALSE)
 }
 \arguments{
-\item{data}{This could be data frame or a vector.}
+\item{data}{This could be data frame, a vector, matrix or data.table.}
 
-\item{missing}{list of possible values stand for missing.}
+\item{missing}{list of possible missing values.}
 
-\item{wt}{For a sampled dataset, you may want to specify the wieght for stats calcualted.
+\item{wt}{For a sampled dataset, you may want to specify the wieght for those stats calcualted.
 It can be a character which is a column name in the dataset provided, or integer (numeric) weights vector.}
 
-\item{entropy}{logical. whether to include entropy as part of output. It will take quite a lot of time.}
+\item{entropy}{logical. whether to include entropy as part of output. It will take quite a long time.}
 
 \item{entropy_method}{The name of the entropy estimator. 
 The `infotheo` package implements four estimators : "emp", "mm", "shrink", "sg" (default:"emp").}
@@ -36,7 +36,8 @@ function gives summary of the dataset.
 }
 \details{
 This function provides a data summary including min, max, number of unique values and number if missing values.
-The min and max will ignore missing value in the data.  The input should be a `data.frame`.
+    The min and max will ignore missing value in the data.
+    As for the mean value, if it is character variable the mode (most frequency level) will be recorded.
 }
 \examples{
 DataSummary(mtcars,missing=list(NA,".","Unknown",-1))

@@ -37,18 +37,18 @@ liftPlot <- function(act,pred1,pred2,weight=NULL,exposure=NULL,breaks=seq(0,2,0.
   if (is.null(showas) )  showas <- c("pred1","pred2") 
   else if (!is.null(showas) && length(showas)<2 ) stop("Only one new name has been provided.")
   
-  dt <- data.table::data.table(act,pred1,pred2,weight,exposure)
+  dt <- data.table(act,pred1,pred2,weight,exposure)
   dt[,ratio:=pred1/pred2]
   dt[,breaks:=cut(ratio,breaks,include.lowest = FALSE,ordered_result = TRUE)]
-  data.table::setkey(dt,breaks)
+  setkey(dt,breaks)
   dt_agg  <- dt[,c(obs=sum(weight*exposure,na.rm=TRUE),
                    lapply(.SD,function(x,w,e)sum(x*w,na.rm = TRUE)/sum(e*w,na.rm = TRUE),e=exposure,w=weight),
                    weight=sum(weight),
                    exposure=sum(exposure)
                    ),
                 by=breaks,.SDcols=c("act","pred1","pred2")]
-  dt_full <- data.table::data.table(breaks=cut(breaks,breaks,include.lowest = FALSE,ordered_result = TRUE))
-  data.table::setkey(dt_full,breaks)
+  dt_full <- data.table(breaks=cut(breaks,breaks,include.lowest = FALSE,ordered_result = TRUE))
+  setkey(dt_full,breaks)
   dt_final <- dt_agg[dt_full,on="breaks"]
   dt_final[is.na(dt_final)] <- 0
   
@@ -69,17 +69,17 @@ liftPlot <- function(act,pred1,pred2,weight=NULL,exposure=NULL,breaks=seq(0,2,0.
   #Plotting
   strTitle <- paste("Impact Analysis comparing: ",showas[1]," and ",showas[2])
   
-  plotly::plot_ly(data = dt_final,x=~breaks,y=~act,name="Observed")%>%
-    plotly::add_trace(line=list(color="#CC3399"),yaxis="y1",
+  plot_ly(data = dt_final,x=~breaks,y=~act,name="Observed")%>%
+    add_trace(line=list(color="#CC3399"),yaxis="y1",
                       marker=list(color="#CC3399",symbol="square",size=10),mode = 'lines+markers', type = 'scatter') %>%
-    plotly::add_trace(x=~breaks,y=~pred1, line=list(color="#336633",shape = "linear"),mode = 'lines+markers', type = 'scatter',
+    add_trace(x=~breaks,y=~pred1, line=list(color="#336633",shape = "linear"),mode = 'lines+markers', type = 'scatter',
                       marker=list(symbol="triangle-up",size=10), name=showas[1],yaxis = "y1") %>%
-    plotly::add_trace(x=~breaks,y=~pred2, line=list(color="#33CC33",shape = "linear"),mode="lines+markers", type = 'scatter',
+    add_trace(x=~breaks,y=~pred2, line=list(color="#33CC33",shape = "linear"),mode="lines+markers", type = 'scatter',
                       marker=list(symbol="triangle-down",size=10), name=showas[2],yaxis = "y1") %>%
-    plotly::add_bars(x=~breaks,y=~exposure,showlegend=FALSE,
+    add_bars(x=~breaks,y=~exposure,showlegend=FALSE,
                      marker=list(color="#99CCFF",line=list(color="#606060",width=1.5)),
                      opacity=0.5,yaxis = "y2") %>%
-    plotly::layout(title = strTitle, xaxis=ax,yaxis = ay1,
+    layout(title = strTitle, xaxis=ax,yaxis = ay1,
                    yaxis2 = c(ay2,list(range=c(0,min(max(dt_final$exposure)*2.5,100)))),
                    legend=l,margin=m)
 }

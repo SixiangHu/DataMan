@@ -2,12 +2,14 @@ DataMan 0.6.1
 -------------------------------------------------------------
 NEW FEATURES
 * `compPlot` adding `xlim` paraneter to plot specific range
+* `DataSummary` more efficient
+* `DataSummary` character variable's mode will be in mean output
 
 DataMan 0.6.0
 -------------------------------------------------------------
 NEW FEATURES
-* `Datasummary` becomes more efficient
-* `Datasummary` adding data entrophy
+* `DataSummary` becomes more efficient
+* `DataSummary` adding data entrophy
 
 BUG FIXES AND MINOR IMPROVEMENTS
 * Get rid of "Add marker to mode" output from `plotly`

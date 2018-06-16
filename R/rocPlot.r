@@ -28,11 +28,11 @@ rocPlot <- function(data,actual){
   
   for (i in 1:iVar){
     
-    if(iVar!=1) pred <- ROCR::prediction(data[[i]],actual)
-    else pred <- ROCR::prediction(data,actual)
+    if(iVar!=1) pred <- prediction(data[[i]],actual)
+    else pred <- prediction(data,actual)
     
-    pref <- ROCR::performance(pred,measure = "tpr", x.measure = "fpr")
-    pref2 <- ROCR::performance(pred,measure = "auc")
+    pref <- performance(pred,measure = "tpr", x.measure = "fpr")
+    pref2 <- performance(pred,measure = "auc")
     num_auc <- signif(pref2@y.values[[1]],3)
  
     strName <- names(data)[i]
@@ -54,11 +54,11 @@ rocPlot <- function(data,actual){
 
   l <- list(bordercolor = "#000000",borderwidth=1,orientation="h")
   
-  plotly::plot_ly(data = auc) %>%
-    plotly::add_trace(x=~x,y=~y,color=~ModelName,mode = 'lines', type = 'scatter') %>%
-    plotly::add_trace(x=c(0,1),y=c(0,1),line=list(color="red"),name="Diagnal Line",
+  plot_ly(data = auc) %>%
+    add_trace(x=~x,y=~y,color=~ModelName,mode = 'lines', type = 'scatter') %>%
+    add_trace(x=c(0,1),y=c(0,1),line=list(color="red"),name="Diagnal Line",
                       mode = 'lines', type = 'scatter') %>%
-    plotly::layout(title="ROC (AUC) Curve",xaxis=ax,yaxis = ay1,legend=l)
+    layout(title="ROC (AUC) Curve",xaxis=ax,yaxis = ay1,legend=l)
 }
 
 #global variable

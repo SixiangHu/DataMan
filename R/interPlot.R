@@ -43,17 +43,17 @@ interPlot <- function(x,y,z,weight=NULL,exposure=NULL,numGrpx=10,numGrpy=10,
   if(is.null(weight)) weight <- rep(1,nr)
   if(is.null(exposure)) exposure <- rep(1,nr)
   
-  dt <- data.table::data.table(x = x,y = y,z = z,w = weight,e=exposure)
-  data.table::setkey(dt,x,y)
+  dt <- data.table(x = x,y = y,z = z,w = weight,e=exposure)
+  setkey(dt,x,y)
 
   dt2 <- dt[,lapply(.SD,function(x,w,e) sum(x*w,na.rm = TRUE)/sum(e*w,na.rm = TRUE),e=e,w=w),by=list(x,y),.SDcols="z"]
-  dt2 <- as.matrix(data.table::dcast(dt2,x~y,value.var="z",drop=FALSE,fill=0)[,-1])
+  dt2 <- as.matrix(dcast(dt2,x~y,value.var="z",drop=FALSE,fill=0)[,-1])
 
-  plotly::plot_ly(z=~dt2, hoverinfo="text",text=~paste(xname," : ", x,"</br>",
+  plot_ly(z=~dt2, hoverinfo="text",text=~paste(xname," : ", x,"</br>",
                                                    yname," : ", y,"</br>",
                                                    zname," : ", z)) %>%
-    plotly::add_surface() %>%
-    plotly::layout(scene=list(xaxis=list(title=paste0(xname," (x)")),
+    add_surface() %>%
+    layout(scene=list(xaxis=list(title=paste0(xname," (x)")),
                            yaxis=list(title=paste0(yname," (y)")),
                            zaxis=list(title=paste0(zname," (z)"))),
                    legend = list(legendgroup="")

@@ -1,14 +1,17 @@
 #' compPlot: data visualisation comparing observation and model prediction(s).
 #' 
-#' @description This function allows you to visualise different model predictions and observations by certain factors.
+#' @description This function allows you to visualise different model predictions and 
+#'     observations by certain factors.
 #' @usage compPlot(x, act, pred, by = NULL, weights = NULL, exposure = NULL, 
-#' breaks = NULL, missing=TRUE, newGroupNum = 10,xname = "x",yname="y",byname="by") 
+#'    breaks = NULL, missing=TRUE, newGroupNum = 10,xlim=NULL, 
+#'    xname = "x",yname="y",byname="by") 
 #' @param x a vector indicates the dependent variable that you want to visulise on (i.e. Age)
 #' @param act a vector indicates the actual response variable (observation)
-#' @param pred a vector or data frame that provides model predictions. Each column must be from the same model predictions.
+#' @param pred a vector or data frame that provides model predictions. 
+#'     Each column must be from the same model predictions.
 #' @param by Optinal.A numerical vector to specify the <by> variable
 #' @param weights Optional. A numerical vector to specify the weights used for calculating weighted average of response.
-#' normally this is the figures from over/down-samping.
+#' Normally this is the figures from over/down-samping.
 #' @param exposure Optional. A numerical vector to specify the exposure used for calculating weighted average of response.
 #' @param breaks Optional. A vector to specify the breaks for `x`
 #' @param missing logical. whether to show the `NA` as `Missing` in plot.  
@@ -20,9 +23,9 @@
 #' 
 #' @author Sixiang.Hu
 #' 
-#' @importFrom data.table as.data.table data.table setkey := uniqueN
+#' @importFrom data.table as.data.table data.table setkey := uniqueN setnames melt
 #' @importFrom plotly plot_ly add_trace add_markers add_bars layout %>%
-#' @importFrom assertthat is.date
+#' @importFrom checkmate testDate
 #' @export
 #'
 #' @examples
@@ -44,7 +47,7 @@ compPlot <- function(x, act, pred, by = NULL, weights = NULL, exposure = NULL,
   # range index
   if ( is.null(xlim) ) {
     ind <- 1:length(x)
-  }else if ( !is.null(xlim) && !(is.numeric(x) || is.date(x)) ) {
+  }else if ( !is.null(xlim) && !(is.numeric(x) || testDate(x)) ) {
     ind <- 1:length(x)
     warning("xlim is provided on character variable. Ignored")
   }
@@ -74,13 +77,13 @@ compPlot <- function(x, act, pred, by = NULL, weights = NULL, exposure = NULL,
   if (is.null(exposure)) exposure <- rep(1, length(x))
 
   #New Group for data which has too much levels.
-  if ( (is.numeric(x) || is.integer(x)) && data.table::uniqueN(x)>100 ) {
+  if ( (is.numeric(x) || is.integer(x)) && uniqueN(x)>100 ) {
     if(is.null(breaks)) breaks <- dmBreak(x,newGroupNum)
     x <- cut(x,breaks,include.lowest = TRUE,ordered_result = TRUE)
   }
   
   if (!is.null(by)) {
-    if ( is.integer(by) & data.table::uniqueN(by[ind])>20 ) {
+    if ( is.integer(by) & uniqueN(by[ind])>20 ) {
       new_band <- dmBreak(by,newGroupNum)
       by <- cut(by,new_band,include.lowest = TRUE,ordered_result=TRUE)
     }else if (!is.integer(by)){
@@ -100,10 +103,10 @@ compPlot <- function(x, act, pred, by = NULL, weights = NULL, exposure = NULL,
   if (!is.null(by)) {
     strTitle  <- paste(strTitle," by ",byname,sep="")
     
-    data.plot <- data.table::data.table(x=x[ind], by = by[ind], act=act[ind], pred[ind,], 
+    data.plot <- data.table(x=x[ind], by = by[ind], act=act[ind], pred[ind,], 
                                         weights=weights[ind], exposure=exposure[ind])
-    data.table::setnames(data.plot, c("xvar", "by", "act", str_pred, "weights","exposure"))
-    data.table::setkey(data.plot, xvar, by)
+    setnames(data.plot, c("xvar", "by", "act", str_pred, "weights","exposure"))
+    setkey(data.plot, xvar, by)
     
     if(missing & class(data.plot[["xvar"]])[1]=="character"){
       set(data.plot,i=which(is.na(data.plot[["xvar"]])),j="xvar",value="Missing")
@@ -112,31 +115,32 @@ compPlot <- function(x, act, pred, by = NULL, weights = NULL, exposure = NULL,
     
     for (v_name in dp_name_str) set(data.plot,j=v_name,value=as.numeric(data.plot[[v_name]]))
     
-    data.agg <- data.plot[, lapply(.SD, function(x,w,e) sum(x*w,na.rm = TRUE)/sum(e*w,na.rm = TRUE), w = weights,e=exposure),
+    data.agg <- data.plot[, lapply(.SD, function(x,w,e) sum(x*w,na.rm = TRUE)/sum(e*w,na.rm = TRUE), 
+                                   w = weights,e=exposure),
                           by = list(xvar, by), .SDcols = setdiff(dp_name_str,c("weights","exposure"))]
 
-    data.agg2 <- data.table::melt(data.agg,id.vars = c("xvar", "act", "by"),measure.vars = str_pred)[order(variable, by, xvar)]
+    data.agg2 <- melt(data.agg,id.vars = c("xvar", "act", "by"),measure.vars = str_pred)[order(variable, by, xvar)]
     
     data.hist <- data.plot[, sum(exposure), by = list(xvar, by)][, freq:=round(V1/sum(V1)*100,1)][order(by, xvar)]
 
-    plotly::plot_ly() %>%
-      plotly::add_trace(y = ~act,color = ~paste("Observed",by,sep="-"),yaxis = "y1",
+    plot_ly() %>%
+      add_trace(y = ~act,color = ~paste("Observed",by,sep="-"),yaxis = "y1",
                         marker=list(symbol="square"),mode = 'lines+markers', type = 'scatter') %>%
-      plotly::add_trace(data = data.agg2,x = ~xvar, y = ~value,
+      add_trace(data = data.agg2,x = ~xvar, y = ~value,
                         color= ~paste("Model",variable,by,sep="-"),yaxis = "y1",
                         marker=list(symbol="triangle-up"),mode = 'lines+markers', type = 'scatter') %>% 
-      plotly::add_bars(x = ~xvar, y = ~freq, color = ~by, data = data.hist,  
+      add_bars(x = ~xvar, y = ~freq, color = ~by, data = data.hist,  
                       marker = list(line = list(color = "#606060", width = 1.5)), 
                        showlegend = FALSE, opacity = 0.5, yaxis = "y2") %>% 
-      plotly::layout(title = strTitle, legend = l, barmode = "stack", 
+      layout(title = strTitle, legend = l, barmode = "stack", 
                      xaxis = ax, yaxis = ay1, yaxis2 = c(ay2,list(range=c(0,min(max(data.hist$freq)*2.5,100)))),
                      margin=m)
   }
   else {
-    data.plot <- data.table::data.table(x=x[ind], act=act[ind], pred[ind,], 
+    data.plot <- data.table(x=x[ind], act=act[ind], pred[ind,], 
                                         weights=weights[ind], exposure=exposure[ind])
-    data.table::setnames(data.plot, c("xvar", "act", str_pred, "weights","exposure"))
-    data.table::setkey(data.plot, xvar)
+    setnames(data.plot, c("xvar", "act", str_pred, "weights","exposure"))
+    setkey(data.plot, xvar)
     
     if(missing & class(data.plot[["xvar"]])[1]=="character"){
       set(data.plot,i=which(is.na(data.plot[["xvar"]])),j="xvar",value="Missing")
@@ -144,21 +148,23 @@ compPlot <- function(x, act, pred, by = NULL, weights = NULL, exposure = NULL,
     
     for (v_name in dp_name_str) set(data.plot,j=v_name,value=as.numeric(data.plot[[v_name]]))
     
-    data.agg <- data.plot[, lapply(.SD, function(x,w,e) sum(x*w,na.rm = TRUE)/sum(e*w,na.rm = TRUE), w = weights,e=exposure), by = xvar, .SDcols = setdiff(dp_name_str,c("weights","exposure"))]
+    data.agg <- data.plot[, lapply(.SD, function(x,w,e) sum(x*w,na.rm = TRUE)/sum(e*w,na.rm = TRUE), 
+                                   w = weights,e=exposure), 
+                          by = xvar, .SDcols = setdiff(dp_name_str,c("weights","exposure"))]
 
-    data.agg2 <- data.table::melt(data.agg, id.vars = c("xvar","act"), measure.vars = str_pred)[order(variable,xvar)]
+    data.agg2 <- melt(data.agg, id.vars = c("xvar","act"), measure.vars = str_pred)[order(variable,xvar)]
     
     data.hist <- data.plot[, sum(exposure), by = xvar][, freq:=round(V1/sum(V1)*100,1)][order(xvar)]
 
-    plotly::plot_ly(data = data.agg,x = ~xvar) %>%
-         plotly::add_trace(y = ~act,line=list(color="#CC3399"),name="Observed",yaxis = "y1",
+    plot_ly(data = data.agg,x = ~xvar) %>%
+         add_trace(y = ~act,line=list(color="#CC3399"),name="Observed",yaxis = "y1",
                            marker=list(symbol="square"),mode = 'lines+markers', type = 'scatter') %>%
-         plotly::add_trace(data = data.agg2,x = ~xvar, y = ~value,color=~variable,yaxis = "y1",
+         add_trace(data = data.agg2,x = ~xvar, y = ~value,color=~variable,yaxis = "y1",
                            marker=list(symbol="triangle-up"),mode = 'lines+markers', type = 'scatter') %>% 
-         plotly::add_bars(x = ~xvar, y = ~freq, data = data.hist, showlegend = FALSE, 
+         add_bars(x = ~xvar, y = ~freq, data = data.hist, showlegend = FALSE, 
                           marker = list(color = "#ffed00", line = list(color = "#000000", width = 1.5)), 
                           opacity = 0.5, yaxis = "y2") %>% 
-         plotly::layout(title = strTitle, xaxis = ax, yaxis = ay1, 
+         layout(title = strTitle, xaxis = ax, yaxis = ay1, 
                         yaxis2 = c(ay2,list(range=c(0,min(max(data.hist$freq)*2.5,100)))), legend = l
                         ,margin=m)
   }

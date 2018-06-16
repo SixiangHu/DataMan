@@ -19,7 +19,7 @@
 #' @importFrom data.table data.table := setDT uniqueN
 #' @importFrom infotheo entropy discretize
 #' @importFrom stats weighted.mean
-#' @checkmate testCharacter testNumeric
+#' @importFrom checkmate testCharacter testNumeric
 #' @export DataSummary
 #' @examples
 #' DataSummary(mtcars,missing=list(NA,".","Unknown",-1))

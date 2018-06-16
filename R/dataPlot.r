@@ -21,8 +21,8 @@
 #' @author Sixiang.Hu
 #' 
 #' @importFrom data.table as.data.table data.table setkey := uniqueN
-#' @importFrom plotly plot_ly add_trace add_markers add_bars layout %>%
-#' @importFrom assertthat is.date
+#' @importFrom plotly plot_ly add_trace add_markers add_bars layout %>% add_lines
+#' @importFrom checkmate testDate
 #' @export
 #' @examples
 #' 
@@ -40,7 +40,7 @@ dataPlot <- function(x,y,by=NULL,weights=NULL, exposure = NULL,newGroupNum=10, x
   if ( is.null(xlim) ) {
     ind <- 1:length(x)
   }
-  else if ( !is.null(xlim) && !(is.numeric(x) || assertthat::is.date(x)) ) {
+  else if ( !is.null(xlim) && !(is.numeric(x) || testDate(x)) ) {
     ind <- 1:length(x)
     warning("xlim is provided on character variable. Ignored")
   }
@@ -74,7 +74,7 @@ dataPlot <- function(x,y,by=NULL,weights=NULL, exposure = NULL,newGroupNum=10, x
 
   #New Group for byvar if it has too many levels.
   if(!is.null(by)){
-    if ( is.integer(by)& data.table::uniqueN(by[ind])>20 ) {
+    if ( is.integer(by)& uniqueN(by[ind])>20 ) {
       new_band <- dmBreak(by,newGroupNum)
       by <- cut(by,new_band,include.lowest = TRUE,ordered_result=TRUE)
     }
@@ -103,8 +103,8 @@ dataPlot <- function(x,y,by=NULL,weights=NULL, exposure = NULL,newGroupNum=10, x
   m <- list(l=-5,r=-5,b=-5,t=-5,pad=0)
     
   if (is.null(by)) {
-    data.plot <- data.table::data.table(x=x[ind],y=y[ind],w=w[ind],e=e[ind])
-    data.table::setkey(data.plot,x)
+    data.plot <- data.table(x=x[ind],y=y[ind],w=w[ind],e=e[ind])
+    setkey(data.plot,x)
     
     if(missing){
       set(data.plot,i=which(is.na(data.plot[["x"]])),j="x",value="Missing")
@@ -114,20 +114,20 @@ dataPlot <- function(x,y,by=NULL,weights=NULL, exposure = NULL,newGroupNum=10, x
     data.agg  <- data.plot[,lapply(.SD,function(x,w,e) sum(y*w,na.rm=TRUE)/sum(e*w,na.rm=TRUE),e=e,w=w),by=x,.SDcols=c("y","w","e")]
     data.hist <- data.plot[,sum(e),by=x][,freq:=round(V1/sum(V1)*100,1)][order(x)]
 
-    plotly::plot_ly(data=data.agg, x=~x, y=~y, name="Observed") %>%
-      plotly::add_lines(line=list(color="#CC3399"),yaxis="y1") %>%
-      plotly::add_markers(marker=list(color="#CC3399",symbol="square",size=10),showlegend=FALSE) %>%
-      plotly::add_bars(x=~x,y=~freq,data=data.hist,showlegend=FALSE,
+    plot_ly(data=data.agg, x=~x, y=~y, name="Observed") %>%
+      add_lines(line=list(color="#CC3399"),yaxis="y1") %>%
+      add_markers(marker=list(color="#CC3399",symbol="square",size=10),showlegend=FALSE) %>%
+      add_bars(x=~x,y=~freq,data=data.hist,showlegend=FALSE,
                         marker=list(color="#99CCFF",line=list(color="#606060",width=1.5)),
                         opacity=0.5,yaxis = "y2") %>%
-      plotly::layout(title=strTitle, xaxis=ax, yaxis=ay1, yaxis2 = c(ay2,list(range=c(0,min(max(data.hist$freq)*2.5,100)))), 
+      layout(title=strTitle, xaxis=ax, yaxis=ay1, yaxis2 = c(ay2,list(range=c(0,min(max(data.hist$freq)*2.5,100)))), 
                      legend=l,margin = m)
   }
   else{
     strTitle  <- paste(strTitle," by ",byname,sep="")
     
-    data.plot <- data.table::data.table(x=x[ind],y=y[ind],w=w[ind],e=e[ind],by=by[ind])
-    data.table::setkey(data.plot,x,by)
+    data.plot <- data.table(x=x[ind],y=y[ind],w=w[ind],e=e[ind],by=by[ind])
+    setkey(data.plot,x,by)
     
     if(missing){
       set(data.plot,i=which(is.na(data.plot[["x"]])),j="x",value="Missing")
@@ -138,12 +138,12 @@ dataPlot <- function(x,y,by=NULL,weights=NULL, exposure = NULL,newGroupNum=10, x
     data.agg  <- data.plot[,lapply(.SD,function(x,w,e) sum(y*w,na.rm=TRUE)/sum(e*w,na.rm=TRUE),e=e,w=w),by=list(x,by),.SDcols=c("y","w","e")]
     data.hist <- data.plot[,sum(e),by=list(x,by)][,freq:=round(V1/sum(V1)*100,1)][order(by,x)]
     
-    plotly::plot_ly(data=data.agg,x=~x,y=~y,color=~paste0("Observed: ",by)) %>%
-        plotly::add_lines(yaxis="y1") %>%
-        plotly::add_bars(x=~x, y=~freq, color=~paste0("Observed: ",by),colors='Set1', data=data.hist,
+    plot_ly(data=data.agg,x=~x,y=~y,color=~paste0("Observed: ",by)) %>%
+        add_lines(yaxis="y1") %>%
+        add_bars(x=~x, y=~freq, color=~paste0("Observed: ",by),colors='Set1', data=data.hist,
                           marker=list(line=list(color="#606060", width=1.5)),
                           showlegend=FALSE, opacity=0.5, yaxis="y2") %>%
-        plotly::layout(title=strTitle, xaxis=ax, yaxis=ay1, yaxis2 = c(ay2,list(range=c(0,min(max(data.hist$freq)*2.5,100)))), 
+        layout(title=strTitle, xaxis=ax, yaxis=ay1, yaxis2 = c(ay2,list(range=c(0,min(max(data.hist$freq)*2.5,100)))), 
                        legend=l, barmode="stack", margin=m)
   }
 }

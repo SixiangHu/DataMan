@@ -1,10 +1,6 @@
 #global variable
 globalVariables(c("V1",".N","f","N","Freq.x","Freq.y","value","xvar","variable","freq"))
 
-#whether a dataset is data frame.
-.isDFnull <- function(data){
-  ("data.frame" %in% class(data)) && (dim(data)[1]==0 || dim(data)[2]==0)
-}
 #' dmBreak
 #' @description Give breaks for pretty plot
 #' @usage dmBreak(x,n,method="pretty")

@@ -20,6 +20,7 @@
 #' `Changed`  - reject the null hypothesis that there is no change.
 #' @author Sixiang Hu
 #' @importFrom stats chisq.test
+#' @importFrom checkmate testDataFrame
 #' @export dataComp
 #' @examples
 #' data(mtcars)
@@ -29,10 +30,10 @@
 #' dataComp(x,y)
 
 dataComp <- function(old,new,alpha=0.01,obs.lim=5){
-  if(is.data.frame(old)){
+  if(testDataFrame(old)){
     
-    if(.isDFnull(old)) stop("No expectation data given.")
-    if(.isDFnull(new)) stop("No test data given.")
+    if(!testDataFrame(old,min.rows=1)) stop("No expectation data given.")
+    if(!testDataFrame(new,min.rows=1)) stop("No test data given.")
     
     strName <- colnames(old)
     res <- data.frame(Name=character(),Result=character())
@@ -64,7 +65,7 @@ dataComp <- function(old,new,alpha=0.01,obs.lim=5){
     if(is.null(old)) stop("No expected data given.")
     if(is.null(new)) stop("No test data given.")
     
-    if(is.data.frame(new)) stop("new dataset must be a vector if a vector has provided as expected.")
+    if(testDataFrame(new)) stop("new dataset must be a vector if a vector has provided as expected.")
     x <- varComp(old,new,alpha,obs.lim)
     if (is.null(x)) res <- "NULL"
     else if (is.na(x$p.value)) res <- "NA"
@@ -91,6 +92,6 @@ varComp <- function(old,new,alpha=0.05,obs.lim){
   #Chisq is not suitable for obs less than 5
   df <- subset(df,Freq.x>obs.lim && Freq.y>obs.lim)
   
-  if (.isDFnull(df)) return(NULL)
+  if (!testDataFrame(df,min.rows=1)) return(NULL)
   else return(suppressWarnings(chisq.test(df[,2],p=df[,3]/sum(df[,3]))))
 }
