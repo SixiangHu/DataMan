@@ -27,7 +27,7 @@ dataPlot(Insurance$Age,Insurance$Claims,exposure = Insurance$Holders,
          by=Insurance$District,xname="Age",byname="District")
 ```
 
-![](misc/dataPlot.PNG)
+![](misc/dataPlot.png)
 
 * `dataComp`: Compare two dataset to check whether there is a profile change.
 
@@ -43,7 +43,7 @@ Pred = Insurance$Claims + runif(nrow(Insurance),min=0,max=10)
 resiPlot(Insurance$Claims,Pred)
 ```
 
-![](misc/resiPlot.PNG)
+![](misc/resiPlot.png)
 
 * `rocPlot`:  Comparing model predictions under roc curve (AUC).
 
@@ -52,7 +52,7 @@ resiPlot(Insurance$Claims,Pred)
 interPlot(Insurance$Age,Insurance$District,Insurance$Claims,xname="Age",yname="District")
 ```
 
-![](misc/interPlot.PNG)
+![](misc/interPlot.png)
 
 * `modelMetric`: Gives simple model metrics calculation functions.
 
