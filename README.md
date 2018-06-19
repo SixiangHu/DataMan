@@ -2,41 +2,61 @@
 
 [![Build Status](https://travis-ci.org/SixiangHu/DataMan.svg?branch=master)](https://travis-ci.org/SixiangHu/DataMan) [![License](http://img.shields.io/badge/license-GPL%20%28%3E=%202%29-brightgreen.svg?style=flat)](http://www.gnu.org/licenses/gpl-2.0.html)
 
-This is an R package for data cleaning, preliminary data analysis and modeling assessing.
+R package for data cleaning, preliminary data analysis and modeling assessing with visualisation.
 
 ### Data Cleaning
 
-Data cleaning have 3 functions at the moment:
+Data cleaning have 2 functions at the moment:
 
-* `DetMiss` : This is the function to detecting missing value in a given data frame, data.table or vector.
+* `DetMiss` : Detecting missing value in a given data frame, data.table or vector.
 
-* `PopMiss` : For missing values, we have choices in: deleting, replace, or populating with mean or mode.
+* `PopMiss` : Imputing missing values via: deleting, replace, or populating with mean or mode.
 
 ### Preliminary Data Analysis
 
-* `DataSummary`: Have a better format and more info compared with R function `summary` in `base`.
+* `DataSummary`: Enhanced data summary of a dataset given min, max, missing, unique count and variable type info.
+![DataSummary_Example](misc/datasummary.PNG)
 
-* `CramersV`: Calculate the Cramers' V statistics on a given data set. Useful for independent test.
+* `CramersV`: Calculate the Cramers' V statistics on character or factor variables in a given dataset.
 
-* `dataPlot`: Visualise data feature.
+* `dataPlot`: Plot response on an one-way basis by explanatory variable.
+```{r}
+library(MASS)
+data("Insurance")
+dataPlot(Insurance$Age,Insurance$Claims,exposure = Insurance$Holders,
+         by=Insurance$District,xname="Age",byname="District")
+```
+
+![](misc/dataPlot.PNG)
 
 * `dataComp`: Compare two dataset to check whether there is a profile change.
 
 ### Model Assess
 
-* `compPlot`: compare model prediction with actual in one-way basis.
+* `compPlot`: Compare model prediction with actual on one-way basis.
 
-* `liftPlot`: visualising different model predictiveness by plotting lift curves on the same graph.
+* `liftPlot`: Visualising and comparing model accuracy by lift curves.
 
-* `resiPlot`: assessing the residual using given actual and predicted values.
+* `resiPlot`: Assessing the residual using contour and AvsE chart.
+```{r}
+Pred = Insurance$Claims + runif(nrow(Insurance),min=0,max=10)
+resiPlot(Insurance$Claims,Pred)
+```
 
-* `rocPlot`: comparing binary model predictions in roc curve (AUC).
+![](misc/resiPlot.PNG)
 
-* `interPlot`: visualising data feature or model predictions on a 3D interactive plot.
+* `rocPlot`:  Comparing model predictions under roc curve (AUC).
 
-* `modelMetric`: Gives simple comparision for one or a set of models.
+* `interPlot`: Visualising data feature or model predictions by 2 factors at the same time using 3D plot.
+```{r}
+interPlot(Insurance$Age,Insurance$District,Insurance$Claims,xname="Age",yname="District")
+```
 
-* `tree2data`: function used to collect information from `gbm` or `randomForest` model object to create data for `sankeyNetwork` plot in `networkD3` package.
+![](misc/interPlot.PNG)
+
+* `modelMetric`: Gives simple model metrics calculation functions.
+
+* `tree2data`: function used to collect information from `gbm` or `randomForest` model object to create data for `sankeyNetwork` plot in `networkD3` package. Example:
 
 ```{r}
 library(networkD3)

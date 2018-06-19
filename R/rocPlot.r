@@ -4,9 +4,8 @@
 #' With provided different model predictions, different lift curves will be 
 #' plot to compare model improvement. 
 #' @usage rocPlot(data,actual)
-#' @param data A vector or `data.frame` includes columns 
-#' that each column standards predictions from a model.
-#' @param actual Numerical vector for actual or true result.
+#' @param data A numeric vector, `martix`, `data.table` or `data.frame` that each column stands for predictions from a model.
+#' @param actual A numeric vector for actual or true results.
 #' @author Sixiang Hu
 #' @importFrom ROCR prediction performance
 #' @importFrom plotly plot_ly add_trace layout %>%
@@ -22,7 +21,7 @@ rocPlot <- function(data,actual){
   if ("matrix" %in% class(data) ) data <- as.data.frame(data)
   
   if ( sum(c("data.frame","data.table") %in% class(data))==0) iVar <- 1
-  else iVar <- dim(data)[2]
+  else iVar <- ncol(data)
   
   auc <- data.frame(x=NULL,y=NULL,ModelName=NULL)
   
@@ -46,11 +45,11 @@ rocPlot <- function(data,actual){
   }
   
   #set axis
-  ay1 <- list(overlaying = "y2", side = "left", title="True Positive Rate", 
-              linecolor = "#000000", gridcolor = "#E5E5E5")
+  ay1 <- list(overlaying = "y1", side = "left", title="True Positive Rate", 
+              linecolor = "#000000", gridcolor = "#E5E5E5",rangemode = "tozero")
 
   ax <- list(title="False Positive Rate", showline=TRUE, linecolor = "#000000",
-             gridcolor = "#E5E5E5")
+             gridcolor = "#E5E5E5",rangemode = "tozero")
 
   l <- list(bordercolor = "#000000",borderwidth=1,orientation="h")
   

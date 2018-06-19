@@ -4,7 +4,7 @@
 #'     observations by certain factors.
 #' @usage compPlot(x, act, pred, by = NULL, weights = NULL, exposure = NULL, 
 #'    breaks = NULL, missing=TRUE, newGroupNum = 10,xlim=NULL, 
-#'    xname = "x",yname="y",byname="by") 
+#'    xname = "x",yname="y",byname="by",legendPos=NULL) 
 #' @param x a vector indicates the dependent variable that you want to visulise on (i.e. Age)
 #' @param act a vector indicates the actual response variable (observation)
 #' @param pred a vector or data frame that provides model predictions. 
@@ -20,6 +20,7 @@
 #' when levels of current plotting variable `x` or `by` is more than 100. 
 #' @param xlim Optional. A vector provides the range of the variable e.g. xlim=c(0,100).
 #' @param xname,yname,byname Optional. Characters to be shown on plot.
+#' @param legendPos Optional. 2 numeric element vector specify the location of legend.
 #' 
 #' @author Sixiang.Hu
 #' 
@@ -38,7 +39,7 @@
         
 compPlot <- function(x, act, pred, by = NULL, weights = NULL, exposure = NULL, 
                      breaks = NULL,missing=TRUE, newGroupNum = 10, xlim=NULL, 
-                     xname = "x",yname="y",byname="by"){
+                     xname = "x",yname="y",byname="by",legendPos = NULL){
   if (is.null(x)) stop("x provided is blank.")
   if (is.null(act)) stop("act provided is blank.")
   if (is.null(pred)) stop("pred provided is blank.")
@@ -97,7 +98,7 @@ compPlot <- function(x, act, pred, by = NULL, weights = NULL, exposure = NULL,
   ay1 <- list(overlaying = "y2", side = "left", title = "Response", linecolor = "#000000", gridcolor = "#E5E5E5")
   ay2 <- list(side = "right", showgrid = FALSE, title = "Exposure (%)", linecolor = "#000000")
   ax <- list(title = "", showline = TRUE, linecolor = "#000000", gridcolor = "#E5E5E5")
-  l <- list(bordercolor = "#000000", borderwidth = 1,orientation="h")
+  l <- list(bordercolor = "#000000", borderwidth = 1,orientation="h",x=legendPos[1],y=legendPos[2])
   m <- list(l=-5,r=-5,b=-5,t=-5,pad=0)
   
   if (!is.null(by)) {

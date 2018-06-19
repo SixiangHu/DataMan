@@ -49,40 +49,42 @@ resiPlot <- function(act,pred,weight=NULL,exposure=NULL,bucket=20){
   if (is.null(exposure)) exposure <- rep(1,length(act))
 
   temp <- data.table(act,pred,pred_cuts,weight,exposure)
-  
-  temp2 <- temp[,lapply(.SD,function(x,w,e)sum(x*w,na.rm = TRUE)/sum(e*w,na.rm = TRUE),e=exposure,w=weight),
-       by=pred_cuts,.SDcols=c("act","pred")][order(pred_cuts)]
-
+  temp2 <- temp[,.(act=sum(act*weight,na.rm = TRUE)/sum(exposure*weight,na.rm = TRUE),
+                   pred=sum(pred*weight,na.rm = TRUE)/sum(exposure*weight,na.rm = TRUE),
+                   stderr = sqrt(var(pred,na.rm=TRUE)/length(na.omit(pred)))),
+                by=pred_cuts][order(pred_cuts)]
   #set axis
-  ay1 <- list(overlaying = "y2", side = "left", title="Actual", 
+  ay1 <- list(overlaying = "y1", side = "left", title="Actual", 
               linecolor = "#000000", gridcolor = "#E5E5E5")
 
   ax <- list(title="Predicted", showline=TRUE, linecolor = "#000000",
-             gridcolor = "#E5E5E5")
+             gridcolor = "#E5E5E5",rangemode = "tozero")
   
-  l <- list(bordercolor = "#000000",borderwidth=1,orientation="h")
+  ay2 <- list(overlaying = "y2", side = "left", title="Residual", 
+              linecolor = "#000000", gridcolor = "#E5E5E5")
+  
+  l <- list(bordercolor = "#000000",borderwidth=1,orientation="h",x=0.2,y=0.43)
   
   #aveplot
   rng <- range(c(temp2$act,temp2$pred), na.rm = TRUE, finite = TRUE)
   
   ave <- plot_ly(data=temp2) %>%
     add_trace(x=~pred,y=~act,name="Fitted", type = 'scatter',
-                      marker=list(color="blue"),mode = 'markers') %>%
+                      marker=list(color="blue"),mode = 'markers',error_x = ~list(value = stderr)) %>%
     add_trace(x=rng, y=rng, type = 'scatter',name="Reference",
-                      line=list(color="red"),mode = 'lines')
+                      line=list(color="red"),mode = 'lines') %>%
+    layout(title="Residual Analysis",xaxis=ax,yaxis = ay1, legend=l)
 
   #residual
   res <- data.table(res=act - pred,pred=pred)
 
   resP <- plot_ly(data=res)%>%
-    add_histogram2dcontour(x=~pred,y=~res)
+    add_histogram2dcontour(x=~pred,y=~res,colorscale="solar",name = "Residual")%>%
+    add_trace(x=rng, y=0, type = 'scatter',name="Reference",
+              line=list(color="black"),mode = 'lines') %>%
+    layout(xaxis=ax, yaxis = ay2, legend=l)
   
-  subplot(
-    ave,
-    resP,
-    nrows = 2, heights = c(0.6, 0.4),
-    shareX = TRUE, shareY = TRUE
-  )
+  subplot(ave,resP,nrows = 2, heights = c(0.6, 0.4),shareX = TRUE, shareY = TRUE)
 }
 
 #global variable

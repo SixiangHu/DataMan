@@ -6,7 +6,7 @@
 \usage{
 compPlot(x, act, pred, by = NULL, weights = NULL, exposure = NULL, 
    breaks = NULL, missing=TRUE, newGroupNum = 10,xlim=NULL, 
-   xname = "x",yname="y",byname="by")
+   xname = "x",yname="y",byname="by",legendPos=NULL)
 }
 \arguments{
 \item{x}{a vector indicates the dependent variable that you want to visulise on (i.e. Age)}
@@ -34,6 +34,8 @@ when levels of current plotting variable `x` or `by` is more than 100.}
 \item{xlim}{Optional. A vector provides the range of the variable e.g. xlim=c(0,100).}
 
 \item{xname, yname, byname}{Optional. Characters to be shown on plot.}
+
+\item{legendPos}{Optional. 2 numeric element vector specify the location of legend.}
 }
 \description{
 This function allows you to visualise different model predictions and 

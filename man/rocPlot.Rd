@@ -7,10 +7,9 @@
 rocPlot(data,actual)
 }
 \arguments{
-\item{data}{A vector or `data.frame` includes columns 
-that each column standards predictions from a model.}
+\item{data}{A numeric vector, `martix`, `data.table` or `data.frame` that each column stands for predictions from a model.}
 
-\item{actual}{Numerical vector for actual or true result.}
+\item{actual}{A numeric vector for actual or true results.}
 }
 \description{
 With provided different model predictions, different lift curves will be 

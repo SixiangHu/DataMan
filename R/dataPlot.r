@@ -2,8 +2,8 @@
 #'
 #' @description This function allows you to visualise features of a dataset 
 #' by specifying dependent and response variable.
-#' @usage dataPlot(x,y,by=NULL,weights=NULL, exposure = NULL,newGroupNum=10, 
-#' xlim=NULL, breaks = NULL, missing=TRUE, xname="x",yname="Response",byname="by")
+#' @usage dataPlot(x,y,by=NULL,weights=NULL, exposure = NULL,newGroupNum=10,xlim=NULL, 
+#'     breaks = NULL, missing=TRUE, xname="x",yname="Response",byname="by",legendPos=NULL)
 #' @param x a vector indicates the dependent variable
 #' @param y a vector indicates the response variable
 #' @param weights Optional. A numerical vector to specify the weights used for calculating weighted average of response.
@@ -17,6 +17,7 @@
 #' @param breaks Optional. A vector to specify the breaks for the xvar.
 #' @param missing logical. whether to show the `NA` as `Missing` in plot.  
 #' If a `Missing` level is already existed, then `NA` will combined
+#' @param legendPos Optional. 2 numeric element vector specify the location of legend.
 #'  
 #' @author Sixiang.Hu
 #' 
@@ -29,7 +30,8 @@
 #' dataPlot(mtcars$gear,mtcars$mpg,mtcars$wt)
 
 dataPlot <- function(x,y,by=NULL,weights=NULL, exposure = NULL,newGroupNum=10, xlim=NULL, 
-                     breaks = NULL, missing=TRUE, xname="x",yname="Response",byname="by"){
+                     breaks = NULL, missing=TRUE, xname="x",yname="Response",byname="by",
+                     legendPos = NULL){
   # Error Trap
   if( is.null(x) ) stop("xvar provided is null.") 
   if( is.null(y) ) stop("yvar provided is null.")
@@ -99,7 +101,7 @@ dataPlot <- function(x,y,by=NULL,weights=NULL, exposure = NULL,newGroupNum=10, x
                gridcolor = "#E5E5E5")
   }
   
-  l <- list(bordercolor = "#000000",borderwidth=1,orientation="h")
+  l <- list(bordercolor = "#000000",borderwidth=1,orientation="h",x=legendPos[1],y=legendPos[2])
   m <- list(l=-5,r=-5,b=-5,t=-5,pad=0)
     
   if (is.null(by)) {

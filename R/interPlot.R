@@ -46,18 +46,29 @@ interPlot <- function(x,y,z,weight=NULL,exposure=NULL,numGrpx=10,numGrpy=10,
   dt <- data.table(x = x,y = y,z = z,w = weight,e=exposure)
   setkey(dt,x,y)
 
-  dt2 <- dt[,lapply(.SD,function(x,w,e) sum(x*w,na.rm = TRUE)/sum(e*w,na.rm = TRUE),e=e,w=w),by=list(x,y),.SDcols="z"]
-  dt2 <- as.matrix(dcast(dt2,x~y,value.var="z",drop=FALSE,fill=0)[,-1])
+  dt <- dt[,.(z = sum(z*w,na.rm = TRUE)/sum(e*w,na.rm = TRUE)), by=list(x,y)]
+  dt <- dcast(dt,y~paste0(x),value.var="z",drop=FALSE,fill=0)
 
-  plot_ly(z=~dt2, hoverinfo="text",text=~paste(xname," : ", x,"</br>",
-                                                   yname," : ", y,"</br>",
-                                                   zname," : ", z)) %>%
+  Response <- as.matrix(dt[,-"y",with=FALSE])
+  rownames(Response) <- dt[["y"]]
+  colnames(Response) <- colnames(dt)[-1]
+
+  custom_hover <- array(dim=dim(Response))
+  for (x in seq_len(ncol(Response))) {
+    for (y in seq_len(nrow(Response))) {
+      custom_hover[(x-1)*nrow(Response) + y] = paste(yname,': ', rownames(Response)[y], '<br />',
+                                                     xname,': ', colnames(Response)[x], '<br />',
+                                                     zname,': ', Response[(x-1)*nrow(Response) + y])
+    }
+  }
+
+  plot_ly(z=~Response,hoverinfo="text",text=custom_hover) %>%
     add_surface() %>%
-    layout(scene=list(xaxis=list(title=paste0(xname," (x)")),
-                           yaxis=list(title=paste0(yname," (y)")),
-                           zaxis=list(title=paste0(zname," (z)"))),
-                   legend = list(legendgroup="")
-                   )
+    layout(scene=list(xaxis=list(title=paste0(xname," (x)"),ticketmode = 'array',ticktext = colnames(Response),tickvals=0:(ncol(Response)-1)),
+                      yaxis=list(title=paste0(yname," (y)"),ticketmode = 'array',ticktext = rownames(Response),tickvals=0:(nrow(Response)-1)),
+                      zaxis=list(title=paste0(zname," (z)"))),
+           legend = list(legendgroup="")
+           )
 }
 
 #global variable

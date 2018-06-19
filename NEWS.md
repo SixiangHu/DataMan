@@ -4,6 +4,13 @@ NEW FEATURES
 * `compPlot` adding `xlim` paraneter to plot specific range
 * `DataSummary` more efficient
 * `DataSummary` character variable's mode will be in mean output
+* `dataPlot`, `compPlot` adding control on legend position
+
+BUG FIXES AND MINOR IMPROVEMENTS
+* `interPlot` legend name changed
+* `interPlot` tick text and hover info can now be shown correctly
+* `resPlot` update the color scheme for better visualisation
+* `resPlot` have error bar added to prediction
 
 DataMan 0.6.0
 -------------------------------------------------------------

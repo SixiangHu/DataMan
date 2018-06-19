@@ -4,8 +4,8 @@
 \alias{dataPlot}
 \title{dataPlot: visualise observation}
 \usage{
-dataPlot(x,y,by=NULL,weights=NULL, exposure = NULL,newGroupNum=10, 
-xlim=NULL, breaks = NULL, missing=TRUE, xname="x",yname="Response",byname="by")
+dataPlot(x,y,by=NULL,weights=NULL, exposure = NULL,newGroupNum=10,xlim=NULL, 
+    breaks = NULL, missing=TRUE, xname="x",yname="Response",byname="by",legendPos=NULL)
 }
 \arguments{
 \item{x}{a vector indicates the dependent variable}
@@ -30,6 +30,8 @@ when levels of current plotting variable `xvar` or `by` is more than 100.}
 If a `Missing` level is already existed, then `NA` will combined}
 
 \item{xname, yname, byname}{Optional. Characters of axis to be shown on plot.}
+
+\item{legendPos}{Optional. 2 numeric element vector specify the location of legend.}
 }
 \description{
 This function allows you to visualise features of a dataset 
