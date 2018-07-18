@@ -24,7 +24,7 @@
 #' @examples
 #' DataSummary(mtcars,missing=list(NA,".","Unknown",-1))
 
-DataSummary <- function(data,missing=list(NA),wt=NULL,entropy=FALSE,entropy_method="emp",sparkline=FALSE){
+DataSummary <- function(data,missing=list(NA,NaN,Inf),wt=NULL,entropy=FALSE,entropy_method="emp",sparkline=FALSE){
   UseMethod("DataSummary",data)
 }
 
@@ -53,7 +53,7 @@ DataSummary.data.table <- function(data,missing=list(NA),wt=NULL,
   for (i in dsName) set(data,i=which(data[[i]] %in% missing), j=i, value=NA)
      
   dsClass   <- data[,sapply(.SD,function(x) class(x)[1])]
-  dsNLevels <- data[,sapply(.SD,function(x) uniqueN(x))]
+  dsNLevels <- data[,sapply(.SD,function(x) uniqueN(x,na.rm=TRUE))]
   dsMiss    <- data[,sapply(.SD,function(x) sum(is.na(x)))]
 
   dsMaxMin    <- data[,sapply(.SD,function(x,weight){
