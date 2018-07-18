@@ -72,7 +72,7 @@ DataSummary.data.table <- function(data,missing=list(NA),wt=NULL,
   },weight=weight)]
   
   dsMean    <- data[,sapply(.SD,function(x,weight){
-    if( testNumeric(x) ) { as.character(round(sum(x*weight,na.rm = TRUE)/sum(weight,na.rm = TRUE),6))}
+    if( testNumeric(x) ) { as.character(round(sum(x*weight,na.rm = TRUE)/sum(weight*(!is.na(x))),6))}
     else {"NA"}
   },weight=weight)]
   
