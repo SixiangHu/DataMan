@@ -14,7 +14,7 @@
 #' This is really useful when modeller wants to assess the interaction terms.
 #' Hence the `z` can be actual response data or model predictions.
 #' @author Sixiang Hu
-#' @importFrom data.table data.table setkey key := dcast
+#' @import data.table
 #' @importFrom plotly plot_ly layout add_surface %>%
 #' @export interPlot
 #' @examples
@@ -72,4 +72,4 @@ interPlot <- function(x,y,z,weight=NULL,exposure=NULL,numGrpx=10,numGrpy=10,
 }
 
 #global variable
-globalVariables(c("e","w"))
+globalVariables(c("e","w","."))

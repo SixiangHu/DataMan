@@ -1,7 +1,7 @@
 #' DataSummary
 #'
 #' @description function gives summary of the dataset.
-#' @usage DataSummary(data,missing=list(NA),wt=NULL,entropy=FALSE,
+#' @usage DataSummary(data,missing=list(NA,NaN,Inf,-Inf),wt=NULL,entropy=FALSE,
 #' entropy_method="emp",sparkline=FALSE)
 #' @param data This could be data frame, a vector, matrix or data.table.
 #' @param missing list of possible missing values.
@@ -22,15 +22,15 @@
 #' @importFrom checkmate testCharacter testNumeric
 #' @export DataSummary
 #' @examples
-#' DataSummary(mtcars,missing=list(NA,".","Unknown",-1))
+#' DataSummary(mtcars,missing=list(NA,NaN,Inf,-Inf,".","Unknown",-1))
 
-DataSummary <- function(data,missing=list(NA,NaN,Inf),wt=NULL,entropy=FALSE,entropy_method="emp",sparkline=FALSE){
+DataSummary <- function(data,missing=list(NA,NaN,Inf,-Inf),wt=NULL,entropy=FALSE,entropy_method="emp",sparkline=FALSE){
   UseMethod("DataSummary",data)
 }
 
 #' @export
 #' @rdname DataSummary
-DataSummary.data.frame <- function(data,missing=list(NA),wt=NULL,
+DataSummary.data.frame <- function(data,missing=list(NA,NaN,Inf,-Inf),wt=NULL,
                                    entropy=FALSE,entropy_method="emp",sparkline=FALSE){
   setDT(data)
   DataSummary.data.table(data,missing,wt,entropy,entropy_method,sparkline)
@@ -39,7 +39,7 @@ DataSummary.data.frame <- function(data,missing=list(NA),wt=NULL,
 #' @export
 #' @rdname DataSummary
 #' 
-DataSummary.data.table <- function(data,missing=list(NA),wt=NULL,
+DataSummary.data.table <- function(data,missing=list(NA,NaN,Inf,-Inf),wt=NULL,
                                    entropy=FALSE,entropy_method="emp",sparkline=FALSE){
   
   if(is.null(wt)) weight <- rep(1,nrow(data))

@@ -1,3 +1,9 @@
+DataMan 0.6.2
+-------------------------------------------------------------
+BUG FIXES AND MINOR IMPROVEMENTS
+* `DataSummary` Fix issue #48: unique value count is not correct when `NA` included.
+* `DataSummary` Fix issue #49: mean value is not correct when `NA` included.
+
 DataMan 0.6.1
 -------------------------------------------------------------
 NEW FEATURES

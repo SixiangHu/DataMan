@@ -6,14 +6,14 @@
 \alias{DataSummary.data.table}
 \title{DataSummary}
 \usage{
-DataSummary(data,missing=list(NA),wt=NULL,entropy=FALSE,
+DataSummary(data,missing=list(NA,NaN,Inf,-Inf),wt=NULL,entropy=FALSE,
 entropy_method="emp",sparkline=FALSE)
 
-\method{DataSummary}{data.frame}(data, missing = list(NA), wt = NULL,
-  entropy = FALSE, entropy_method = "emp", sparkline = FALSE)
+\method{DataSummary}{data.frame}(data, missing = list(NA, NaN, Inf, -Inf),
+  wt = NULL, entropy = FALSE, entropy_method = "emp", sparkline = FALSE)
 
-\method{DataSummary}{data.table}(data, missing = list(NA), wt = NULL,
-  entropy = FALSE, entropy_method = "emp", sparkline = FALSE)
+\method{DataSummary}{data.table}(data, missing = list(NA, NaN, Inf, -Inf),
+  wt = NULL, entropy = FALSE, entropy_method = "emp", sparkline = FALSE)
 }
 \arguments{
 \item{data}{This could be data frame, a vector, matrix or data.table.}
@@ -40,7 +40,7 @@ This function provides a data summary including min, max, number of unique value
     As for the mean value, if it is character variable the mode (most frequency level) will be recorded.
 }
 \examples{
-DataSummary(mtcars,missing=list(NA,".","Unknown",-1))
+DataSummary(mtcars,missing=list(NA,NaN,Inf,-Inf,".","Unknown",-1))
 }
 \author{
 Sixiang Hu

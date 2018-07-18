@@ -21,8 +21,9 @@
 #' heterogeneity
 #' 
 #' @author Sixiang Hu
-#' @importFrom data.table setkey data.table
+#' @import data.table
 #' @importFrom plotly plot_ly add_histogram2dcontour add_trace %>% subplot
+#' @importFrom stats var
 #' @export resiPlot
 #' @examples
 #' set.seed(1L)
@@ -88,4 +89,4 @@ resiPlot <- function(act,pred,weight=NULL,exposure=NULL,bucket=20){
 }
 
 #global variable
-globalVariables(c("x","e","w"))
+globalVariables(c("x","e","w","."))
