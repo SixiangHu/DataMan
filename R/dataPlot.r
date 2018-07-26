@@ -68,8 +68,8 @@ dataPlot <- function(x,y,by=NULL,weights=NULL, exposure = NULL,newGroupNum=10, x
       e <- exposure
   }else e <- rep(1,length(x))
   
-  #New group for x if it has too many levels.
-  if (is.numeric(x) && nlevels(as.factor(x)) > 100) {
+  #New group for x if it has too many levels or user specified breaks.
+  if ( (is.numeric(x) && nlevels(as.factor(x)) > 100) | !is.null(breaks) ) {
     if(is.null(breaks)) breaks <- dmBreak(x, newGroupNum)
     x <- cut(x, breaks, include.lowest = TRUE, ordered_result = TRUE)
   }
