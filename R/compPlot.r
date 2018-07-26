@@ -77,8 +77,8 @@ compPlot <- function(x, act, pred, by = NULL, weights = NULL, exposure = NULL,
   if (is.null(weights)) weights <- rep(1, length(x))
   if (is.null(exposure)) exposure <- rep(1, length(x))
 
-  #New Group for data which has too much levels.
-  if ( (is.numeric(x) || is.integer(x)) && uniqueN(x)>100 ) {
+  #New Group for data which has too much levels or when user specified breaks.
+  if ( (is.numeric(x) & uniqueN(x)>100) | !is.null(breaks) ) {
     if(is.null(breaks)) breaks <- dmBreak(x,newGroupNum)
     x <- cut(x,breaks,include.lowest = TRUE,ordered_result = TRUE)
   }
