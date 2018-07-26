@@ -17,28 +17,33 @@ length as act.}
 \item{exposure}{numerical vector to give exposure to observations.}
 
 \item{bucket}{Integer. It specifies the number of bucket of the AvsE plot.}
+
+\item{residualFun}{Character. Name of residual function. The first parameter 
+must be actual, and second parameter must be predictions. By default, residual 
+function is difference between `act` and `pred`.}
+
+\item{...}{other parameters for `residualFun` specified.}
 }
 \description{
 This function assess the residual using given actual and
   predicted values.
 }
 \details{
-Currently, the residual in this function is defined as: Residual =
+In previous version of this function, the residual in this function is defined as: Residual =
 actual - predicted.  `resi` or `reisdual` function from `stats`
 package are not used because this function will be used for much wider model assess (e.g.
 `randomFoest`, `gbm`), and 2 functions mentioned above can only applied to
 `glm` and `lm`.
 
-This function will give 2 plots: AvsE plot: The aggregated (by provided
-number of bucket) average actual and predicted value, with a diagnal line for
-comparison. Residual vs Prediction: This plot is used to assess the baise and
-heterogeneity
+This function will give 2 plots: 
+AvsE plot: The average actual and predicted value for each bucket, with a diagnal line for comparison. 
+Residual vs Prediction: This plot is used to assess the baise and heterogeneity
 }
 \examples{
 set.seed(1L)
 act <- rgamma(10000,1)
-pred <- rgamma(10000,1) + sample(c(0.001,0),10000,replace=TRUE)
-resiPlot(act,pred)
+pred <- act + rnorm(10000)
+resiPlot(act,pred,residualFun = "residualDeviance",family = "gamma")
 }
 \author{
 Sixiang Hu

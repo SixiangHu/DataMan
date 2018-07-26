@@ -9,16 +9,20 @@
 #' @param weight numerical vector to give weight to observations.
 #' @param exposure numerical vector to give exposure to observations.
 #' @param bucket Integer. It specifies the number of bucket of the AvsE plot.
-#' @details Currently, the residual in this function is defined as: Residual =
+#' @param residualFun Character. Name of residual function. The first parameter 
+#' must be actual, and second parameter must be predictions. By default, residual 
+#' function is difference between `act` and `pred`.
+#' @param ... other parameters for `residualFun` specified.
+#' 
+#' @details In previous version of this function, the residual in this function is defined as: Residual =
 #' actual - predicted.  `resi` or `reisdual` function from `stats`
 #' package are not used because this function will be used for much wider model assess (e.g.
 #' `randomFoest`, `gbm`), and 2 functions mentioned above can only applied to
 #' `glm` and `lm`.
 #' 
-#' This function will give 2 plots: AvsE plot: The aggregated (by provided
-#' number of bucket) average actual and predicted value, with a diagnal line for
-#' comparison. Residual vs Prediction: This plot is used to assess the baise and
-#' heterogeneity
+#' This function will give 2 plots: 
+#' AvsE plot: The average actual and predicted value for each bucket, with a diagnal line for comparison. 
+#' Residual vs Prediction: This plot is used to assess the baise and heterogeneity
 #' 
 #' @author Sixiang Hu
 #' @import data.table
@@ -28,10 +32,10 @@
 #' @examples
 #' set.seed(1L)
 #' act <- rgamma(10000,1)
-#' pred <- rgamma(10000,1) + sample(c(0.001,0),10000,replace=TRUE)
-#' resiPlot(act,pred)
+#' pred <- act + rnorm(10000)
+#' resiPlot(act,pred,residualFun = "residualDeviance",family = "gamma")
 
-resiPlot <- function(act,pred,weight=NULL,exposure=NULL,bucket=20){
+resiPlot <- function(act,pred,weight=NULL,exposure=NULL,bucket=20,residualFun = "-",...){
   rng <- range(rbind(act,pred),na.rm = TRUE,finite=TRUE)
   
   if (is.na(rng) || is.infinite(rng)) stop("Given data are all NAs or infinites.")
@@ -77,7 +81,7 @@ resiPlot <- function(act,pred,weight=NULL,exposure=NULL,bucket=20){
     layout(title="Residual Analysis",xaxis=ax,yaxis = ay1, legend=l)
 
   #residual
-  res <- data.table(res=act - pred,pred=pred)
+  res <- data.table(res=do.call(residualFun,list(act,pred,...)),pred=pred)
 
   resP <- plot_ly(data=res)%>%
     add_histogram2dcontour(x=~pred,y=~res,colorscale="solar",name = "Residual")%>%
