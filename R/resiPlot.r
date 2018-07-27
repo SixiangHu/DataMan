@@ -2,7 +2,8 @@
 #' 
 #' @description This function assess the residual using given actual and
 #'   predicted values.
-#' @usage resiPlot(act,pred,weight=NULL,exposure=NULL,bucket=20)
+#' @usage resiPlot(act,pred,weight=NULL,exposure=NULL,bucket=20,residualFun = "-",...)
+#' 
 #' @param act numerical vector for actual observation.
 #' @param pred numerical vector for model preidctions.  It must have the same
 #'   length as act.
@@ -33,7 +34,10 @@
 #' set.seed(1L)
 #' act <- rgamma(10000,1)
 #' pred <- act + rnorm(10000)
-#' resiPlot(act,pred,residualFun = "residualDeviance",family = "gamma")
+#' signDeviance <- function(y,mu){
+#'   sign(y-mu)*sqrt(residualDeviance(y,mu,family = "gamma"))
+#' }
+#' resiPlot(act,pred,residualFun = "signDeviance")
 
 resiPlot <- function(act,pred,weight=NULL,exposure=NULL,bucket=20,residualFun = "-",...){
   rng <- range(rbind(act,pred),na.rm = TRUE,finite=TRUE)

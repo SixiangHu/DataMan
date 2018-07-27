@@ -1,3 +1,12 @@
+DataMan 0.6.3
+-------------------------------------------------------------
+NEW FEATURES
+* [#52] `resiPlot` can use differemt definition of residual function
+* Add `residualDeviance` function to calculate the residual deviance for different distribution.
+
+BUG FIXES AND MINOR IMPROVEMENTS
+* [#51] breaks are ignored when unique level <100 in `compPlot` and `dataPlot`
+
 DataMan 0.6.2
 -------------------------------------------------------------
 BUG FIXES AND MINOR IMPROVEMENTS

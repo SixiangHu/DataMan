@@ -43,7 +43,10 @@ Residual vs Prediction: This plot is used to assess the baise and heterogeneity
 set.seed(1L)
 act <- rgamma(10000,1)
 pred <- act + rnorm(10000)
-resiPlot(act,pred,residualFun = "residualDeviance",family = "gamma")
+signDeviance <- function(y,mu){
+  sign(y-mu)*sqrt(residualDeviance(y,mu,family = "gamma"))
+}
+resiPlot(act,pred,residualFun = "signDeviance")
 }
 \author{
 Sixiang Hu
